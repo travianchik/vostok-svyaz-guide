@@ -207,7 +207,7 @@ function Logo() {
       <div className="leading-tight">
         <div className="text-[15px] font-black tracking-tight">Восток связь</div>
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-          Мобильная сеть
+          от Билайн
         </div>
       </div>
     </div>
@@ -245,7 +245,7 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
 
   return (
     <div className="flex flex-col h-[calc(100vh-44px)]">
-      <TopBar title="Офисы Восток связь" onBack={onBack} />
+      <TopBar title="Офисы Билайн" onBack={onBack} />
 
       {/* Map */}
       <div className="relative flex-1 bg-[#e6eef3] overflow-hidden">
@@ -629,6 +629,9 @@ function HomeBeeline({ phone, onLogout }: { phone: string; onLogout: () => void 
           Выйти
         </button>
       </div>
+      <div className="px-5 pb-2">
+        <h1 className="text-xl font-bold">Добро пожаловать, Абонент</h1>
+      </div>
 
       <div className="px-5 pt-2 overflow-auto flex-1 pb-8">
         {/* Balance card */}
@@ -643,27 +646,9 @@ function HomeBeeline({ phone, onLogout }: { phone: string; onLogout: () => void 
               <span className="text-5xl font-black">847</span>
               <span className="text-xl font-bold">,50 ₽</span>
             </div>
-            <button className="mt-5 h-11 px-5 rounded-2xl bg-brand text-brand-foreground font-bold text-sm">
-              Пополнить
-            </button>
           </div>
         </div>
 
-        {/* Info row */}
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {[
-            { l: "Тариф", v: "Восток" },
-            { l: "Минут", v: "300" },
-            { l: "ГБ", v: "20" },
-          ].map((x) => (
-            <div key={x.l} className="p-3 rounded-2xl bg-card border border-border">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {x.l}
-              </div>
-              <div className="text-lg font-black mt-1">{x.v}</div>
-            </div>
-          ))}
-        </div>
 
         <div className="mt-6 p-4 rounded-2xl bg-brand/20 text-sm">
           В этой версии приложения доступен просмотр номера и баланса. Управление тарифом
@@ -706,16 +691,6 @@ function HomeOther({
           <div className="text-2xl font-black tracking-wide mt-1">{formatPhone(phone)}</div>
           <div className="mt-6 text-xs uppercase tracking-widest text-white/60">Баланс</div>
           <div className="text-5xl font-black mt-1">—</div>
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-2">
-          {["Тариф", "Минут", "ГБ"].map((x) => (
-            <div key={x} className="p-3 rounded-2xl bg-card border border-border">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {x}
-              </div>
-              <div className="text-lg font-black mt-1">—</div>
-            </div>
-          ))}
         </div>
       </div>
 

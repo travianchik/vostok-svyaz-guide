@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -33,35 +34,42 @@
   --color-brand: var(--brand);
   --color-brand-foreground: var(--brand-foreground);
   --color-surface: var(--surface);
-  --font-display: "Inter", system-ui, sans-serif;
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
 }
 
 :root {
   --radius: 1rem;
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.12 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.12 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.12 0 0);
-  --primary: oklch(0.12 0 0);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.96 0 0);
-  --secondary-foreground: oklch(0.12 0 0);
-  --muted: oklch(0.95 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.92 0 0);
-  --accent-foreground: oklch(0.12 0 0);
-  --destructive: oklch(0.58 0.22 27);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.9 0 0);
-  --ring: oklch(0.12 0 0);
+  --background: hsl(0 0% 97%);
+  --foreground: hsl(0 0% 7%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(0 0% 7%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(0 0% 7%);
+  --primary: hsl(47 100% 50%);
+  --primary-foreground: hsl(0 0% 0%);
+  --secondary: hsl(0 0% 93%);
+  --secondary-foreground: hsl(0 0% 15%);
+  --muted: hsl(0 0% 93%);
+  --muted-foreground: hsl(0 0% 45%);
+  --accent: hsl(47 100% 50%);
+  --accent-foreground: hsl(0 0% 0%);
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(0 0% 88%);
+  --input: hsl(0 0% 88%);
+  --ring: hsl(47 100% 50%);
+  --success: hsl(142 71% 45%);
+  --success-foreground: hsl(0 0% 100%);
 
-  /* Beeline-inspired */
-  --brand: oklch(0.9 0.19 95);          /* signature yellow */
-  --brand-foreground: oklch(0.12 0 0);
-  --surface: oklch(0.08 0 0);            /* deep black surface */
+  /* Beeline brand */
+  --brand: hsl(47 100% 50%);
+  --brand-foreground: hsl(0 0% 0%);
+  --surface: hsl(0 0% 7%);
+  --beeline-black: 0 0% 7%;
+  --beeline-stripe: 47 100% 50%;
 }
 
 @layer base {
@@ -70,7 +78,36 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-display);
+    font-family: "Manrope", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+}
+
+@layer utilities {
+  .beeline-gradient {
+    background: repeating-linear-gradient(
+      -45deg,
+      hsl(var(--beeline-stripe)),
+      hsl(var(--beeline-stripe)) 10px,
+      hsl(var(--beeline-black)) 10px,
+      hsl(var(--beeline-black)) 20px
+    );
+  }
+  .beeline-card-gradient {
+    background: linear-gradient(135deg, hsl(0 0% 12%), hsl(0 0% 18%));
+  }
+  @keyframes bounce-in {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-bounce-in { animation: bounce-in 0.5s ease-out; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  .animate-shake { animation: shake 0.4s ease-in-out; }
 }

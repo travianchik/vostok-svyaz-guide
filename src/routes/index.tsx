@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -15,6 +15,12 @@ import {
   X,
   Check,
   Search,
+  Plus,
+  CreditCard,
+  Grid3x3,
+  Wifi,
+  Globe,
+  User,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -28,20 +34,51 @@ export const Route = createFileRoute("/")({
 });
 
 type Screen =
+  | "splash"
   | "welcome"
+  | "auth-otp"
+  | "sim-notice"
   | "sim-map"
   | "sim-docs"
-  | "auth-phone"
-  | "auth-otp"
-  | "home-beeline"
-  | "home-other";
+  | "home";
+
+type Lang = "ru" | "tg" | "ky" | "uz";
+type Tab = "svyaz" | "bank" | "uslugi";
+
+const LANGS: { code: Lang; label: string; hello: string; native: string }[] = [
+  { code: "ru", label: "Русский", hello: "Добро пожаловать", native: "Русский" },
+  { code: "tg", label: "Тоҷикӣ", hello: "Хуш омадед", native: "Тоҷикӣ" },
+  { code: "ky", label: "Кыргызча", hello: "Кош келиңиз", native: "Кыргызча" },
+  { code: "uz", label: "O‘zbekcha", hello: "Xush kelibsiz", native: "O‘zbekcha" },
+];
+
+const BEELINE_PREFIXES = ["903","905","906","909","951","953","960","961","963","964","965","966","967","968"];
+function detectOperator(phone: string): "beeline" | "mts" | "megafon" | "tele2" | "other" {
+  const p = phone.slice(0, 3);
+  if (BEELINE_PREFIXES.includes(p)) return "beeline";
+  if (["910","915","916","917","919"].includes(p)) return "mts";
+  if (["920","921","925","926","927","929"].includes(p)) return "megafon";
+  if (["900","901","902","904","908","950","952","958"].includes(p)) return "tele2";
+  return "other";
+}
+function operatorLabel(op: ReturnType<typeof detectOperator>) {
+  return { beeline: "Билайн", mts: "МТС", megafon: "МегаФон", tele2: "Tele2", other: "Другой оператор" }[op];
+}
 
 function App() {
-  const [screen, setScreen] = useState<Screen>("welcome");
-  const [operator, setOperator] = useState<"beeline" | "other">("beeline");
+  const [screen, setScreen] = useState<Screen>("splash");
+  const [lang, setLang] = useState<Lang>("ru");
+  const [showLangPopup, setShowLangPopup] = useState(true);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
+  const [tab, setTab] = useState<Tab>("svyaz");
+  // bound numbers: primary (currently shown) + additional
+  const [primary, setPrimary] = useState<string>("");
+  const [additional, setAdditional] = useState<string[]>([]);
+  const [showAdNotice, setShowAdNotice] = useState(false);
+  const [bindMode, setBindMode] = useState(false);
+
+  const operator = useMemo(() => detectOperator(primary || phone), [primary, phone]);
 
   return (
     <div className="min-h-screen bg-neutral-200 flex items-start justify-center">
@@ -58,56 +95,89 @@ function App() {
           </span>
         </div>
 
+        {screen === "splash" && (
+          <Splash
+            lang={lang}
+            setLang={setLang}
+            showLangPopup={showLangPopup}
+            setShowLangPopup={setShowLangPopup}
+            onContinue={() => setScreen("welcome")}
+          />
+        )}
+
         {screen === "welcome" && (
           <Welcome
-            onOrder={() => setScreen("sim-map")}
-            onLogin={() => setScreen("auth-phone")}
-          />
-        )}
-        {screen === "sim-map" && (
-          <SimMap onBack={() => setScreen("welcome")} onDocs={() => setScreen("sim-docs")} />
-        )}
-        {screen === "sim-docs" && (
-          <SimDocs onBack={() => setScreen("sim-map")} />
-        )}
-        {screen === "auth-phone" && (
-          <AuthPhone
             phone={phone}
             setPhone={setPhone}
-            operator={operator}
-            setOperator={setOperator}
-            onBack={() => setScreen("welcome")}
-            onNext={() => setScreen("auth-otp")}
+            onOrder={() => setScreen("sim-notice")}
+            onAuth={() => setScreen("auth-otp")}
           />
         )}
+
         {screen === "auth-otp" && (
           <AuthOtp
             phone={phone}
             otp={otp}
             setOtp={setOtp}
-            onBack={() => setScreen("auth-phone")}
+            onBack={() => setScreen("welcome")}
             onLogin={() => {
-              if (operator === "beeline") setScreen("home-beeline");
-              else {
-                setScreen("home-other");
-                setShowPopup(true);
-              }
+              setPrimary(phone);
+              setScreen("home");
+              setTab("svyaz");
+              const op = detectOperator(phone);
+              if (op !== "beeline") setShowAdNotice(true);
             }}
           />
         )}
-        {screen === "home-beeline" && (
-          <HomeBeeline phone={phone} onLogout={() => setScreen("welcome")} />
+
+        {screen === "sim-notice" && (
+          <SimNotice
+            onBack={() => setScreen(primary ? "home" : "welcome")}
+            onToMap={() => setScreen("sim-map")}
+          />
         )}
-        {screen === "home-other" && (
-          <HomeOther
-            phone={phone}
-            onLogout={() => setScreen("welcome")}
-            onOrder={() => {
-              setShowPopup(false);
-              setScreen("sim-map");
+
+        {screen === "sim-map" && (
+          <SimMap
+            onBack={() => setScreen("sim-notice")}
+            onDocs={() => setScreen("sim-docs")}
+          />
+        )}
+
+        {screen === "sim-docs" && (
+          <SimDocs onBack={() => setScreen("sim-map")} />
+        )}
+
+        {screen === "home" && (
+          <Home
+            primary={primary}
+            additional={additional}
+            operator={operator}
+            tab={tab}
+            setTab={setTab}
+            onLogout={() => {
+              setPrimary("");
+              setAdditional([]);
+              setPhone("");
+              setOtp("");
+              setScreen("welcome");
             }}
-            showPopup={showPopup}
-            setShowPopup={setShowPopup}
+            showAdNotice={showAdNotice && operator !== "beeline"}
+            dismissAd={() => setShowAdNotice(false)}
+            onOrderSim={() => {
+              setShowAdNotice(false);
+              setScreen("sim-notice");
+            }}
+            bindMode={bindMode}
+            openBind={() => setBindMode(true)}
+            closeBind={() => setBindMode(false)}
+            onBindNumber={(newPhone) => {
+              setAdditional((a) => [primary, ...a]);
+              setPrimary(newPhone);
+              setBindMode(false);
+              const op = detectOperator(newPhone);
+              setShowAdNotice(op !== "beeline");
+            }}
           />
         )}
       </div>
@@ -115,17 +185,131 @@ function App() {
   );
 }
 
-/* ---------- WELCOME ---------- */
+/* ---------- SPLASH ---------- */
+function Splash({
+  lang,
+  setLang,
+  showLangPopup,
+  setShowLangPopup,
+  onContinue,
+}: {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  showLangPopup: boolean;
+  setShowLangPopup: (v: boolean) => void;
+  onContinue: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    if (showLangPopup) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % LANGS.length), 1800);
+    return () => clearInterval(t);
+  }, [showLangPopup]);
 
+  const active = LANGS.find((l) => l.code === lang) ?? LANGS[0];
+
+  return (
+    <div className={`relative flex flex-col h-[calc(100vh-44px)] ${showLangPopup ? "" : ""}`}>
+      <div className={`flex-1 flex flex-col items-center justify-center px-6 transition ${showLangPopup ? "blur-md scale-[0.98]" : ""}`}>
+        <div className="w-20 h-20 rounded-3xl bg-brand grid place-items-center shadow-xl mb-8">
+          <div className="w-8 h-8 rounded-full bg-surface" />
+        </div>
+        <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
+          Восток связь · от Билайн
+        </div>
+        <div className="h-32 flex flex-col items-center justify-center">
+          {showLangPopup ? (
+            <>
+              {LANGS.map((l) => (
+                <div key={l.code} className="text-2xl font-black text-center leading-tight">
+                  {l.hello}
+                </div>
+              ))}
+            </>
+          ) : (
+            <div key={idx} className="text-4xl font-black text-center leading-tight animate-in fade-in slide-in-from-bottom-2 duration-500">
+              {LANGS[idx].hello}
+            </div>
+          )}
+        </div>
+        {!showLangPopup && (
+          <>
+            <div className="mt-6 text-sm text-muted-foreground">
+              Язык: <span className="font-semibold text-foreground">{active.native}</span>
+              <button onClick={() => setShowLangPopup(true)} className="ml-2 underline">
+                сменить
+              </button>
+            </div>
+            <button
+              onClick={onContinue}
+              className="mt-10 h-14 px-10 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center gap-2"
+            >
+              Продолжить
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {showLangPopup && (
+        <div className="absolute inset-0 z-30 flex items-end bg-black/30 backdrop-blur-sm">
+          <div className="w-full bg-background rounded-t-3xl p-6 pb-8 animate-in slide-in-from-bottom duration-300">
+            <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-brand grid place-items-center">
+                <Globe className="h-5 w-5 text-brand-foreground" />
+              </div>
+              <div>
+                <div className="font-black text-lg leading-tight">Выберите язык</div>
+                <div className="text-xs text-muted-foreground">Забан · Тил · Til · Язык</div>
+              </div>
+            </div>
+            <div className="mt-5 space-y-2">
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => setLang(l.code)}
+                  className={`w-full flex items-center justify-between p-4 rounded-2xl border-2 transition ${
+                    lang === l.code
+                      ? "border-foreground bg-brand/10"
+                      : "border-border bg-card"
+                  }`}
+                >
+                  <div className="text-left">
+                    <div className="font-bold">{l.native}</div>
+                    <div className="text-xs text-muted-foreground">{l.hello}</div>
+                  </div>
+                  {lang === l.code && (
+                    <div className="w-6 h-6 rounded-full bg-brand grid place-items-center">
+                      <Check className="h-3.5 w-3.5 text-brand-foreground" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowLangPopup(false)}
+              className="mt-5 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold"
+            >
+              Продолжить
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- WELCOME ---------- */
 const slides = [
   {
     title: "Связь, которая работает на Востоке",
-    text: "Управляйте номером, балансом и тарифом в одном приложении.",
+    text: "Управляйте номером и балансом в одном приложении.",
     icon: Sparkles,
   },
   {
     title: "Выгодные тарифы рядом",
-    text: "Подберите тариф под себя — звонки, интернет и роуминг без переплат.",
+    text: "Звонки, интернет и роуминг без переплат.",
     icon: Wallet,
   },
   {
@@ -135,63 +319,101 @@ const slides = [
   },
 ];
 
-function Welcome({ onOrder, onLogin }: { onOrder: () => void; onLogin: () => void }) {
+function Welcome({
+  phone,
+  setPhone,
+  onOrder,
+  onAuth,
+}: {
+  phone: string;
+  setPhone: (v: string) => void;
+  onOrder: () => void;
+  onAuth: () => void;
+}) {
   const [i, setI] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setI((v) => (v + 1) % slides.length), 3000);
+    return () => clearInterval(t);
+  }, []);
   const S = slides[i].icon;
+  const formatted = useMemo(() => formatPhone(phone), [phone]);
+  const valid = phone.length === 10;
+
   return (
-    <div className="flex flex-col h-[calc(100vh-44px)]">
+    <div className="flex flex-col h-[calc(100vh-44px)] overflow-auto">
       <div className="px-6 pt-4 flex items-center justify-between">
         <Logo />
       </div>
 
-      <div className="flex-1 px-6 pt-6">
-        <div className="rounded-3xl bg-surface text-white p-6 h-[420px] flex flex-col justify-between relative overflow-hidden">
+      <div className="px-6 pt-5">
+        <div className="rounded-3xl bg-surface text-white p-6 h-[300px] flex flex-col justify-between relative overflow-hidden">
           <div className="absolute -right-12 -top-12 w-56 h-56 rounded-full bg-brand/90" />
           <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-brand/20" />
           <div className="relative">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand text-brand-foreground mb-6">
-              <S className="h-6 w-6" />
+            <div className="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-brand text-brand-foreground mb-4">
+              <S className="h-5 w-5" />
             </div>
-            <h2 className="text-3xl font-black leading-tight tracking-tight">
+            <h2 key={i} className="text-2xl font-black leading-tight tracking-tight animate-in fade-in duration-500">
               {slides[i].title}
             </h2>
-            <p className="mt-3 text-white/80 text-[15px] leading-relaxed">{slides[i].text}</p>
+            <p className="mt-2 text-white/80 text-[14px] leading-relaxed">{slides[i].text}</p>
           </div>
           <div className="relative flex items-center justify-between">
             <div className="flex gap-1.5">
               {slides.map((_, idx) => (
-                <button
+                <span
                   key={idx}
-                  onClick={() => setI(idx)}
                   className={`h-1.5 rounded-full transition-all ${
                     idx === i ? "w-6 bg-brand" : "w-1.5 bg-white/30"
                   }`}
                 />
               ))}
             </div>
-            <button
-              onClick={() => setI((i + 1) % slides.length)}
-              className="w-11 h-11 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition"
-            >
-              <ArrowRight className="h-5 w-5" />
-            </button>
+            <span className="text-[10px] uppercase tracking-widest text-white/50">авто</span>
           </div>
         </div>
       </div>
 
-      <div className="p-6 space-y-3">
+      {/* Auth form */}
+      <div className="px-6 mt-5">
+        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">
+          Войти по номеру телефона
+        </div>
+        <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
+          <Phone className="h-5 w-5" />
+          <input
+            inputMode="numeric"
+            placeholder="+7 (___) ___-__-__"
+            value={formatted}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").slice(-10);
+              setPhone(digits);
+            }}
+            className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
+          />
+        </div>
+        {valid && (
+          <div className="mt-2 text-[11px] text-muted-foreground">
+            Оператор определяется автоматически через ЦНИИС:&nbsp;
+            <span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-6 pt-4 space-y-3 mt-auto">
+        <button
+          disabled={!valid}
+          onClick={onAuth}
+          className="w-full h-14 rounded-2xl bg-foreground text-background font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
+        >
+          Получить смс-код
+        </button>
         <button
           onClick={onOrder}
           className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
         >
           Заказать сим-карту
           <ChevronRight className="h-5 w-5" />
-        </button>
-        <button
-          onClick={onLogin}
-          className="w-full h-14 rounded-2xl border-2 border-foreground text-foreground font-bold text-base active:scale-[0.98] transition"
-        >
-          Зарегистрироваться / Войти
         </button>
       </div>
     </div>
@@ -229,13 +451,98 @@ function TopBar({ title, onBack }: { title: string; onBack: () => void }) {
   );
 }
 
-/* ---------- SIM MAP ---------- */
+/* ---------- SIM NOTICE (Beeline /dobro/notice/ flow) ---------- */
+const noticeSteps = [
+  {
+    n: "01",
+    t: "Оставьте заявку",
+    d: "Укажите ФИО и удобный способ связи. Мы перезвоним для подтверждения.",
+  },
+  {
+    n: "02",
+    t: "Выберите номер и тариф",
+    d: "Подберём красивый номер из доступных и предложим подходящий тариф.",
+  },
+  {
+    n: "03",
+    t: "Подготовьте документы",
+    d: "Паспорт РФ или паспорт + миграционная карта для иностранных граждан.",
+  },
+  {
+    n: "04",
+    t: "Получите сим-карту в офисе",
+    d: "Приходите в ближайший офис Билайн с документами. Оформление займёт 10 минут.",
+  },
+  {
+    n: "05",
+    t: "Активируйте и пользуйтесь",
+    d: "Сим-карта активна сразу. Номер автоматически появится в приложении.",
+  },
+];
 
+function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => void }) {
+  return (
+    <div className="flex flex-col h-[calc(100vh-44px)]">
+      <TopBar title="Заказ сим-карты" onBack={onBack} />
+      <div className="flex-1 overflow-auto">
+        <div className="relative rounded-b-3xl bg-surface text-white p-6 overflow-hidden">
+          <div className="absolute -right-12 -top-12 w-44 h-44 rounded-full bg-brand/90" />
+          <div className="relative">
+            <div className="text-xs uppercase tracking-widest text-white/60">
+              Уведомление об оказании услуг связи
+            </div>
+            <div className="text-2xl font-black mt-2 leading-tight">
+              5 простых шагов
+              <br /> до новой сим-карты
+            </div>
+            <p className="mt-3 text-white/80 text-sm">
+              Порядок оформления соответствует требованиям закона «О связи».
+            </p>
+          </div>
+        </div>
+
+        <div className="p-5 space-y-3">
+          {noticeSteps.map((s) => (
+            <div
+              key={s.n}
+              className="flex gap-4 p-4 rounded-2xl bg-card border border-border"
+            >
+              <div className="text-3xl font-black text-brand leading-none shrink-0 w-10">
+                {s.n}
+              </div>
+              <div className="min-w-0">
+                <div className="font-bold text-sm">{s.t}</div>
+                <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  {s.d}
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <div className="p-4 rounded-2xl bg-brand/20 text-sm">
+            После оформления номер автоматически появится в приложении «Восток связь».
+          </div>
+        </div>
+      </div>
+      <div className="p-5 border-t border-border bg-background">
+        <button
+          onClick={onToMap}
+          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2"
+        >
+          Найти ближайший офис
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- SIM MAP ---------- */
 const offices = [
-  { id: 1, name: "Восток связь — Ленина 24", dist: "320 м", hours: "09:00 – 21:00", x: 38, y: 42 },
-  { id: 2, name: "Восток связь — ТЦ Восток", dist: "1.2 км", hours: "10:00 – 22:00", x: 65, y: 30 },
-  { id: 3, name: "Восток связь — Гагарина 7", dist: "2.4 км", hours: "09:00 – 20:00", x: 22, y: 70 },
-  { id: 4, name: "Восток связь — Мира 101", dist: "3.1 км", hours: "10:00 – 21:00", x: 78, y: 65 },
+  { id: 1, name: "Билайн — Ленина 24", dist: "320 м", hours: "09:00 – 21:00", x: 38, y: 42 },
+  { id: 2, name: "Билайн — ТЦ Восток", dist: "1.2 км", hours: "10:00 – 22:00", x: 65, y: 30 },
+  { id: 3, name: "Билайн — Гагарина 7", dist: "2.4 км", hours: "09:00 – 20:00", x: 22, y: 70 },
+  { id: 4, name: "Билайн — Мира 101", dist: "3.1 км", hours: "10:00 – 21:00", x: 78, y: 65 },
 ];
 
 function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) {
@@ -247,9 +554,7 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
     <div className="flex flex-col h-[calc(100vh-44px)]">
       <TopBar title="Офисы Билайн" onBack={onBack} />
 
-      {/* Map */}
       <div className="relative flex-1 bg-[#e6eef3] overflow-hidden">
-        {/* Streets */}
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
           <path d="M0 50 L100 45" stroke="#cdd8e0" strokeWidth="2" fill="none" />
           <path d="M50 0 L55 100" stroke="#cdd8e0" strokeWidth="2" fill="none" />
@@ -269,7 +574,6 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
           )}
         </svg>
 
-        {/* Geo dot */}
         {geo && (
           <div
             className="absolute -translate-x-1/2 -translate-y-1/2"
@@ -280,7 +584,6 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
           </div>
         )}
 
-        {/* Pins */}
         {offices.map((o) => (
           <button
             key={o.id}
@@ -291,11 +594,7 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
             className="absolute -translate-x-1/2 -translate-y-full"
             style={{ left: `${o.x}%`, top: `${o.y}%` }}
           >
-            <div
-              className={`relative ${
-                selected.id === o.id ? "scale-110" : "scale-100"
-              } transition`}
-            >
+            <div className={`relative ${selected.id === o.id ? "scale-110" : "scale-100"} transition`}>
               <div className="w-9 h-9 rounded-full bg-brand grid place-items-center shadow-lg ring-2 ring-surface">
                 <MapPin className="h-5 w-5 text-surface" fill="currentColor" />
               </div>
@@ -304,7 +603,6 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
           </button>
         ))}
 
-        {/* Search */}
         <div className="absolute top-3 left-3 right-3">
           <div className="flex items-center gap-2 h-11 px-4 rounded-2xl bg-white shadow-md">
             <Search className="h-4 w-4 text-muted-foreground" />
@@ -315,7 +613,6 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
           </div>
         </div>
 
-        {/* Geo button */}
         <button
           onClick={() => setGeo(true)}
           className={`absolute right-3 bottom-3 w-12 h-12 rounded-full grid place-items-center shadow-lg transition ${
@@ -326,7 +623,6 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
         </button>
       </div>
 
-      {/* Geo accept sheet */}
       {!geo && (
         <div className="absolute left-0 right-0 bottom-0 max-w-[440px] mx-auto p-4 bg-background border-t border-border rounded-t-3xl shadow-2xl">
           <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4" />
@@ -358,7 +654,6 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
         </div>
       )}
 
-      {/* Selected office card */}
       {geo && (
         <div className="bg-background border-t border-border p-4 rounded-t-3xl shadow-[0_-8px_24px_rgba(0,0,0,0.06)]">
           <div className="w-10 h-1 bg-border rounded-full mx-auto mb-3" />
@@ -413,10 +708,7 @@ function SimDocs({ onBack }: { onBack: () => void }) {
           <div className="text-xl font-black mt-1">Возьмите с собой</div>
         </div>
         {docs.map((d) => (
-          <div
-            key={d.t}
-            className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border"
-          >
+          <div key={d.t} className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border">
             <div className="w-10 h-10 rounded-xl bg-brand grid place-items-center shrink-0">
               <Check className="h-5 w-5 text-brand-foreground" />
             </div>
@@ -432,108 +724,6 @@ function SimDocs({ onBack }: { onBack: () => void }) {
       </div>
     </div>
   );
-}
-
-/* ---------- AUTH PHONE ---------- */
-function AuthPhone({
-  phone,
-  setPhone,
-  operator,
-  setOperator,
-  onBack,
-  onNext,
-}: {
-  phone: string;
-  setPhone: (v: string) => void;
-  operator: "beeline" | "other";
-  setOperator: (v: "beeline" | "other") => void;
-  onBack: () => void;
-  onNext: () => void;
-}) {
-  const formatted = useMemo(() => formatPhone(phone), [phone]);
-  const valid = phone.length === 10;
-
-  return (
-    <div className="flex flex-col h-[calc(100vh-44px)]">
-      <TopBar title="Вход" onBack={onBack} />
-      <div className="flex-1 overflow-auto p-6">
-        <h2 className="text-2xl font-black leading-tight">
-          Введите номер
-          <br /> телефона
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Мы отправим одноразовый код для входа.
-        </p>
-
-        <div className="mt-8">
-          <div className="flex items-center gap-3 h-16 px-4 rounded-2xl border-2 border-foreground bg-card">
-            <Phone className="h-5 w-5" />
-            <input
-              autoFocus
-              inputMode="numeric"
-              placeholder="+7 (___) ___-__-__"
-              value={formatted}
-              onChange={(e) => {
-                const digits = e.target.value.replace(/\D/g, "").slice(-10);
-                setPhone(digits);
-              }}
-              className="flex-1 bg-transparent outline-none font-bold text-lg tracking-wider"
-            />
-          </div>
-
-          <div className="mt-5">
-            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">
-              Демо: оператор номера
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setOperator("beeline")}
-                className={`h-12 rounded-2xl font-bold text-sm transition ${
-                  operator === "beeline"
-                    ? "bg-brand text-brand-foreground"
-                    : "bg-muted text-foreground"
-                }`}
-              >
-                Билайн
-              </button>
-              <button
-                onClick={() => setOperator("other")}
-                className={`h-12 rounded-2xl font-bold text-sm transition ${
-                  operator === "other"
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-foreground"
-                }`}
-              >
-                Другой оператор
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="p-6">
-        <button
-          disabled={!valid}
-          onClick={onNext}
-          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
-        >
-          Получить смс-код
-        </button>
-        <p className="text-[11px] text-muted-foreground text-center mt-3">
-          Нажимая кнопку, вы соглашаетесь с условиями использования.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function formatPhone(d: string) {
-  if (!d) return "";
-  const p = ["+7"];
-  if (d.length > 0) p.push(" (" + d.slice(0, 3));
-  if (d.length >= 3) p.push(") " + d.slice(3, 6));
-  if (d.length >= 6) p.push("-" + d.slice(6, 8));
-  if (d.length >= 8) p.push("-" + d.slice(8, 10));
-  return p.join("");
 }
 
 /* ---------- AUTH OTP ---------- */
@@ -565,23 +755,13 @@ function AuthOtp({
             <div
               key={i}
               className={`h-16 rounded-2xl border-2 grid place-items-center text-2xl font-black ${
-                i === otp.length
-                  ? "border-foreground bg-brand/10"
-                  : "border-border bg-card"
+                i === otp.length ? "border-foreground bg-brand/10" : "border-border bg-card"
               }`}
             >
               {d.trim()}
             </div>
           ))}
         </div>
-
-        <input
-          autoFocus
-          inputMode="numeric"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 4))}
-          className="opacity-0 absolute pointer-events-none"
-        />
 
         <div className="mt-8 grid grid-cols-3 gap-2">
           {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((k, i) => (
@@ -598,10 +778,6 @@ function AuthOtp({
             </button>
           ))}
         </div>
-
-        <button className="mt-4 text-sm text-muted-foreground w-full text-center">
-          Отправить код повторно через 0:42
-        </button>
       </div>
       <div className="p-6">
         <button
@@ -616,10 +792,48 @@ function AuthOtp({
   );
 }
 
-/* ---------- HOME (BEELINE) ---------- */
-function HomeBeeline({ phone, onLogout }: { phone: string; onLogout: () => void }) {
+function formatPhone(d: string) {
+  if (!d) return "";
+  const p = ["+7"];
+  if (d.length > 0) p.push(" (" + d.slice(0, 3));
+  if (d.length >= 3) p.push(") " + d.slice(3, 6));
+  if (d.length >= 6) p.push("-" + d.slice(6, 8));
+  if (d.length >= 8) p.push("-" + d.slice(8, 10));
+  return p.join("");
+}
+
+/* ---------- HOME (with bottom nav) ---------- */
+function Home({
+  primary,
+  additional,
+  operator,
+  tab,
+  setTab,
+  onLogout,
+  showAdNotice,
+  dismissAd,
+  onOrderSim,
+  bindMode,
+  openBind,
+  closeBind,
+  onBindNumber,
+}: {
+  primary: string;
+  additional: string[];
+  operator: ReturnType<typeof detectOperator>;
+  tab: Tab;
+  setTab: (t: Tab) => void;
+  onLogout: () => void;
+  showAdNotice: boolean;
+  dismissAd: () => void;
+  onOrderSim: () => void;
+  bindMode: boolean;
+  openBind: () => void;
+  closeBind: () => void;
+  onBindNumber: (p: string) => void;
+}) {
   return (
-    <div className="flex flex-col h-[calc(100vh-44px)] bg-background">
+    <div className="relative flex flex-col h-[calc(100vh-44px)] bg-background">
       <div className="px-5 pt-4 pb-2 flex items-center justify-between">
         <Logo />
         <button
@@ -629,119 +843,295 @@ function HomeBeeline({ phone, onLogout }: { phone: string; onLogout: () => void 
           Выйти
         </button>
       </div>
-      <div className="px-5 pb-2">
-        <h1 className="text-xl font-bold">Добро пожаловать, Абонент</h1>
+
+      <div className="flex-1 overflow-auto pb-24">
+        {tab === "svyaz" && (
+          <TabSvyaz
+            primary={primary}
+            additional={additional}
+            operator={operator}
+            showAdNotice={showAdNotice}
+            dismissAd={dismissAd}
+            onOrderSim={onOrderSim}
+            openBind={openBind}
+          />
+        )}
+        {tab === "bank" && <TabBank />}
+        {tab === "uslugi" && <TabUslugi />}
       </div>
 
-      <div className="px-5 pt-2 overflow-auto flex-1 pb-8">
-        {/* Balance card */}
-        <div className="relative rounded-3xl bg-surface text-white p-6 overflow-hidden">
-          <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-brand/90" />
-          <div className="absolute -right-6 top-20 w-24 h-24 rounded-full bg-brand/30" />
-          <div className="relative">
+      {/* Bottom Nav */}
+      <div className="absolute bottom-0 left-0 right-0 bg-background border-t border-border">
+        <div className="grid grid-cols-3 px-2 py-2 pb-3">
+          <NavBtn icon={Wifi} label="Связь" active={tab === "svyaz"} onClick={() => setTab("svyaz")} />
+          <NavBtn icon={CreditCard} label="Банк" active={tab === "bank"} onClick={() => setTab("bank")} />
+          <NavBtn icon={Grid3x3} label="Услуги" active={tab === "uslugi"} onClick={() => setTab("uslugi")} />
+        </div>
+      </div>
+
+      {bindMode && <BindNumberSheet onClose={closeBind} onBind={onBindNumber} />}
+    </div>
+  );
+}
+
+function NavBtn({
+  icon: Icon,
+  label,
+  active,
+  onClick,
+}: {
+  icon: typeof Wifi;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center gap-1 py-2 rounded-2xl transition ${
+        active ? "bg-brand/15" : ""
+      }`}
+    >
+      <Icon className={`h-5 w-5 ${active ? "text-foreground" : "text-muted-foreground"}`} />
+      <span className={`text-[11px] font-bold ${active ? "text-foreground" : "text-muted-foreground"}`}>
+        {label}
+      </span>
+    </button>
+  );
+}
+
+function TabSvyaz({
+  primary,
+  additional,
+  operator,
+  showAdNotice,
+  dismissAd,
+  onOrderSim,
+  openBind,
+}: {
+  primary: string;
+  additional: string[];
+  operator: ReturnType<typeof detectOperator>;
+  showAdNotice: boolean;
+  dismissAd: () => void;
+  onOrderSim: () => void;
+  openBind: () => void;
+}) {
+  const isBeeline = operator === "beeline";
+  return (
+    <div className="px-5 pt-2 space-y-4">
+      <h1 className="text-xl font-bold">Добро пожаловать, Абонент</h1>
+
+      {/* Balance card */}
+      <div className="relative rounded-3xl bg-surface text-white p-6 overflow-hidden">
+        <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-brand/90" />
+        <div className="absolute -right-6 top-20 w-24 h-24 rounded-full bg-brand/30" />
+        <div className="relative">
+          <div className="flex items-center justify-between">
             <div className="text-xs uppercase tracking-widest text-white/60">Ваш номер</div>
-            <div className="text-2xl font-black tracking-wide mt-1">{formatPhone(phone)}</div>
-            <div className="mt-6 text-xs uppercase tracking-widest text-white/60">Баланс</div>
-            <div className="flex items-baseline gap-1 mt-1">
-              <span className="text-5xl font-black">847</span>
-              <span className="text-xl font-bold">,50 ₽</span>
-            </div>
+            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-white/15 backdrop-blur">
+              {operatorLabel(operator)}
+            </span>
+          </div>
+          <div className="text-2xl font-black tracking-wide mt-1">{formatPhone(primary)}</div>
+          <div className="mt-6 text-xs uppercase tracking-widest text-white/60">Баланс</div>
+          <div className="flex items-baseline gap-1 mt-1">
+            <span className="text-5xl font-black">{isBeeline ? "847" : "—"}</span>
+            {isBeeline && <span className="text-xl font-bold">,50 ₽</span>}
           </div>
         </div>
+      </div>
 
+      {/* Bind new number — only if not Beeline */}
+      {!isBeeline && (
+        <button
+          onClick={openBind}
+          className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-foreground/30 bg-card active:scale-[0.99] transition"
+        >
+          <div className="w-11 h-11 rounded-2xl bg-brand grid place-items-center shrink-0">
+            <Plus className="h-5 w-5 text-brand-foreground" />
+          </div>
+          <div className="text-left min-w-0">
+            <div className="font-bold text-sm">Привязать новый номер</div>
+            <div className="text-xs text-muted-foreground">
+              Текущий номер сохранится в профиле как дополнительный
+            </div>
+          </div>
+        </button>
+      )}
 
-        <div className="mt-6 p-4 rounded-2xl bg-brand/20 text-sm">
-          В этой версии приложения доступен просмотр номера и баланса. Управление тарифом
-          появится в следующих обновлениях.
+      {/* Ad notice if not Beeline */}
+      {!isBeeline && showAdNotice && (
+        <div className="relative rounded-3xl bg-brand p-5 overflow-hidden">
+          <button
+            onClick={dismissAd}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface/10 grid place-items-center"
+          >
+            <X className="h-4 w-4 text-surface" />
+          </button>
+          <div className="w-11 h-11 rounded-2xl bg-surface text-brand grid place-items-center mb-3">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="text-surface font-black text-lg leading-tight">
+            Закажите номер Билайн
+          </div>
+          <p className="text-surface/80 text-sm mt-1">
+            Полный доступ к сервисам «Восток связь» — только с сим-картой Билайн.
+          </p>
+          <button
+            onClick={onOrderSim}
+            className="mt-4 h-12 px-5 rounded-2xl bg-surface text-brand font-bold text-sm inline-flex items-center gap-2"
+          >
+            Заказать сим-карту
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
+      )}
+
+      {/* Additional numbers */}
+      {additional.length > 0 && (
+        <div className="space-y-2">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-bold px-1">
+            Дополнительные номера в профиле
+          </div>
+          {additional.map((p) => (
+            <div
+              key={p}
+              className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border"
+            >
+              <div className="w-10 h-10 rounded-xl bg-muted grid place-items-center">
+                <User className="h-4 w-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-bold text-sm">{formatPhone(p)}</div>
+                <div className="text-[11px] text-muted-foreground">
+                  {operatorLabel(detectOperator(p))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TabBank() {
+  return (
+    <div className="px-5 pt-4 space-y-4">
+      <h1 className="text-xl font-bold">Билайн Банк</h1>
+      <div className="relative rounded-3xl bg-surface text-white p-6 overflow-hidden h-48">
+        <div className="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-brand/90" />
+        <div className="relative h-full flex flex-col justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-white/60">Карта</div>
+            <div className="text-lg font-black mt-1">•• •• •• 4821</div>
+          </div>
+          <div>
+            <div className="text-xs uppercase tracking-widest text-white/60">Доступно</div>
+            <div className="text-3xl font-black">12 480 ₽</div>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {["Перевод", "Платёж", "История"].map((t) => (
+          <div key={t} className="p-4 rounded-2xl bg-card border border-border text-center">
+            <div className="text-xs font-bold">{t}</div>
+          </div>
+        ))}
+      </div>
+      <div className="p-4 rounded-2xl bg-brand/20 text-sm">
+        Управление картой и переводы появятся в следующих обновлениях.
       </div>
     </div>
   );
 }
 
-/* ---------- HOME (OTHER OPERATOR) ---------- */
-function HomeOther({
-  phone,
-  onLogout,
-  onOrder,
-  showPopup,
-  setShowPopup,
-}: {
-  phone: string;
-  onLogout: () => void;
-  onOrder: () => void;
-  showPopup: boolean;
-  setShowPopup: (v: boolean) => void;
-}) {
+function TabUslugi() {
+  const items = [
+    { t: "Интернет дома", d: "Тарифы и подключение" },
+    { t: "ТВ", d: "Каналы и фильмы" },
+    { t: "Роуминг", d: "Тарифы в поездках" },
+    { t: "Подписки", d: "Музыка, кино, игры" },
+    { t: "Поддержка", d: "Чат 24/7" },
+  ];
   return (
-    <div className="relative flex flex-col h-[calc(100vh-44px)]">
-      <div className="px-5 pt-4 pb-2 flex items-center justify-between">
-        <Logo />
-        <button
-          onClick={onLogout}
-          className="text-xs font-semibold text-muted-foreground px-3 py-2 rounded-full hover:bg-muted"
+    <div className="px-5 pt-4 space-y-3">
+      <h1 className="text-xl font-bold">Услуги</h1>
+      {items.map((i) => (
+        <div
+          key={i.t}
+          className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border"
         >
-          Выйти
+          <div className="w-11 h-11 rounded-2xl bg-brand grid place-items-center shrink-0">
+            <Sparkles className="h-5 w-5 text-brand-foreground" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="font-bold text-sm">{i.t}</div>
+            <div className="text-xs text-muted-foreground">{i.d}</div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BindNumberSheet({
+  onClose,
+  onBind,
+}: {
+  onClose: () => void;
+  onBind: (p: string) => void;
+}) {
+  const [v, setV] = useState("");
+  const formatted = useMemo(() => formatPhone(v), [v]);
+  const valid = v.length === 10;
+  const op = detectOperator(v);
+  return (
+    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-30 flex items-end">
+      <div className="w-full bg-background rounded-t-3xl p-6 pb-8 animate-in slide-in-from-bottom duration-300">
+        <div className="flex justify-between items-start">
+          <div className="w-12 h-12 rounded-2xl bg-brand grid place-items-center">
+            <Plus className="h-6 w-6 text-brand-foreground" />
+          </div>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-muted grid place-items-center"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <h3 className="mt-5 text-2xl font-black leading-tight">Привязать новый номер</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Текущий номер останется в профиле как дополнительный.
+        </p>
+
+        <div className="mt-5 flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
+          <Phone className="h-5 w-5" />
+          <input
+            autoFocus
+            inputMode="numeric"
+            placeholder="+7 (___) ___-__-__"
+            value={formatted}
+            onChange={(e) => setV(e.target.value.replace(/\D/g, "").slice(-10))}
+            className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
+          />
+        </div>
+        {valid && (
+          <div className="mt-2 text-[11px] text-muted-foreground">
+            Оператор по ЦНИИС: <span className="font-bold text-foreground">{operatorLabel(op)}</span>
+          </div>
+        )}
+
+        <button
+          disabled={!valid}
+          onClick={() => onBind(v)}
+          className="mt-5 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40"
+        >
+          Привязать номер
         </button>
       </div>
-
-      <div className="px-5 overflow-auto flex-1 pb-8 opacity-60 pointer-events-none">
-        <div className="relative rounded-3xl bg-surface text-white p-6 overflow-hidden">
-          <div className="text-xs uppercase tracking-widest text-white/60">Ваш номер</div>
-          <div className="text-2xl font-black tracking-wide mt-1">{formatPhone(phone)}</div>
-          <div className="mt-6 text-xs uppercase tracking-widest text-white/60">Баланс</div>
-          <div className="text-5xl font-black mt-1">—</div>
-        </div>
-      </div>
-
-      {showPopup && (
-        <div className="absolute inset-0 bg-black/50 z-20 flex items-end">
-          <div className="w-full bg-background rounded-t-3xl p-6 pb-8 animate-in slide-in-from-bottom duration-300">
-            <div className="flex justify-between items-start">
-              <div className="w-12 h-12 rounded-2xl bg-brand grid place-items-center">
-                <Sparkles className="h-6 w-6 text-brand-foreground" />
-              </div>
-              <button
-                onClick={() => setShowPopup(false)}
-                className="w-9 h-9 rounded-full bg-muted grid place-items-center"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <h3 className="mt-5 text-2xl font-black leading-tight">
-              Для полного доступа нужен номер Билайн
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Сервис «Восток связь» работает только с сим-картами Билайн. Закажите карту —
-              это займёт пару минут.
-            </p>
-            <ul className="mt-4 space-y-2">
-              {["Выгодные тарифы", "Бесплатная доставка в офис", "Сохраним ваш номер"].map(
-                (t) => (
-                  <li key={t} className="flex items-center gap-2 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-brand grid place-items-center">
-                      <Check className="h-3 w-3 text-brand-foreground" />
-                    </div>
-                    {t}
-                  </li>
-                ),
-              )}
-            </ul>
-            <button
-              onClick={onOrder}
-              className="mt-6 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base"
-            >
-              Заказать сим-карту
-            </button>
-            <button
-              onClick={() => setShowPopup(false)}
-              className="mt-2 w-full h-12 rounded-2xl font-semibold text-sm text-muted-foreground"
-            >
-              Позже
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

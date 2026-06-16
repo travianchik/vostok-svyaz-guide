@@ -390,8 +390,10 @@ function Welcome({
             value={formatted}
             onChange={(e) => {
               let digits = e.target.value.replace(/\D/g, "");
-              // Strip the country prefix that comes from the "+7" mask
-              if (digits.length > 10 && (digits[0] === "7" || digits[0] === "8")) {
+              // The "+7" prefix in the mask always reappears as a leading
+              // "7"; strip it (and any "8") so the user only controls the
+              // 10 actual subscriber digits.
+              while (digits.length > 0 && (digits[0] === "7" || digits[0] === "8")) {
                 digits = digits.slice(1);
               }
               setPhone(digits.slice(0, 10));

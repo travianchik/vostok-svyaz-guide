@@ -39,7 +39,7 @@ export const Route = createFileRoute("/")({
 type Screen =
   | "splash"
   | "welcome"
-  | "auth-otp"
+  
   | "sim-notice"
   | "sim-map"
   | "sim-docs"
@@ -71,7 +71,7 @@ function operatorLabel(op: ReturnType<typeof detectOperator>) {
 function App() {
   const [screen, setScreen] = useState<Screen>("splash");
   const [lang, setLang] = useState<Lang>("ru");
-  const [showLangPopup, setShowLangPopup] = useState(true);
+  const [showLangPopup, setShowLangPopup] = useState(false);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [tab, setTab] = useState<Tab>("svyaz");
@@ -112,23 +112,16 @@ function App() {
           <Welcome
             phone={phone}
             setPhone={setPhone}
-            onOrder={() => setScreen("sim-notice")}
-            onAuth={() => setScreen("auth-otp")}
-          />
-        )}
-
-        {screen === "auth-otp" && (
-          <AuthOtp
-            phone={phone}
             otp={otp}
             setOtp={setOtp}
-            onBack={() => setScreen("welcome")}
+            onOrder={() => setScreen("sim-notice")}
             onLogin={() => {
               setPrimary(phone);
               setScreen("home");
               setTab("svyaz");
               const op = detectOperator(phone);
               if (op !== "beeline") setShowAdNotice(true);
+              setOtp("");
             }}
           />
         )}
@@ -244,7 +237,7 @@ function Splash({
               </button>
             </div>
             <button
-              onClick={onContinue}
+              onClick={() => setShowLangPopup(true)}
               className="mt-10 h-14 px-10 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center gap-2"
             >
               Продолжить
@@ -291,7 +284,7 @@ function Splash({
               ))}
             </div>
             <button
-              onClick={() => setShowLangPopup(false)}
+              onClick={() => { setShowLangPopup(false); onContinue(); }}
               className="mt-5 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold"
             >
               Продолжить
@@ -325,14 +318,19 @@ const slides = [
 function Welcome({
   phone,
   setPhone,
+  otp,
+  setOtp,
   onOrder,
-  onAuth,
+  onLogin,
 }: {
   phone: string;
   setPhone: (v: string) => void;
+  otp: string;
+  setOtp: (v: string) => void;
   onOrder: () => void;
-  onAuth: () => void;
+  onLogin: () => void;
 }) {
+  const [step, setStep] = useState<"phone" | "otp">("phone");
   const [i, setI] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % slides.length), 3000);
@@ -378,58 +376,69 @@ function Welcome({
       </div>
 
       {/* Auth form */}
-      <div className="px-6 mt-5">
-        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">
-          Войти по номеру телефона
-        </div>
-        <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
-          <Phone className="h-5 w-5" />
-          <input
-            inputMode="numeric"
-            placeholder="+7 (___) ___-__-__"
-            value={formatted}
-            onChange={(e) => {
-              let digits = e.target.value.replace(/\D/g, "");
-              // Strip the country prefix that comes from the "+7" mask
-              if (digits.length > 10 && (digits[0] === "7" || digits[0] === "8")) {
-                digits = digits.slice(1);
-              }
-              setPhone(digits.slice(0, 10));
-            }}
-            className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
-          />
-        </div>
-        {valid && (
-          <div className="mt-2 text-[11px] text-muted-foreground">
-            Оператор определяется автоматически через ЦНИИС:&nbsp;
-            <span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
+      {step === "phone" ? (
+        <>
+          <div className="px-6 mt-5">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">
+              Войти по номеру телефона
+            </div>
+            <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
+              <Phone className="h-5 w-5" />
+              <input
+                inputMode="numeric"
+                placeholder="+7 (___) ___-__-__"
+                value={formatted}
+                onChange={(e) => {
+                  let digits = e.target.value.replace(/\D/g, "");
+                  while (digits.length > 0 && (digits[0] === "7" || digits[0] === "8")) {
+                    digits = digits.slice(1);
+                  }
+                  setPhone(digits.slice(0, 10));
+                }}
+                className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
+              />
+            </div>
+            {valid && (
+              <div className="mt-2 text-[11px] text-muted-foreground">
+                Оператор определяется автоматически через ЦНИИС:&nbsp;
+                <span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setPhone("9035551234")}
+              className="mt-3 w-full text-[12px] font-bold text-brand underline underline-offset-4"
+            >
+              Демо: войти как абонент Билайн
+            </button>
           </div>
-        )}
-        <button
-          type="button"
-          onClick={() => setPhone("9035551234")}
-          className="mt-3 w-full text-[12px] font-bold text-brand underline underline-offset-4"
-        >
-          Демо: войти как абонент Билайн
-        </button>
-      </div>
 
-      <div className="p-6 pt-4 space-y-3 mt-auto">
-        <button
-          disabled={!valid}
-          onClick={onAuth}
-          className="w-full h-14 rounded-2xl bg-foreground text-background font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
-        >
-          Получить смс-код
-        </button>
-        <button
-          onClick={onOrder}
-          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
-        >
-          Заказать сим-карту
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
+          <div className="p-6 pt-4 space-y-3 mt-auto">
+            <button
+              disabled={!valid}
+              onClick={() => { setOtp(""); setStep("otp"); }}
+              className="w-full h-14 rounded-2xl bg-foreground text-background font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
+            >
+              Получить смс-код
+            </button>
+            <button
+              onClick={onOrder}
+              className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
+            >
+              Заказать сим-карту
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </>
+      ) : (
+        <InlineOtp
+          phone={phone}
+          otp={otp}
+          setOtp={setOtp}
+          onBack={() => { setOtp(""); setStep("phone"); }}
+          onLogin={onLogin}
+        />
+      )}
     </div>
   );
 }
@@ -740,8 +749,8 @@ function SimDocs({ onBack }: { onBack: () => void }) {
   );
 }
 
-/* ---------- AUTH OTP ---------- */
-function AuthOtp({
+/* ---------- INLINE OTP (shown inside Welcome) ---------- */
+function InlineOtp({
   phone,
   otp,
   setOtp,
@@ -756,28 +765,34 @@ function AuthOtp({
 }) {
   const digits = otp.padEnd(4, " ").split("");
   return (
-    <div className="flex flex-col h-[calc(100vh-44px)]">
-      <TopBar title="Подтверждение" onBack={onBack} />
-      <div className="flex-1 overflow-auto p-6">
-        <h2 className="text-2xl font-black leading-tight">Введите код из СМС</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Отправили на {formatPhone(phone)}
-        </p>
-
-        <div className="mt-10 grid grid-cols-4 gap-3">
-          {digits.map((d, i) => (
-            <div
-              key={i}
-              className={`h-16 rounded-2xl border-2 grid place-items-center text-2xl font-black ${
-                i === otp.length ? "border-foreground bg-brand/10" : "border-border bg-card"
-              }`}
-            >
-              {d.trim()}
-            </div>
-          ))}
+    <>
+      <div className="px-6 mt-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
+            Подтверждение по СМС
+          </div>
+          <button onClick={onBack} className="text-[12px] font-bold text-brand">
+            Изменить номер
+          </button>
         </div>
-
-        <div className="mt-8 grid grid-cols-3 gap-2">
+        <div className="rounded-2xl bg-card border border-border p-4">
+          <div className="text-sm">
+            Код отправлен на <span className="font-black">{formatPhone(phone)}</span>
+          </div>
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {digits.map((d, i) => (
+              <div
+                key={i}
+                className={`h-14 rounded-xl border-2 grid place-items-center text-2xl font-black ${
+                  i === otp.length ? "border-foreground bg-brand/10" : "border-border bg-background"
+                }`}
+              >
+                {d.trim()}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
           {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((k, i) => (
             <button
               key={i}
@@ -786,14 +801,14 @@ function AuthOtp({
                 else if (k && otp.length < 4) setOtp(otp + k);
               }}
               disabled={!k}
-              className="h-14 rounded-2xl bg-muted font-bold text-xl active:bg-brand active:text-brand-foreground transition disabled:bg-transparent"
+              className="h-12 rounded-2xl bg-muted font-bold text-lg active:bg-brand active:text-brand-foreground transition disabled:bg-transparent"
             >
               {k}
             </button>
           ))}
         </div>
       </div>
-      <div className="p-6">
+      <div className="p-6 pt-4 mt-auto">
         <button
           disabled={otp.length !== 4}
           onClick={onLogin}
@@ -802,7 +817,7 @@ function AuthOtp({
           Войти
         </button>
       </div>
-    </div>
+    </>
   );
 }
 

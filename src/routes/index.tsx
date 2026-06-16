@@ -21,6 +21,9 @@ import {
   Wifi,
   Globe,
   User,
+  Settings,
+  Layers,
+  PieChart,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({

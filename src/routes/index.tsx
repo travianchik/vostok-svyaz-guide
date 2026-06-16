@@ -405,6 +405,13 @@ function Welcome({
             <span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
           </div>
         )}
+        <button
+          type="button"
+          onClick={() => setPhone("9035551234")}
+          className="mt-3 w-full text-[12px] font-bold text-brand underline underline-offset-4"
+        >
+          Демо: войти как абонент Билайн
+        </button>
       </div>
 
       <div className="p-6 pt-4 space-y-3 mt-auto">

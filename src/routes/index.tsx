@@ -923,77 +923,142 @@ function TabSvyaz({
   const isBeeline = operator === "beeline";
   return (
     <div className="px-5 pt-2 space-y-4">
-      <h1 className="text-xl font-bold">Добро пожаловать, Абонент</h1>
-
-      {/* Balance card */}
-      <div className="relative rounded-3xl bg-surface text-white p-6 overflow-hidden">
-        <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-brand/90" />
-        <div className="absolute -right-6 top-20 w-24 h-24 rounded-full bg-brand/30" />
-        <div className="relative">
-          <div className="flex items-center justify-between">
-            <div className="text-xs uppercase tracking-widest text-white/60">Ваш номер</div>
-            <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-white/15 backdrop-blur">
-              {operatorLabel(operator)}
-            </span>
-          </div>
-          <div className="text-2xl font-black tracking-wide mt-1">{formatPhone(primary)}</div>
-          <div className="mt-6 text-xs uppercase tracking-widest text-white/60">Баланс</div>
-          <div className="flex items-baseline gap-1 mt-1">
-            <span className="text-5xl font-black">{isBeeline ? "847" : "—"}</span>
-            {isBeeline && <span className="text-xl font-bold">,50 ₽</span>}
-          </div>
+      {/* User header */}
+      <div className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border">
+        <div className="w-12 h-12 rounded-full bg-muted grid place-items-center shrink-0">
+          <User className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <div className="min-w-0">
+          <div className="font-black text-base tracking-tight">{formatPhone(primary)}</div>
+          <div className="text-xs text-muted-foreground">Алина Петрова</div>
         </div>
       </div>
 
-      {/* Bind new number — only if not Beeline */}
-      {!isBeeline && (
-        <button
-          onClick={openBind}
-          className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-foreground/30 bg-card active:scale-[0.99] transition"
-        >
-          <div className="w-11 h-11 rounded-2xl bg-brand grid place-items-center shrink-0">
-            <Plus className="h-5 w-5 text-brand-foreground" />
+      {isBeeline ? (
+        <>
+          {/* Balance card */}
+          <div className="rounded-2xl bg-card border border-border p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
+                <div className="text-xs text-muted-foreground mt-1">на балансе</div>
+              </div>
+              <button className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0">
+                Пополнить
+              </button>
+            </div>
+            <div className="text-[11px] text-muted-foreground mt-4">28 июня спишется 650 ₽</div>
           </div>
-          <div className="text-left min-w-0">
-            <div className="font-bold text-sm">Привязать новый номер</div>
-            <div className="text-xs text-muted-foreground">
-              Текущий номер сохранится в профиле как дополнительный
+
+          {/* Tariff */}
+          <div className="flex items-center gap-2 px-1">
+            <h2 className="text-base font-black">Тариф</h2>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand text-brand-foreground">
+              твой тариф
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-2xl bg-card border border-border">
+              <div className="text-2xl font-black">25<span className="text-muted-foreground">/35</span></div>
+              <div className="text-xs text-muted-foreground mt-1">Гигабайты</div>
+            </div>
+            <div className="p-4 rounded-2xl bg-card border border-border">
+              <div className="text-2xl font-black">200<span className="text-muted-foreground">/250</span></div>
+              <div className="text-xs text-muted-foreground mt-1">Минуты</div>
             </div>
           </div>
-        </button>
-      )}
 
-      {/* Ad notice if not Beeline */}
-      {!isBeeline && showAdNotice && (
-        <div className="relative rounded-3xl bg-brand p-5 overflow-hidden">
-          <button
-            onClick={dismissAd}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface/10 grid place-items-center"
-          >
-            <X className="h-4 w-4 text-surface" />
-          </button>
-          <div className="w-11 h-11 rounded-2xl bg-surface text-brand grid place-items-center mb-3">
-            <Sparkles className="h-5 w-5" />
+          {/* Round actions */}
+          <div className="grid grid-cols-3 gap-2 pt-2">
+            {[
+              { icon: Settings, label: "Настроить\nтариф" },
+              { icon: Layers, label: "Услуги\nи сервисы" },
+              { icon: PieChart, label: "Мои\nрасходы" },
+            ].map(({ icon: Icon, label }) => (
+              <button key={label} className="flex flex-col items-center gap-2">
+                <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <span className="text-[11px] text-center text-muted-foreground leading-tight whitespace-pre-line">
+                  {label}
+                </span>
+              </button>
+            ))}
           </div>
-          <div className="text-surface font-black text-lg leading-tight">
-            Закажите номер Билайн
+
+          {/* Special offers */}
+          <div className="pt-2">
+            <h2 className="text-base font-black px-1 mb-2">Специальные предложения</h2>
+            <div className="rounded-2xl bg-surface text-white p-5">
+              <div className="font-bold text-sm leading-snug">
+                Следите за вашим балансом<br />и управляйте связью
+              </div>
+            </div>
           </div>
-          <p className="text-surface/80 text-sm mt-1">
-            Полный доступ к сервисам «Восток связь» — только с сим-картой Билайн.
-          </p>
+        </>
+      ) : (
+        <>
+          {/* Non-Beeline balance placeholder */}
+          <div className="rounded-2xl bg-card border border-border p-5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-3xl font-black tracking-tight text-muted-foreground">—</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  баланс недоступен · {operatorLabel(operator)}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bind new number */}
           <button
-            onClick={onOrderSim}
-            className="mt-4 h-12 px-5 rounded-2xl bg-surface text-brand font-bold text-sm inline-flex items-center gap-2"
+            onClick={openBind}
+            className="w-full flex items-center gap-3 p-4 rounded-2xl border-2 border-dashed border-foreground/30 bg-card active:scale-[0.99] transition"
           >
-            Заказать сим-карту
-            <ChevronRight className="h-4 w-4" />
+            <div className="w-11 h-11 rounded-2xl bg-brand grid place-items-center shrink-0">
+              <Plus className="h-5 w-5 text-brand-foreground" />
+            </div>
+            <div className="text-left min-w-0">
+              <div className="font-bold text-sm">Привязать новый номер</div>
+              <div className="text-xs text-muted-foreground">
+                Текущий номер сохранится в профиле как дополнительный
+              </div>
+            </div>
           </button>
-        </div>
+
+          {/* Ad notice */}
+          {showAdNotice && (
+            <div className="relative rounded-2xl bg-brand p-5 overflow-hidden">
+              <button
+                onClick={dismissAd}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface/10 grid place-items-center"
+              >
+                <X className="h-4 w-4 text-surface" />
+              </button>
+              <div className="w-11 h-11 rounded-2xl bg-surface text-brand grid place-items-center mb-3">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <div className="text-surface font-black text-lg leading-tight">
+                Закажите номер Билайн
+              </div>
+              <p className="text-surface/80 text-sm mt-1">
+                Полный доступ к сервисам «Восток связь» — только с сим-картой Билайн.
+              </p>
+              <button
+                onClick={onOrderSim}
+                className="mt-4 h-12 px-5 rounded-2xl bg-surface text-brand font-bold text-sm inline-flex items-center gap-2"
+              >
+                Заказать сим-карту
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Additional numbers */}
       {additional.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2 pt-2">
           <div className="text-xs uppercase tracking-wider text-muted-foreground font-bold px-1">
             Дополнительные номера в профиле
           </div>

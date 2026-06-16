@@ -376,60 +376,69 @@ function Welcome({
       </div>
 
       {/* Auth form */}
-      <div className="px-6 mt-5">
-        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">
-          Войти по номеру телефона
-        </div>
-        <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
-          <Phone className="h-5 w-5" />
-          <input
-            inputMode="numeric"
-            placeholder="+7 (___) ___-__-__"
-            value={formatted}
-            onChange={(e) => {
-              let digits = e.target.value.replace(/\D/g, "");
-              // The "+7" prefix in the mask always reappears as a leading
-              // "7"; strip it (and any "8") so the user only controls the
-              // 10 actual subscriber digits.
-              while (digits.length > 0 && (digits[0] === "7" || digits[0] === "8")) {
-                digits = digits.slice(1);
-              }
-              setPhone(digits.slice(0, 10));
-            }}
-            className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
-          />
-        </div>
-        {valid && (
-          <div className="mt-2 text-[11px] text-muted-foreground">
-            Оператор определяется автоматически через ЦНИИС:&nbsp;
-            <span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
+      {step === "phone" ? (
+        <>
+          <div className="px-6 mt-5">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">
+              Войти по номеру телефона
+            </div>
+            <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
+              <Phone className="h-5 w-5" />
+              <input
+                inputMode="numeric"
+                placeholder="+7 (___) ___-__-__"
+                value={formatted}
+                onChange={(e) => {
+                  let digits = e.target.value.replace(/\D/g, "");
+                  while (digits.length > 0 && (digits[0] === "7" || digits[0] === "8")) {
+                    digits = digits.slice(1);
+                  }
+                  setPhone(digits.slice(0, 10));
+                }}
+                className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
+              />
+            </div>
+            {valid && (
+              <div className="mt-2 text-[11px] text-muted-foreground">
+                Оператор определяется автоматически через ЦНИИС:&nbsp;
+                <span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setPhone("9035551234")}
+              className="mt-3 w-full text-[12px] font-bold text-brand underline underline-offset-4"
+            >
+              Демо: войти как абонент Билайн
+            </button>
           </div>
-        )}
-        <button
-          type="button"
-          onClick={() => setPhone("9035551234")}
-          className="mt-3 w-full text-[12px] font-bold text-brand underline underline-offset-4"
-        >
-          Демо: войти как абонент Билайн
-        </button>
-      </div>
 
-      <div className="p-6 pt-4 space-y-3 mt-auto">
-        <button
-          disabled={!valid}
-          onClick={onAuth}
-          className="w-full h-14 rounded-2xl bg-foreground text-background font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
-        >
-          Получить смс-код
-        </button>
-        <button
-          onClick={onOrder}
-          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
-        >
-          Заказать сим-карту
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      </div>
+          <div className="p-6 pt-4 space-y-3 mt-auto">
+            <button
+              disabled={!valid}
+              onClick={() => { setOtp(""); setStep("otp"); }}
+              className="w-full h-14 rounded-2xl bg-foreground text-background font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
+            >
+              Получить смс-код
+            </button>
+            <button
+              onClick={onOrder}
+              className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
+            >
+              Заказать сим-карту
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </>
+      ) : (
+        <InlineOtp
+          phone={phone}
+          otp={otp}
+          setOtp={setOtp}
+          onBack={() => { setOtp(""); setStep("phone"); }}
+          onLogin={onLogin}
+        />
+      )}
     </div>
   );
 }

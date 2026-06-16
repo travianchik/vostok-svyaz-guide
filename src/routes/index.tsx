@@ -71,7 +71,7 @@ function operatorLabel(op: ReturnType<typeof detectOperator>) {
 function App() {
   const [screen, setScreen] = useState<Screen>("splash");
   const [lang, setLang] = useState<Lang>("ru");
-  const [showLangPopup, setShowLangPopup] = useState(true);
+  const [showLangPopup, setShowLangPopup] = useState(false);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [tab, setTab] = useState<Tab>("svyaz");

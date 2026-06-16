@@ -112,23 +112,16 @@ function App() {
           <Welcome
             phone={phone}
             setPhone={setPhone}
-            onOrder={() => setScreen("sim-notice")}
-            onAuth={() => setScreen("auth-otp")}
-          />
-        )}
-
-        {screen === "auth-otp" && (
-          <AuthOtp
-            phone={phone}
             otp={otp}
             setOtp={setOtp}
-            onBack={() => setScreen("welcome")}
+            onOrder={() => setScreen("sim-notice")}
             onLogin={() => {
               setPrimary(phone);
               setScreen("home");
               setTab("svyaz");
               const op = detectOperator(phone);
               if (op !== "beeline") setShowAdNotice(true);
+              setOtp("");
             }}
           />
         )}

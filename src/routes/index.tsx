@@ -39,7 +39,7 @@ export const Route = createFileRoute("/")({
 type Screen =
   | "splash"
   | "welcome"
-  | "auth-otp"
+  
   | "sim-notice"
   | "sim-map"
   | "sim-docs"

@@ -389,8 +389,12 @@ function Welcome({
             placeholder="+7 (___) ___-__-__"
             value={formatted}
             onChange={(e) => {
-              const digits = e.target.value.replace(/\D/g, "").slice(-10);
-              setPhone(digits);
+              let digits = e.target.value.replace(/\D/g, "");
+              // Strip the country prefix that comes from the "+7" mask
+              if (digits.length > 10 && (digits[0] === "7" || digits[0] === "8")) {
+                digits = digits.slice(1);
+              }
+              setPhone(digits.slice(0, 10));
             }}
             className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
           />

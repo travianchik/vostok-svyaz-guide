@@ -749,8 +749,8 @@ function SimDocs({ onBack }: { onBack: () => void }) {
   );
 }
 
-/* ---------- AUTH OTP ---------- */
-function AuthOtp({
+/* ---------- INLINE OTP (shown inside Welcome) ---------- */
+function InlineOtp({
   phone,
   otp,
   setOtp,
@@ -765,28 +765,34 @@ function AuthOtp({
 }) {
   const digits = otp.padEnd(4, " ").split("");
   return (
-    <div className="flex flex-col h-[calc(100vh-44px)]">
-      <TopBar title="Подтверждение" onBack={onBack} />
-      <div className="flex-1 overflow-auto p-6">
-        <h2 className="text-2xl font-black leading-tight">Введите код из СМС</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Отправили на {formatPhone(phone)}
-        </p>
-
-        <div className="mt-10 grid grid-cols-4 gap-3">
-          {digits.map((d, i) => (
-            <div
-              key={i}
-              className={`h-16 rounded-2xl border-2 grid place-items-center text-2xl font-black ${
-                i === otp.length ? "border-foreground bg-brand/10" : "border-border bg-card"
-              }`}
-            >
-              {d.trim()}
-            </div>
-          ))}
+    <>
+      <div className="px-6 mt-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-bold">
+            Подтверждение по СМС
+          </div>
+          <button onClick={onBack} className="text-[12px] font-bold text-brand">
+            Изменить номер
+          </button>
         </div>
-
-        <div className="mt-8 grid grid-cols-3 gap-2">
+        <div className="rounded-2xl bg-card border border-border p-4">
+          <div className="text-sm">
+            Код отправлен на <span className="font-black">{formatPhone(phone)}</span>
+          </div>
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {digits.map((d, i) => (
+              <div
+                key={i}
+                className={`h-14 rounded-xl border-2 grid place-items-center text-2xl font-black ${
+                  i === otp.length ? "border-foreground bg-brand/10" : "border-border bg-background"
+                }`}
+              >
+                {d.trim()}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-3 grid grid-cols-3 gap-2">
           {["1","2","3","4","5","6","7","8","9","","0","⌫"].map((k, i) => (
             <button
               key={i}
@@ -795,14 +801,14 @@ function AuthOtp({
                 else if (k && otp.length < 4) setOtp(otp + k);
               }}
               disabled={!k}
-              className="h-14 rounded-2xl bg-muted font-bold text-xl active:bg-brand active:text-brand-foreground transition disabled:bg-transparent"
+              className="h-12 rounded-2xl bg-muted font-bold text-lg active:bg-brand active:text-brand-foreground transition disabled:bg-transparent"
             >
               {k}
             </button>
           ))}
         </div>
       </div>
-      <div className="p-6">
+      <div className="p-6 pt-4 mt-auto">
         <button
           disabled={otp.length !== 4}
           onClick={onLogin}
@@ -811,7 +817,7 @@ function AuthOtp({
           Войти
         </button>
       </div>
-    </div>
+    </>
   );
 }
 

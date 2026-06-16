@@ -284,7 +284,7 @@ function Splash({
               ))}
             </div>
             <button
-              onClick={() => setShowLangPopup(false)}
+              onClick={() => { setShowLangPopup(false); onContinue(); }}
               className="mt-5 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold"
             >
               Продолжить

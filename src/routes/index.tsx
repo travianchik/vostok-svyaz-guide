@@ -318,14 +318,19 @@ const slides = [
 function Welcome({
   phone,
   setPhone,
+  otp,
+  setOtp,
   onOrder,
-  onAuth,
+  onLogin,
 }: {
   phone: string;
   setPhone: (v: string) => void;
+  otp: string;
+  setOtp: (v: string) => void;
   onOrder: () => void;
-  onAuth: () => void;
+  onLogin: () => void;
 }) {
+  const [step, setStep] = useState<"phone" | "otp">("phone");
   const [i, setI] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % slides.length), 3000);

@@ -237,7 +237,7 @@ function Splash({
               </button>
             </div>
             <button
-              onClick={onContinue}
+              onClick={() => setShowLangPopup(true)}
               className="mt-10 h-14 px-10 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center gap-2"
             >
               Продолжить

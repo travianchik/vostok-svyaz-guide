@@ -337,7 +337,7 @@ function Welcome({
     return () => clearInterval(t);
   }, []);
   const S = slides[i].icon;
-  const formatted = useMemo(() => formatPhone(phone), [phone]);
+  const formatted = useMemo(() => formatPhoneInput(phone), [phone]);
   const valid = phone.length === 10;
 
   return (
@@ -382,17 +382,14 @@ function Welcome({
         </div>
         <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
           <Phone className="h-5 w-5" />
+          <span className="font-bold text-base tracking-wider">+7</span>
           <input
             inputMode="numeric"
-            placeholder="+7 (___) ___-__-__"
+            placeholder="(___) ___-__-__"
             value={formatted}
             readOnly={step === "otp"}
             onChange={(e) => {
-              let digits = e.target.value.replace(/\D/g, "");
-              while (digits.length > 0 && (digits[0] === "7" || digits[0] === "8")) {
-                digits = digits.slice(1);
-              }
-              setPhone(digits.slice(0, 10));
+              setPhone(normalizePhoneDigits(e.target.value));
             }}
             className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
           />
@@ -787,6 +784,23 @@ function formatPhone(d: string) {
   return p.join("");
 }
 
+function formatPhoneInput(d: string) {
+  if (!d) return "";
+  const p = ["(" + d.slice(0, 3)];
+  if (d.length >= 3) p.push(") " + d.slice(3, 6));
+  if (d.length >= 6) p.push("-" + d.slice(6, 8));
+  if (d.length >= 8) p.push("-" + d.slice(8, 10));
+  return p.join("");
+}
+
+function normalizePhoneDigits(value: string) {
+  let digits = value.replace(/\D/g, "");
+  if (digits.length > 10 && (digits[0] === "7" || digits[0] === "8")) {
+    digits = digits.slice(1);
+  }
+  return digits.slice(0, 10);
+}
+
 /* ---------- HOME (with bottom nav) ---------- */
 function Home({
   primary,
@@ -1135,7 +1149,7 @@ function BindNumberSheet({
   onBind: (p: string) => void;
 }) {
   const [v, setV] = useState("");
-  const formatted = useMemo(() => formatPhone(v), [v]);
+  const formatted = useMemo(() => formatPhoneInput(v), [v]);
   const valid = v.length === 10;
   const op = detectOperator(v);
   return (
@@ -1159,17 +1173,14 @@ function BindNumberSheet({
 
         <div className="mt-5 flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
           <Phone className="h-5 w-5" />
+          <span className="font-bold text-base tracking-wider">+7</span>
           <input
             autoFocus
             inputMode="numeric"
-            placeholder="+7 (___) ___-__-__"
+            placeholder="(___) ___-__-__"
             value={formatted}
             onChange={(e) => {
-              let digits = e.target.value.replace(/\D/g, "");
-              while (digits.length > 10 && (digits[0] === "7" || digits[0] === "8")) {
-                digits = digits.slice(1);
-              }
-              setV(digits.slice(0, 10));
+              setV(normalizePhoneDigits(e.target.value));
             }}
             className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
           />

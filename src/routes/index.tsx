@@ -1164,7 +1164,13 @@ function BindNumberSheet({
             inputMode="numeric"
             placeholder="+7 (___) ___-__-__"
             value={formatted}
-            onChange={(e) => setV(e.target.value.replace(/\D/g, "").slice(-10))}
+            onChange={(e) => {
+              let digits = e.target.value.replace(/\D/g, "");
+              while (digits.length > 10 && (digits[0] === "7" || digits[0] === "8")) {
+                digits = digits.slice(1);
+              }
+              setV(digits.slice(0, 10));
+            }}
             className="flex-1 bg-transparent outline-none font-bold text-base tracking-wider"
           />
         </div>

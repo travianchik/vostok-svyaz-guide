@@ -456,11 +456,11 @@ function Welcome({
           </button>
         )}
         <button
-          onClick={onOrder}
-          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
+          disabled
+          className="w-full h-14 rounded-2xl bg-muted text-muted-foreground font-bold text-base flex items-center justify-center gap-2 cursor-not-allowed opacity-70"
         >
-          Заказать сим-карту
-          <ChevronRight className="h-5 w-5" />
+          Заказ сим-карты — в разработке
+          <ChevronRight className="h-5 w-5 opacity-40" />
         </button>
       </div>
     </div>

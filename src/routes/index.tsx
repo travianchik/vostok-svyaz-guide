@@ -463,11 +463,11 @@ function Welcome({
           </button>
         )}
         <button
-          disabled
-          className="w-full h-14 rounded-2xl bg-muted text-muted-foreground font-bold text-base flex items-center justify-center gap-2 cursor-not-allowed opacity-70"
+          onClick={onOrder}
+          className="w-full h-14 rounded-2xl border-2 border-foreground bg-background text-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
         >
-          Заказ сим-карты — в разработке
-          <ChevronRight className="h-5 w-5 opacity-40" />
+          Заказать сим-карту
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
     </div>
@@ -1134,11 +1134,11 @@ function TabSvyaz({
                 Полный доступ к сервисам «Восток связь» — только с сим-картой Билайн.
               </p>
               <button
-                disabled
-                className="mt-4 h-12 px-5 rounded-2xl bg-muted text-muted-foreground font-bold text-sm inline-flex items-center gap-2 cursor-not-allowed opacity-70"
+                onClick={onOrderSim}
+                className="mt-4 h-12 px-5 rounded-2xl bg-brand text-brand-foreground font-bold text-sm inline-flex items-center gap-2 active:scale-[0.98] transition"
               >
-                Заказ сим-карты — в разработке
-                <ChevronRight className="h-4 w-4 opacity-40" />
+                Заказать сим-карту
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           )}

@@ -24,6 +24,13 @@ import {
   Settings,
   Layers,
   PieChart,
+  Mail,
+  Smartphone,
+  ScanFace,
+  Download,
+  LogIn,
+  Sliders,
+  Building2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({

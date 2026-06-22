@@ -506,32 +506,40 @@ function TopBar({ title, onBack }: { title: string; onBack: () => void }) {
 }
 
 /* ---------- SIM NOTICE (Beeline /dobro/notice/ flow) ---------- */
-const noticeSteps = [
+const noticeDocs = [
   {
-    n: "01",
-    t: "Оставьте заявку",
-    d: "Укажите ФИО и удобный способ связи. Мы перезвоним для подтверждения.",
+    icon: FileText,
+    t: "Оригинал паспорта",
+    d: "И заверенный перевод паспорта — его можно получить в бюро переводов.",
   },
   {
-    n: "02",
-    t: "Выберите номер и тариф",
-    d: "Подберём красивый номер из доступных и предложим подходящий тариф.",
+    icon: CreditCard,
+    t: "СНИЛС",
+    d: "Оформи в МФЦ, Социальном фонде России или у работодателя. Понадобится паспорт и нотариально заверенный перевод.",
   },
   {
-    n: "03",
-    t: "Подготовьте документы",
-    d: "Паспорт РФ или паспорт + миграционная карта для иностранных граждан.",
+    icon: Mail,
+    t: "Адрес электронной почты",
+    d: "Создай его заранее — пригодится для регистрации на госуслугах.",
   },
   {
-    n: "04",
-    t: "Получите сим-карту в офисе",
-    d: "Приходите в ближайший офис Билайн с документами. Оформление займёт 10 минут.",
+    icon: ShieldCheck,
+    t: "Учётная запись на Госуслугах",
+    d: "Создай и подтверди её в МФЦ.",
   },
   {
-    n: "05",
-    t: "Активируйте и пользуйтесь",
-    d: "Сим-карта активна сразу. Номер автоматически появится в приложении.",
+    icon: ScanFace,
+    t: "Биометрические данные",
+    d: "Голос и лицо — сдай в любом банке, который участвует в ЕБС.",
   },
+];
+
+const appSteps = [
+  { icon: Smartphone, t: "Установи сим в смартфон" },
+  { icon: Download, t: "Установи приложение «Восток связь»" },
+  { icon: LogIn, t: "Нажми «Войти»" },
+  { icon: Phone, t: "Зайди по номеру, который дали в офисе" },
+  { icon: Sliders, t: "Управляй сим в приложении" },
 ];
 
 function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => void }) {
@@ -539,45 +547,106 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
     <div className="flex flex-col h-[calc(100vh-44px)]">
       <TopBar title="Заказ сим-карты" onBack={onBack} />
       <div className="flex-1 overflow-auto">
+        {/* Hero */}
         <div className="relative rounded-b-3xl bg-surface text-white p-6 overflow-hidden">
           <div className="absolute -right-12 -top-12 w-44 h-44 rounded-full bg-brand/90" />
+          <div className="absolute -left-16 -bottom-20 w-44 h-44 rounded-full bg-brand/20" />
           <div className="relative">
-            <div className="text-xs uppercase tracking-widest text-white/60">
-              Уведомление об оказании услуг связи
+            <div className="text-[11px] uppercase tracking-widest text-white/60">
+              Памятка для иностранных граждан
             </div>
             <div className="text-2xl font-black mt-2 leading-tight">
-              5 простых шагов
-              <br /> до новой сим-карты
+              Как оформить
+              <br />сим-карту
             </div>
-            <p className="mt-3 text-white/80 text-sm">
-              Порядок оформления соответствует требованиям закона «О связи».
+            <p className="mt-3 text-white/80 text-sm leading-relaxed">
+              Пошаговая инструкция — от подготовки документов до настройки приложения.
             </p>
           </div>
         </div>
 
-        <div className="p-5 space-y-3">
-          {noticeSteps.map((s) => (
-            <div
-              key={s.n}
-              className="flex gap-4 p-4 rounded-2xl bg-card border border-border"
-            >
-              <div className="text-3xl font-black text-brand leading-none shrink-0 w-10">
-                {s.n}
-              </div>
-              <div className="min-w-0">
-                <div className="font-bold text-sm">{s.t}</div>
-                <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                  {s.d}
+        {/* Step 1 */}
+        <div className="px-5 pt-6">
+          <StepHeader n="1" title="Подготовь документы" subtitle="Если чего-то не хватает — обратись в МФЦ" />
+          <div className="mt-4 space-y-2.5">
+            {noticeDocs.map((d) => {
+              const Icon = d.icon;
+              return (
+                <div
+                  key={d.t}
+                  className="flex gap-3 p-4 rounded-2xl bg-card border border-border"
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-brand text-brand-foreground grid place-items-center shrink-0">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="font-bold text-sm leading-tight">{d.t}</div>
+                    <div className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      {d.d}
+                    </div>
+                  </div>
                 </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Step 2 */}
+        <div className="px-5 pt-6">
+          <StepHeader
+            n="2"
+            title="Приходи в офис Билайн"
+            subtitle="С готовыми документами и смартфоном"
+          />
+          <button
+            onClick={onToMap}
+            className="mt-4 w-full p-4 rounded-2xl bg-surface text-white flex items-center gap-3 active:scale-[0.99] transition"
+          >
+            <div className="w-11 h-11 rounded-2xl bg-brand text-brand-foreground grid place-items-center shrink-0">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <div className="text-left min-w-0 flex-1">
+              <div className="font-bold text-sm">Найти ближайший офис</div>
+              <div className="text-[11px] text-white/60 mt-0.5">
+                Покажем на карте и построим маршрут
               </div>
             </div>
-          ))}
+            <ChevronRight className="h-5 w-5 text-white/70 shrink-0" />
+          </button>
+        </div>
 
-          <div className="p-4 rounded-2xl bg-brand/20 text-sm">
-            После оформления номер автоматически появится в приложении «Восток связь».
+        {/* Step 3 */}
+        <div className="px-5 pt-6 pb-6">
+          <StepHeader
+            n="3"
+            title="Настрой сим и управляй тарифом"
+            subtitle="Прямо в приложении «Восток связь»"
+          />
+          <div className="mt-4 space-y-2">
+            {appSteps.map((s, idx) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.t}
+                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-card border border-border"
+                >
+                  <div className="w-8 h-8 rounded-full bg-brand/15 text-foreground grid place-items-center font-black text-sm shrink-0">
+                    {idx + 1}
+                  </div>
+                  <div className="font-semibold text-sm flex-1 min-w-0">{s.t}</div>
+                  <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 p-4 rounded-2xl bg-brand/15 text-xs leading-relaxed">
+            После оформления номер автоматически появится в приложении «Восток связь» —
+            баланс, тариф и услуги будут под рукой.
           </div>
         </div>
       </div>
+
       <div className="p-5 border-t border-border bg-background">
         <button
           onClick={onToMap}
@@ -586,6 +655,23 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
           Найти ближайший офис
           <ChevronRight className="h-5 w-5" />
         </button>
+      </div>
+    </div>
+  );
+}
+
+function StepHeader({ n, title, subtitle }: { n: string; title: string; subtitle: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 rounded-2xl bg-foreground text-background grid place-items-center font-black shrink-0">
+        {n}
+      </div>
+      <div className="min-w-0">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-bold">
+          Шаг {n}
+        </div>
+        <div className="font-black text-lg leading-tight mt-0.5">{title}</div>
+        <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>
       </div>
     </div>
   );

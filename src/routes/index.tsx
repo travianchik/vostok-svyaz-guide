@@ -617,6 +617,31 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
             ))}
           </div>
         </div>
+
+        {/* Step 3 */}
+        <div className="px-5 pb-6">
+          <StepHeader
+            n="3"
+            title="Настрой сим и управляй тарифом"
+            subtitle="Через приложение «Восток связь»"
+          />
+          <div className="mt-4 space-y-2.5">
+            {appSteps.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.t}
+                  className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border"
+                >
+                  <div className="w-11 h-11 rounded-2xl bg-brand text-brand-foreground grid place-items-center shrink-0">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 font-bold text-sm leading-tight">{s.t}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="p-5 border-t border-border bg-background">

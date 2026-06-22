@@ -592,68 +592,39 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
         </div>
 
         {/* Step 2 */}
-        <div className="px-5 pt-6">
+        <div className="px-5 pt-6 pb-6">
           <StepHeader
             n="2"
             title="Приходи в офис Билайн"
             subtitle="С готовыми документами и смартфоном"
           />
-          <button
-            onClick={onToMap}
-            className="mt-4 w-full p-4 rounded-2xl bg-surface text-white flex items-center gap-3 active:scale-[0.99] transition"
-          >
-            <div className="w-11 h-11 rounded-2xl bg-brand text-brand-foreground grid place-items-center shrink-0">
-              <Building2 className="h-5 w-5" />
-            </div>
-            <div className="text-left min-w-0 flex-1">
-              <div className="font-bold text-sm">Найти ближайший офис</div>
-              <div className="text-[11px] text-white/60 mt-0.5">
-                Покажем на карте и построим маршрут
-              </div>
-            </div>
-            <ChevronRight className="h-5 w-5 text-white/70 shrink-0" />
-          </button>
-        </div>
-
-        {/* Step 3 */}
-        <div className="px-5 pt-6 pb-6">
-          <StepHeader
-            n="3"
-            title="Настрой сим и управляй тарифом"
-            subtitle="Прямо в приложении «Восток связь»"
-          />
           <div className="mt-4 space-y-2">
-            {appSteps.map((s, idx) => {
-              const Icon = s.icon;
-              return (
-                <div
-                  key={s.t}
-                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-card border border-border"
-                >
-                  <div className="w-8 h-8 rounded-full bg-brand/15 text-foreground grid place-items-center font-black text-sm shrink-0">
-                    {idx + 1}
-                  </div>
-                  <div className="font-semibold text-sm flex-1 min-w-0">{s.t}</div>
-                  <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+            {offices.map((o) => (
+              <div
+                key={o.id}
+                className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border"
+              >
+                <div className="w-11 h-11 rounded-2xl bg-brand text-brand-foreground grid place-items-center shrink-0">
+                  <MapPin className="h-5 w-5" />
                 </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-5 p-4 rounded-2xl bg-brand/15 text-xs leading-relaxed">
-            После оформления номер автоматически появится в приложении «Восток связь» —
-            баланс, тариф и услуги будут под рукой.
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-sm leading-tight">{o.name}</div>
+                  <div className="text-[11px] text-muted-foreground mt-1">
+                    {o.hours} · {o.dist}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
       <div className="p-5 border-t border-border bg-background">
         <button
-          onClick={onToMap}
+          onClick={onBack}
           className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2"
         >
-          Найти ближайший офис
-          <ChevronRight className="h-5 w-5" />
+          Понятно
         </button>
       </div>
     </div>

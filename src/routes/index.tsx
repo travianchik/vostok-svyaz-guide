@@ -31,6 +31,9 @@ import {
   LogIn,
   Sliders,
   Building2,
+  Wrench,
+  Lock,
+  Delete,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -55,11 +58,11 @@ type Screen =
 type Lang = "ru" | "tg" | "ky" | "uz";
 type Tab = "svyaz" | "bank" | "uslugi";
 
-const LANGS: { code: Lang; label: string; hello: string; native: string }[] = [
-  { code: "ru", label: "Русский", hello: "Добро пожаловать", native: "Русский" },
-  { code: "tg", label: "Тоҷикӣ", hello: "Хуш омадед", native: "Тоҷикӣ" },
-  { code: "ky", label: "Кыргызча", hello: "Кош келиңиз", native: "Кыргызча" },
-  { code: "uz", label: "O‘zbekcha", hello: "Xush kelibsiz", native: "O‘zbekcha" },
+const LANGS: { code: Lang; label: string; hello: string; native: string; flag: string }[] = [
+  { code: "ru", label: "Русский", hello: "Добро пожаловать", native: "Русский", flag: "🇷🇺" },
+  { code: "tg", label: "Тоҷикӣ", hello: "Хуш омадед", native: "Тоҷикӣ", flag: "🇹🇯" },
+  { code: "ky", label: "Кыргызча", hello: "Кош келиңиз", native: "Кыргызча", flag: "🇰🇬" },
+  { code: "uz", label: "O‘zbekcha", hello: "Xush kelibsiz", native: "O‘zbekcha", flag: "🇺🇿" },
 ];
 
 const BEELINE_PREFIXES = ["903","905","906","909","951","953","960","961","963","964","965","966","967","968"];
@@ -87,8 +90,12 @@ function App() {
   const [additional, setAdditional] = useState<string[]>([]);
   const [showAdNotice, setShowAdNotice] = useState(false);
   const [bindMode, setBindMode] = useState(false);
+  const [devMsg, setDevMsg] = useState<string | null>(null);
+  // bank auth: 'login' = first-time data entry, 'passcode' = subsequent, 'in' = unlocked
+  const [bankAuth, setBankAuth] = useState<"login" | "passcode" | "in">("login");
 
   const operator = useMemo(() => detectOperator(primary || phone), [primary, phone]);
+  const showDev = (m = "Раздел в разработке") => setDevMsg(m);
 
   return (
     <div className="min-h-screen bg-neutral-200 flex items-start justify-center">
@@ -163,6 +170,7 @@ function App() {
               setAdditional([]);
               setPhone("");
               setOtp("");
+              setBankAuth("login");
               setScreen("welcome");
             }}
             showAdNotice={showAdNotice && operator !== "beeline"}
@@ -181,8 +189,30 @@ function App() {
               const op = detectOperator(newPhone);
               setShowAdNotice(op !== "beeline");
             }}
+            showDev={showDev}
+            bankAuth={bankAuth}
+            setBankAuth={setBankAuth}
           />
         )}
+
+        {devMsg && <DevToast text={devMsg} onClose={() => setDevMsg(null)} />}
+      </div>
+    </div>
+  );
+}
+
+function DevToast({ text, onClose }: { text: string; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 2200);
+    return () => clearTimeout(t);
+  }, [onClose]);
+  return (
+    <div className="absolute inset-x-0 bottom-24 z-50 flex justify-center px-6 pointer-events-none">
+      <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl bg-foreground text-background shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="w-8 h-8 rounded-xl bg-brand grid place-items-center shrink-0">
+          <Wrench className="h-4 w-4 text-brand-foreground" />
+        </div>
+        <div className="text-sm font-bold">{text}</div>
       </div>
     </div>
   );
@@ -278,9 +308,12 @@ function Splash({
                       : "border-border bg-card"
                   }`}
                 >
-                  <div className="text-left">
-                    <div className="font-bold">{l.native}</div>
-                    <div className="text-xs text-muted-foreground">{l.hello}</div>
+                  <div className="flex items-center gap-3 text-left">
+                    <span className="text-2xl leading-none" aria-hidden>{l.flag}</span>
+                    <div>
+                      <div className="font-bold">{l.native}</div>
+                      <div className="text-xs text-muted-foreground">{l.hello}</div>
+                    </div>
                   </div>
                   {lang === l.code && (
                     <div className="w-6 h-6 rounded-full bg-brand grid place-items-center">
@@ -905,6 +938,9 @@ function Home({
   openBind,
   closeBind,
   onBindNumber,
+  showDev,
+  bankAuth,
+  setBankAuth,
 }: {
   primary: string;
   additional: string[];
@@ -919,6 +955,9 @@ function Home({
   openBind: () => void;
   closeBind: () => void;
   onBindNumber: (p: string) => void;
+  showDev: (m?: string) => void;
+  bankAuth: "login" | "passcode" | "in";
+  setBankAuth: (s: "login" | "passcode" | "in") => void;
 }) {
   return (
     <div className="relative flex flex-col h-[calc(100vh-44px)] bg-background">
@@ -942,9 +981,16 @@ function Home({
             dismissAd={dismissAd}
             onOrderSim={onOrderSim}
             openBind={openBind}
+            showDev={showDev}
           />
         )}
-        {tab === "bank" && <TabBank />}
+        {tab === "bank" && (
+          <TabBank
+            auth={bankAuth}
+            setAuth={setBankAuth}
+            onLock={() => setBankAuth("passcode")}
+          />
+        )}
         {tab === "uslugi" && <TabUslugi />}
       </div>
 
@@ -996,6 +1042,7 @@ function TabSvyaz({
   dismissAd,
   onOrderSim,
   openBind,
+  showDev,
 }: {
   primary: string;
   additional: string[];
@@ -1004,6 +1051,7 @@ function TabSvyaz({
   dismissAd: () => void;
   onOrderSim: () => void;
   openBind: () => void;
+  showDev: (m?: string) => void;
 }) {
   const isBeeline = operator === "beeline";
   return (
@@ -1028,7 +1076,10 @@ function TabSvyaz({
                 <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
                 <div className="text-xs text-muted-foreground mt-1">на балансе</div>
               </div>
-              <button className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0">
+              <button
+                onClick={() => showDev("Пополнение — раздел в разработке")}
+                className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
+              >
                 Пополнить
               </button>
             </div>
@@ -1042,14 +1093,22 @@ function TabSvyaz({
               твой тариф
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-2xl bg-card border border-border">
-              <div className="text-2xl font-black">25<span className="text-muted-foreground">/35</span></div>
-              <div className="text-xs text-muted-foreground mt-1">Гигабайты</div>
+          <div className="relative">
+            <div className="grid grid-cols-2 gap-3 blur-md select-none pointer-events-none">
+              <div className="p-4 rounded-2xl bg-card border border-border">
+                <div className="text-2xl font-black">25<span className="text-muted-foreground">/35</span></div>
+                <div className="text-xs text-muted-foreground mt-1">Гигабайты</div>
+              </div>
+              <div className="p-4 rounded-2xl bg-card border border-border">
+                <div className="text-2xl font-black">200<span className="text-muted-foreground">/250</span></div>
+                <div className="text-xs text-muted-foreground mt-1">Минуты</div>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-card border border-border">
-              <div className="text-2xl font-black">200<span className="text-muted-foreground">/250</span></div>
-              <div className="text-xs text-muted-foreground mt-1">Минуты</div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/90 text-background text-xs font-bold shadow-lg">
+                <Wrench className="h-3.5 w-3.5" />
+                Раздел в разработке
+              </div>
             </div>
           </div>
 
@@ -1060,7 +1119,11 @@ function TabSvyaz({
               { icon: Layers, label: "Услуги\nи сервисы" },
               { icon: PieChart, label: "Мои\nрасходы" },
             ].map(({ icon: Icon, label }) => (
-              <button key={label} className="flex flex-col items-center gap-2">
+              <button
+                key={label}
+                onClick={() => showDev(`${label.replace("\n", " ")} — в разработке`)}
+                className="flex flex-col items-center gap-2 active:scale-[0.97] transition"
+              >
                 <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -1169,10 +1232,28 @@ function TabSvyaz({
   );
 }
 
-function TabBank() {
+function TabBank({
+  auth,
+  setAuth,
+}: {
+  auth: "login" | "passcode" | "in";
+  setAuth: (s: "login" | "passcode" | "in") => void;
+  onLock: () => void;
+}) {
+  if (auth === "login") return <BankLogin onDone={() => setAuth("in")} />;
+  if (auth === "passcode") return <BankPasscode onDone={() => setAuth("in")} />;
   return (
     <div className="px-5 pt-4 space-y-4">
-      <h1 className="text-xl font-bold">Билайн Банк</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">Билайн Банк</h1>
+        <button
+          onClick={() => setAuth("passcode")}
+          className="text-xs font-semibold text-muted-foreground px-3 py-1.5 rounded-full bg-muted inline-flex items-center gap-1.5"
+        >
+          <Lock className="h-3.5 w-3.5" />
+          Заблокировать
+        </button>
+      </div>
       <div className="relative rounded-3xl bg-surface text-white p-6 overflow-hidden h-48">
         <div className="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-brand/90" />
         <div className="relative h-full flex flex-col justify-between">
@@ -1200,32 +1281,229 @@ function TabBank() {
   );
 }
 
-function TabUslugi() {
-  const items = [
-    { t: "Интернет дома", d: "Тарифы и подключение" },
-    { t: "ТВ", d: "Каналы и фильмы" },
-    { t: "Роуминг", d: "Тарифы в поездках" },
-    { t: "Подписки", d: "Музыка, кино, игры" },
-    { t: "Поддержка", d: "Чат 24/7" },
-  ];
-  return (
-    <div className="px-5 pt-4 space-y-3">
-      <h1 className="text-xl font-bold">Услуги</h1>
-      {items.map((i) => (
-        <div
-          key={i.t}
-          className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border"
-        >
-          <div className="w-11 h-11 rounded-2xl bg-brand grid place-items-center shrink-0">
-            <Sparkles className="h-5 w-5 text-brand-foreground" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-bold text-sm">{i.t}</div>
-            <div className="text-xs text-muted-foreground">{i.d}</div>
-          </div>
-          <ChevronRight className="h-5 w-5 text-muted-foreground" />
+function BankLogin({ onDone }: { onDone: () => void }) {
+  const [step, setStep] = useState<"data" | "create-passcode">("data");
+  const [fio, setFio] = useState("");
+  const [birth, setBirth] = useState("");
+  const [passport, setPassport] = useState("");
+  const [pin, setPin] = useState("");
+  const [pin2, setPin2] = useState("");
+
+  if (step === "data") {
+    const valid = fio.trim().length > 3 && birth.length === 10 && passport.replace(/\D/g, "").length === 10;
+    return (
+      <div className="px-5 pt-4 pb-8 space-y-4">
+        <div>
+          <h1 className="text-xl font-black tracking-tight">Билайн Банк</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Первый вход. Подтвердите свои данные, чтобы открыть счёт.
+          </p>
         </div>
-      ))}
+        <div className="space-y-3">
+          <BankField label="ФИО" placeholder="Иванов Иван Иванович" value={fio} onChange={setFio} />
+          <BankField
+            label="Дата рождения"
+            placeholder="ДД.ММ.ГГГГ"
+            value={birth}
+            onChange={(v) => setBirth(maskDate(v))}
+            inputMode="numeric"
+          />
+          <BankField
+            label="Серия и номер паспорта"
+            placeholder="0000 000000"
+            value={passport}
+            onChange={(v) => setPassport(maskPassport(v))}
+            inputMode="numeric"
+          />
+        </div>
+        <div className="p-3 rounded-2xl bg-brand/15 text-[11px] leading-snug text-foreground/80">
+          Нажимая «Продолжить», вы соглашаетесь на обработку персональных данных и условия открытия счёта.
+        </div>
+        <button
+          disabled={!valid}
+          onClick={() => setStep("create-passcode")}
+          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+        >
+          Продолжить
+        </button>
+      </div>
+    );
+  }
+
+  const ok = pin.length === 4 && pin === pin2;
+  return (
+    <div className="px-5 pt-4 pb-8 space-y-5">
+      <div>
+        <h1 className="text-xl font-black tracking-tight">Придумайте код-пароль</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Код потребуется для входа в банк в следующий раз.
+        </p>
+      </div>
+      <PinDisplay value={pin} label="Новый код" />
+      <PinDisplay value={pin2} label="Повторите код" />
+      <PinKeypad
+        onDigit={(d) => {
+          if (pin.length < 4) setPin(pin + d);
+          else if (pin2.length < 4) setPin2(pin2 + d);
+        }}
+        onBack={() => {
+          if (pin2.length > 0) setPin2(pin2.slice(0, -1));
+          else setPin(pin.slice(0, -1));
+        }}
+      />
+      <button
+        disabled={!ok}
+        onClick={onDone}
+        className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+      >
+        Сохранить и войти
+      </button>
+    </div>
+  );
+}
+
+function BankPasscode({ onDone }: { onDone: () => void }) {
+  const [pin, setPin] = useState("");
+  const [err, setErr] = useState(false);
+  useEffect(() => {
+    if (pin.length === 4) {
+      // demo: any 4 digits accepted
+      const t = setTimeout(onDone, 250);
+      return () => clearTimeout(t);
+    }
+    setErr(false);
+  }, [pin, onDone]);
+  return (
+    <div className="px-5 pt-6 pb-8 space-y-6 flex flex-col items-center">
+      <div className="w-16 h-16 rounded-3xl bg-brand grid place-items-center shadow-lg">
+        <Lock className="h-7 w-7 text-brand-foreground" />
+      </div>
+      <div className="text-center">
+        <h1 className="text-xl font-black tracking-tight">Введите код-пароль</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Для входа в Билайн Банк
+        </p>
+      </div>
+      <PinDisplay value={pin} label="" error={err} />
+      <PinKeypad
+        onDigit={(d) => pin.length < 4 && setPin(pin + d)}
+        onBack={() => setPin(pin.slice(0, -1))}
+      />
+      <button
+        onClick={() => setPin("")}
+        className="text-xs font-semibold text-muted-foreground underline"
+      >
+        Забыли код-пароль?
+      </button>
+    </div>
+  );
+}
+
+function BankField({
+  label,
+  placeholder,
+  value,
+  onChange,
+  inputMode,
+}: {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  inputMode?: "text" | "numeric";
+}) {
+  return (
+    <label className="block">
+      <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+        {label}
+      </div>
+      <input
+        inputMode={inputMode ?? "text"}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
+      />
+    </label>
+  );
+}
+
+function PinDisplay({ value, label, error }: { value: string; label: string; error?: boolean }) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {label && <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">{label}</div>}
+      <div className="flex gap-3">
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className={`w-4 h-4 rounded-full border-2 transition ${
+              error
+                ? "border-destructive bg-destructive"
+                : value.length > i
+                  ? "border-foreground bg-foreground"
+                  : "border-foreground/30"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PinKeypad({ onDigit, onBack }: { onDigit: (d: string) => void; onBack: () => void }) {
+  const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "back"];
+  return (
+    <div className="grid grid-cols-3 gap-3 w-full max-w-[280px] mx-auto">
+      {keys.map((k, i) => {
+        if (k === "") return <div key={i} />;
+        if (k === "back")
+          return (
+            <button
+              key={i}
+              onClick={onBack}
+              className="h-16 rounded-2xl bg-muted grid place-items-center active:scale-95 transition"
+            >
+              <Delete className="h-5 w-5" />
+            </button>
+          );
+        return (
+          <button
+            key={i}
+            onClick={() => onDigit(k)}
+            className="h-16 rounded-2xl bg-card border border-border text-2xl font-black active:scale-95 active:bg-muted transition"
+          >
+            {k}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function maskDate(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 8);
+  const p: string[] = [];
+  if (d.length > 0) p.push(d.slice(0, 2));
+  if (d.length >= 3) p.push(d.slice(2, 4));
+  if (d.length >= 5) p.push(d.slice(4, 8));
+  return p.join(".");
+}
+function maskPassport(v: string) {
+  const d = v.replace(/\D/g, "").slice(0, 10);
+  if (d.length <= 4) return d;
+  return d.slice(0, 4) + " " + d.slice(4);
+}
+
+function TabUslugi() {
+  return (
+    <div className="px-5 pt-4 pb-10 space-y-4 flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <div className="w-20 h-20 rounded-3xl bg-brand grid place-items-center shadow-lg">
+        <Wrench className="h-9 w-9 text-brand-foreground" />
+      </div>
+      <h1 className="text-2xl font-black tracking-tight">Услуги</h1>
+      <p className="text-sm text-muted-foreground max-w-[280px]">
+        Раздел в разработке. Скоро здесь появятся домашний интернет, ТВ, роуминг, подписки и поддержка.
+      </p>
     </div>
   );
 }

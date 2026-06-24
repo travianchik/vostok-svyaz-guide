@@ -31,6 +31,9 @@ import {
   LogIn,
   Sliders,
   Building2,
+  Wrench,
+  Lock,
+  Delete,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({

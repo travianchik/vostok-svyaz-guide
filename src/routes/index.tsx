@@ -90,8 +90,12 @@ function App() {
   const [additional, setAdditional] = useState<string[]>([]);
   const [showAdNotice, setShowAdNotice] = useState(false);
   const [bindMode, setBindMode] = useState(false);
+  const [devMsg, setDevMsg] = useState<string | null>(null);
+  // bank auth: 'login' = first-time data entry, 'passcode' = subsequent, 'in' = unlocked
+  const [bankAuth, setBankAuth] = useState<"login" | "passcode" | "in">("login");
 
   const operator = useMemo(() => detectOperator(primary || phone), [primary, phone]);
+  const showDev = (m = "Раздел в разработке") => setDevMsg(m);
 
   return (
     <div className="min-h-screen bg-neutral-200 flex items-start justify-center">

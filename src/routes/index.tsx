@@ -938,6 +938,9 @@ function Home({
   openBind,
   closeBind,
   onBindNumber,
+  showDev,
+  bankAuth,
+  setBankAuth,
 }: {
   primary: string;
   additional: string[];
@@ -952,6 +955,9 @@ function Home({
   openBind: () => void;
   closeBind: () => void;
   onBindNumber: (p: string) => void;
+  showDev: (m?: string) => void;
+  bankAuth: "login" | "passcode" | "in";
+  setBankAuth: (s: "login" | "passcode" | "in") => void;
 }) {
   return (
     <div className="relative flex flex-col h-[calc(100vh-44px)] bg-background">
@@ -975,9 +981,16 @@ function Home({
             dismissAd={dismissAd}
             onOrderSim={onOrderSim}
             openBind={openBind}
+            showDev={showDev}
           />
         )}
-        {tab === "bank" && <TabBank />}
+        {tab === "bank" && (
+          <TabBank
+            auth={bankAuth}
+            setAuth={setBankAuth}
+            onLock={() => setBankAuth("passcode")}
+          />
+        )}
         {tab === "uslugi" && <TabUslugi />}
       </div>
 

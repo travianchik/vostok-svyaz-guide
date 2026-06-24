@@ -55,11 +55,11 @@ type Screen =
 type Lang = "ru" | "tg" | "ky" | "uz";
 type Tab = "svyaz" | "bank" | "uslugi";
 
-const LANGS: { code: Lang; label: string; hello: string; native: string }[] = [
-  { code: "ru", label: "Русский", hello: "Добро пожаловать", native: "Русский" },
-  { code: "tg", label: "Тоҷикӣ", hello: "Хуш омадед", native: "Тоҷикӣ" },
-  { code: "ky", label: "Кыргызча", hello: "Кош келиңиз", native: "Кыргызча" },
-  { code: "uz", label: "O‘zbekcha", hello: "Xush kelibsiz", native: "O‘zbekcha" },
+const LANGS: { code: Lang; label: string; hello: string; native: string; flag: string }[] = [
+  { code: "ru", label: "Русский", hello: "Добро пожаловать", native: "Русский", flag: "🇷🇺" },
+  { code: "tg", label: "Тоҷикӣ", hello: "Хуш омадед", native: "Тоҷикӣ", flag: "🇹🇯" },
+  { code: "ky", label: "Кыргызча", hello: "Кош келиңиз", native: "Кыргызча", flag: "🇰🇬" },
+  { code: "uz", label: "O‘zbekcha", hello: "Xush kelibsiz", native: "O‘zbekcha", flag: "🇺🇿" },
 ];
 
 const BEELINE_PREFIXES = ["903","905","906","909","951","953","960","961","963","964","965","966","967","968"];

@@ -1042,6 +1042,7 @@ function TabSvyaz({
   dismissAd,
   onOrderSim,
   openBind,
+  showDev,
 }: {
   primary: string;
   additional: string[];
@@ -1050,6 +1051,7 @@ function TabSvyaz({
   dismissAd: () => void;
   onOrderSim: () => void;
   openBind: () => void;
+  showDev: (m?: string) => void;
 }) {
   const isBeeline = operator === "beeline";
   return (
@@ -1074,7 +1076,10 @@ function TabSvyaz({
                 <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
                 <div className="text-xs text-muted-foreground mt-1">на балансе</div>
               </div>
-              <button className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0">
+              <button
+                onClick={() => showDev("Пополнение — раздел в разработке")}
+                className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
+              >
                 Пополнить
               </button>
             </div>
@@ -1088,14 +1093,22 @@ function TabSvyaz({
               твой тариф
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-2xl bg-card border border-border">
-              <div className="text-2xl font-black">25<span className="text-muted-foreground">/35</span></div>
-              <div className="text-xs text-muted-foreground mt-1">Гигабайты</div>
+          <div className="relative">
+            <div className="grid grid-cols-2 gap-3 blur-md select-none pointer-events-none">
+              <div className="p-4 rounded-2xl bg-card border border-border">
+                <div className="text-2xl font-black">25<span className="text-muted-foreground">/35</span></div>
+                <div className="text-xs text-muted-foreground mt-1">Гигабайты</div>
+              </div>
+              <div className="p-4 rounded-2xl bg-card border border-border">
+                <div className="text-2xl font-black">200<span className="text-muted-foreground">/250</span></div>
+                <div className="text-xs text-muted-foreground mt-1">Минуты</div>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-card border border-border">
-              <div className="text-2xl font-black">200<span className="text-muted-foreground">/250</span></div>
-              <div className="text-xs text-muted-foreground mt-1">Минуты</div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/90 text-background text-xs font-bold shadow-lg">
+                <Wrench className="h-3.5 w-3.5" />
+                Раздел в разработке
+              </div>
             </div>
           </div>
 
@@ -1106,7 +1119,11 @@ function TabSvyaz({
               { icon: Layers, label: "Услуги\nи сервисы" },
               { icon: PieChart, label: "Мои\nрасходы" },
             ].map(({ icon: Icon, label }) => (
-              <button key={label} className="flex flex-col items-center gap-2">
+              <button
+                key={label}
+                onClick={() => showDev(`${label.replace("\n", " ")} — в разработке`)}
+                className="flex flex-col items-center gap-2 active:scale-[0.97] transition"
+              >
                 <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center">
                   <Icon className="h-5 w-5" />
                 </div>

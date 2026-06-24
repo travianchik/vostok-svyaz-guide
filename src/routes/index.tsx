@@ -170,6 +170,7 @@ function App() {
               setAdditional([]);
               setPhone("");
               setOtp("");
+              setBankAuth("login");
               setScreen("welcome");
             }}
             showAdNotice={showAdNotice && operator !== "beeline"}
@@ -188,8 +189,30 @@ function App() {
               const op = detectOperator(newPhone);
               setShowAdNotice(op !== "beeline");
             }}
+            showDev={showDev}
+            bankAuth={bankAuth}
+            setBankAuth={setBankAuth}
           />
         )}
+
+        {devMsg && <DevToast text={devMsg} onClose={() => setDevMsg(null)} />}
+      </div>
+    </div>
+  );
+}
+
+function DevToast({ text, onClose }: { text: string; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 2200);
+    return () => clearTimeout(t);
+  }, [onClose]);
+  return (
+    <div className="absolute inset-x-0 bottom-24 z-50 flex justify-center px-6 pointer-events-none">
+      <div className="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl bg-foreground text-background shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="w-8 h-8 rounded-xl bg-brand grid place-items-center shrink-0">
+          <Wrench className="h-4 w-4 text-brand-foreground" />
+        </div>
+        <div className="text-sm font-bold">{text}</div>
       </div>
     </div>
   );

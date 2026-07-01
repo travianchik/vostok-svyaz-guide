@@ -1158,7 +1158,7 @@ function TabSvyaz({
                 Пополнить
               </button>
             </div>
-            <div className="text-[11px] text-muted-foreground mt-4">28 июня спишется 650 ₽</div>
+            
           </div>
 
           {/* Tariff */}

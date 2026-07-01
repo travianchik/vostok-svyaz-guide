@@ -1326,14 +1326,47 @@ function TabSvyaz({
 function TabBank({
   auth,
   setAuth,
+  onLock,
+  operator,
+  onOrderSim,
 }: {
   auth: "login" | "passcode" | "in";
   setAuth: (s: "login" | "passcode" | "in") => void;
   onLock: () => void;
+  operator: ReturnType<typeof detectOperator>;
+  onOrderSim: () => void;
 }) {
+  if (operator !== "beeline") {
+    return <BankDisabledNotice onOrderSim={onOrderSim} />;
+  }
   if (auth === "login") return <BankLogin onDone={() => setAuth("in")} />;
   if (auth === "passcode") return <BankPasscode onDone={() => setAuth("in")} />;
-  return <BankWebview onLock={() => setAuth("passcode")} />;
+  return <BankWebview onLock={onLock} />;
+}
+
+function BankDisabledNotice({ onOrderSim }: { onOrderSim: () => void }) {
+  return (
+    <div className="px-5 pt-6">
+      <div className="relative rounded-2xl bg-brand p-6 overflow-hidden">
+        <div className="w-12 h-12 rounded-2xl bg-surface text-brand grid place-items-center mb-4">
+          <CreditCard className="h-6 w-6" />
+        </div>
+        <div className="text-surface font-black text-xl leading-tight">
+          Банковский сервис недоступен
+        </div>
+        <p className="text-surface/80 text-sm mt-2 leading-relaxed">
+          Чтобы пользоваться картой и переводами, оформите сим-карту Билайн.
+        </p>
+        <button
+          onClick={onOrderSim}
+          className="mt-5 h-12 px-5 rounded-2xl bg-brand text-brand-foreground font-bold text-sm inline-flex items-center gap-2 active:scale-[0.98] transition"
+        >
+          Оформить сим-карту
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function TajikFlag() {

@@ -1316,40 +1316,180 @@ function TabBank({
 }) {
   if (auth === "login") return <BankLogin onDone={() => setAuth("in")} />;
   if (auth === "passcode") return <BankPasscode onDone={() => setAuth("in")} />;
+  return <BankWebview onLock={() => setAuth("passcode")} />;
+}
+
+function TajikFlag() {
+  // Round Tajikistan flag: red-white-green with gold crown+stars
   return (
-    <div className="px-5 pt-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">Билайн Банк</h1>
-        <button
-          onClick={() => setAuth("passcode")}
-          className="text-xs font-semibold text-muted-foreground px-3 py-1.5 rounded-full bg-muted inline-flex items-center gap-1.5"
-        >
-          <Lock className="h-3.5 w-3.5" />
-          Заблокировать
-        </button>
+    <svg viewBox="0 0 40 40" className="w-full h-full">
+      <defs>
+        <clipPath id="tjc"><circle cx="20" cy="20" r="20" /></clipPath>
+      </defs>
+      <g clipPath="url(#tjc)">
+        <rect width="40" height="14" fill="#cc0000" />
+        <rect y="14" width="40" height="12" fill="#ffffff" />
+        <rect y="26" width="40" height="14" fill="#006600" />
+        <g fill="#f8c300">
+          <path d="M14 18h12v1.5H14zM15 20h10l-1 1.5H16z" />
+          <circle cx="20" cy="17" r="0.8" />
+          <circle cx="17" cy="17.3" r="0.6" />
+          <circle cx="23" cy="17.3" r="0.6" />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+function MirCard({ last4 = "4821" }: { last4?: string }) {
+  return (
+    <div className="relative rounded-2xl overflow-hidden aspect-[1.586/1] shadow-lg" style={{ background: "#1b8a5a" }}>
+      <div className="absolute inset-0 opacity-90"
+           style={{ background: "linear-gradient(135deg, #1b8a5a 0%, #0f6b45 60%, #094e33 100%)" }} />
+      {/* Flag circle */}
+      <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full overflow-hidden ring-4 ring-white/10">
+        <TajikFlag />
       </div>
-      <div className="relative rounded-3xl bg-surface text-white p-6 overflow-hidden h-48">
-        <div className="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-brand/90" />
-        <div className="relative h-full flex flex-col justify-between">
-          <div>
-            <div className="text-xs uppercase tracking-widest text-white/60">Карта</div>
-            <div className="text-lg font-black mt-1">•• •• •• 4821</div>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-widest text-white/60">Доступно</div>
-            <div className="text-3xl font-black">12 480 ₽</div>
-          </div>
-        </div>
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        {["Перевод", "Платёж", "История"].map((t) => (
-          <div key={t} className="p-4 rounded-2xl bg-card border border-border text-center">
-            <div className="text-xs font-bold">{t}</div>
-          </div>
+      {/* Chip */}
+      <div className="absolute left-5 top-5 w-9 h-7 rounded-md bg-gradient-to-br from-yellow-300 to-yellow-600 grid grid-cols-3 grid-rows-2 gap-[1px] p-[2px]">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="bg-yellow-800/40 rounded-sm" />
         ))}
       </div>
-      <div className="p-4 rounded-2xl bg-brand/20 text-sm">
-        Управление картой и переводы появятся в следующих обновлениях.
+      {/* aloqa! label */}
+      <div className="absolute left-16 top-5 text-white font-black text-lg leading-none tracking-tight">
+        aloqa<span className="text-yellow-300">!</span>
+      </div>
+      {/* Number */}
+      <div className="absolute left-5 bottom-10 text-white/90 font-mono text-sm tracking-widest">
+        •••• •••• •••• {last4}
+      </div>
+      {/* МИР logo */}
+      <div className="absolute right-4 bottom-4 text-white font-black italic text-xl tracking-tight">
+        мир
+      </div>
+    </div>
+  );
+}
+
+function BankWebview({ onLock }: { onLock: () => void }) {
+  const history = [
+    { day: "Сегодня", who: "Коргоо Маркет", cat: "Финансовые операции", sum: -1656.94, sign: "-", icon: "K", color: "#22c55e" },
+    { day: "Вчера", who: "Иван Х.", cat: "Перевод от друга", sum: 3656.74, sign: "+", icon: "И", color: "#ef4444" },
+    { day: "Вчера", who: "Иван Х.", cat: "Перевод от друга", sum: 3656.74, sign: "+", icon: "И", color: "#ef4444" },
+    { day: "Вчера", who: "Lamoda", cat: "Покупки онлайн", sum: -3656.74, sign: "-", icon: "la", color: "#111827" },
+  ];
+
+  return (
+    <div className="bg-background min-h-full">
+      {/* Webview browser bar */}
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+        <button onClick={onLock} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
+          <Lock className="h-3.5 w-3.5" /> Закрыть
+        </button>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+          Webview · Альфа-Банк
+        </div>
+        <div className="w-6" />
+      </div>
+
+      {/* Header */}
+      <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+        <div className="w-6" />
+        <div className="text-center">
+          <div className="text-base font-bold">Карта aloqa!</div>
+          <button className="text-[11px] text-brand font-semibold mt-0.5 inline-flex items-center gap-0.5">
+            Цифровая карта <ChevronRight className="h-3 w-3" />
+          </button>
+        </div>
+        <button onClick={onLock} className="w-8 h-8 grid place-items-center rounded-full bg-muted">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      <div className="px-5 pt-3 space-y-5">
+        {/* Card */}
+        <MirCard />
+
+        {/* Balance */}
+        <div className="text-center">
+          <div className="text-4xl font-black tracking-tight">12 480,00 ₽</div>
+          <div className="text-xs text-muted-foreground mt-1">Доступно на карте</div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-around">
+          {[
+            { icon: Plus, label: "Пополнить" },
+            { icon: ArrowRight, label: "Перевести" },
+            { icon: Sliders, label: "Действия" },
+          ].map((a) => (
+            <div key={a.label} className="flex flex-col items-center gap-2">
+              <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center shadow-sm">
+                <a.icon className="h-5 w-5" />
+              </div>
+              <div className="text-[11px] font-semibold">{a.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Recommend block */}
+        <div className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3">
+          <div className="flex-1">
+            <div className="font-bold text-sm">Рекомендуйте карту aloqa!</div>
+            <div className="mt-1 grid grid-cols-2 gap-2 text-[11px]">
+              <div><span className="text-muted-foreground">Вам</span> <span className="font-bold">1 200 ₽</span></div>
+              <div><span className="text-muted-foreground">Другу</span> <span className="font-bold">300 ₽</span></div>
+            </div>
+            <button className="mt-3 h-9 px-4 rounded-full bg-foreground text-background text-xs font-bold">
+              Рекомендовать
+            </button>
+          </div>
+          <div className="w-16 h-16 rounded-xl grid place-items-center shrink-0"
+               style={{ background: "linear-gradient(135deg,#1b8a5a,#094e33)" }}>
+            <CreditCard className="h-7 w-7 text-white" />
+          </div>
+        </div>
+
+        {/* History */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-lg font-black">История</div>
+            <button className="text-xs font-semibold text-muted-foreground">Все</button>
+          </div>
+          <div className="space-y-3">
+            {history.map((h, i) => {
+              const showDay = i === 0 || history[i - 1].day !== h.day;
+              return (
+                <React.Fragment key={i}>
+                  {showDay && (
+                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground pt-2">{h.day}</div>
+                  )}
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full grid place-items-center text-white font-black text-sm shrink-0"
+                         style={{ background: h.color }}>
+                      {h.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-bold truncate">{h.who}</div>
+                      <div className="text-[11px] text-muted-foreground truncate">{h.cat}</div>
+                    </div>
+                    <div className={`text-sm font-bold ${h.sign === "+" ? "text-green-600" : "text-foreground"}`}>
+                      {h.sign === "+" ? "+" : "−"}{Math.abs(h.sum).toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
+                    </div>
+                  </div>
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer note */}
+        <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
+          Банковские услуги предоставляет АО «Альфа-Банк».<br />
+          Экран открыт во встроенном веб-браузере приложения.
+        </div>
       </div>
     </div>
   );

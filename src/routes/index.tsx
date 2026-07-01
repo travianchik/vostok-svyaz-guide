@@ -1343,9 +1343,9 @@ function TajikFlag() {
 
 function MirCard({ last4 = "4821" }: { last4?: string }) {
   return (
-    <div className="relative rounded-2xl overflow-hidden aspect-[1.586/1] shadow-lg" style={{ background: "#1b8a5a" }}>
+    <div className="relative rounded-2xl overflow-hidden aspect-[1.586/1] shadow-lg" style={{ background: "hsl(160 100% 33%)" }}>
       <div className="absolute inset-0 opacity-90"
-           style={{ background: "linear-gradient(135deg, #1b8a5a 0%, #0f6b45 60%, #094e33 100%)" }} />
+           style={{ background: "linear-gradient(135deg, hsl(160 100% 33%) 0%, hsl(165 100% 28%) 60%, hsl(165 100% 22%) 100%)" }} />
       {/* Flag circle */}
       <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full overflow-hidden ring-4 ring-white/10">
         <TajikFlag />
@@ -1356,9 +1356,9 @@ function MirCard({ last4 = "4821" }: { last4?: string }) {
           <div key={i} className="bg-yellow-800/40 rounded-sm" />
         ))}
       </div>
-      {/* aloqa! label */}
+      {/* aloQa label */}
       <div className="absolute left-16 top-5 text-white font-black text-lg leading-none tracking-tight">
-        aloqa<span className="text-yellow-300">!</span>
+        aloQa
       </div>
       {/* Number */}
       <div className="absolute left-5 bottom-10 text-white/90 font-mono text-sm tracking-widest">

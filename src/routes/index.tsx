@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -58,11 +58,86 @@ type Screen =
 type Lang = "ru" | "tg" | "ky" | "uz";
 type Tab = "svyaz" | "bank" | "uslugi";
 
-const LANGS: { code: Lang; label: string; hello: string; native: string; flag: string }[] = [
-  { code: "ru", label: "Русский", hello: "Добро пожаловать", native: "Русский", flag: "🇷🇺" },
-  { code: "tg", label: "Тоҷикӣ", hello: "Хуш омадед", native: "Тоҷикӣ", flag: "🇹🇯" },
-  { code: "ky", label: "Кыргызча", hello: "Кош келиңиз", native: "Кыргызча", flag: "🇰🇬" },
-  { code: "uz", label: "O‘zbekcha", hello: "Xush kelibsiz", native: "O‘zbekcha", flag: "🇺🇿" },
+const LANGS: { code: Lang; label: string; hello: string; native: string; flag: React.ReactNode }[] = [
+  {
+    code: "ru",
+    label: "Русский",
+    hello: "Добро пожаловать",
+    native: "Русский",
+    flag: (
+      <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
+        <rect width="36" height="8" fill="#FFFFFF" />
+        <rect y="8" width="36" height="8" fill="#0039A6" />
+        <rect y="16" width="36" height="8" fill="#D52B1E" />
+      </svg>
+    ),
+  },
+  {
+    code: "tg",
+    label: "Тоҷикӣ",
+    hello: "Хуш омадед",
+    native: "Тоҷикӣ",
+    flag: (
+      <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
+        <rect width="36" height="7" fill="#CC0000" />
+        <rect y="7" width="36" height="10" fill="#FFFFFF" />
+        <rect y="17" width="36" height="7" fill="#006600" />
+        <g transform="translate(18,12)" fill="#FFD700">
+          <path d="M0,-5 L1.2,-1.5 L4.5,-1.5 L1.8,0.8 L2.8,4 L0,2 L-2.8,4 L-1.8,0.8 L-4.5,-1.5 L-1.2,-1.5 Z" />
+          <circle cx="0" cy="-7" r="0.8" />
+          <circle cx="-4.5" cy="-4.5" r="0.8" />
+          <circle cx="4.5" cy="-4.5" r="0.8" />
+          <circle cx="-5.5" cy="1" r="0.8" />
+          <circle cx="5.5" cy="1" r="0.8" />
+          <circle cx="-3" cy="5.5" r="0.8" />
+          <circle cx="3" cy="5.5" r="0.8" />
+        </g>
+      </svg>
+    ),
+  },
+  {
+    code: "ky",
+    label: "Кыргызча",
+    hello: "Кош келиңиз",
+    native: "Кыргызча",
+    flag: (
+      <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
+        <rect width="36" height="24" fill="#E4002B" />
+        <g transform="translate(18,12)" fill="#FFED00">
+          <circle r="5" />
+          <g stroke="#FFED00" strokeWidth="1.2">
+            <path d="M0,-11 L0,-7 M0,7 L0,11 M-11,0 L-7,0 M7,0 L11,0 M-7.8,-7.8 L-5,-5 M5,5 L7.8,7.8 M-7.8,7.8 L-5,5 M5,-5 L7.8,-7.8" />
+          </g>
+        </g>
+      </svg>
+    ),
+  },
+  {
+    code: "uz",
+    label: "O‘zbekcha",
+    hello: "Xush kelibsiz",
+    native: "O‘zbekcha",
+    flag: (
+      <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
+        <rect width="36" height="8" fill="#1EB53A" />
+        <rect y="8" width="36" height="8" fill="#FFFFFF" />
+        <rect y="16" width="36" height="8" fill="#0099B5" />
+        <rect y="7.75" width="36" height="0.5" fill="#DC143C" />
+        <rect y="15.75" width="36" height="0.5" fill="#DC143C" />
+        <g transform="translate(8,12)">
+          <circle cx="0" cy="0" r="4" fill="#FFFFFF" />
+          <circle cx="1.5" cy="0" r="3.5" fill="#0099B5" />
+          <g fill="#FFFFFF">
+            <circle cx="12" cy="-3" r="0.6" />
+            <circle cx="16" cy="-1" r="0.6" />
+            <circle cx="18" cy="2" r="0.6" />
+            <circle cx="16" cy="5" r="0.6" />
+            <circle cx="12" cy="7" r="0.6" />
+          </g>
+        </g>
+      </svg>
+    ),
+  },
 ];
 
 const BEELINE_PREFIXES = ["903","905","906","909","951","953","960","961","963","964","965","966","967","968"];
@@ -309,7 +384,7 @@ function Splash({
                   }`}
                 >
                   <div className="flex items-center gap-3 text-left">
-                    <span className="text-2xl leading-none" aria-hidden>{l.flag}</span>
+                    <span className="flex items-center justify-center" aria-hidden>{l.flag}</span>
                     <div>
                       <div className="font-bold">{l.native}</div>
                       <div className="text-xs text-muted-foreground">{l.hello}</div>

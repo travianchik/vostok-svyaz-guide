@@ -39,8 +39,8 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Восток связь — мобильное приложение" },
-      { name: "description", content: "CJM прототип мобильного приложения Восток связь" },
+      { title: "aloQa — мобильное приложение" },
+      { name: "description", content: "CJM прототип мобильного приложения aloQa" },
     ],
   }),
   component: App,
@@ -323,7 +323,7 @@ function Splash({
           <div className="w-8 h-8 rounded-full bg-surface" />
         </div>
         <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          Восток связь · от Билайн
+          aloQa
         </div>
         <div className="h-32 flex flex-col items-center justify-center">
           {showLangPopup ? (
@@ -414,7 +414,7 @@ function Splash({
 /* ---------- WELCOME ---------- */
 const slides = [
   {
-    title: "Связь, которая работает на Востоке",
+    title: "aloQa — связь, которая ведёт к цели",
     text: "Управляйте номером и балансом в одном приложении.",
     icon: Sparkles,
   },
@@ -589,9 +589,9 @@ function Logo() {
         <div className="w-4 h-4 rounded-full bg-surface" />
       </div>
       <div className="leading-tight">
-        <div className="text-[15px] font-black tracking-tight">Восток связь</div>
+        <div className="text-[15px] font-black tracking-tight">aloQa</div>
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-          от Билайн
+          связь с целью
         </div>
       </div>
     </div>
@@ -644,7 +644,7 @@ const noticeDocs = [
 
 const appSteps = [
   { icon: Smartphone, t: "Установи сим в смартфон" },
-  { icon: Download, t: "Установи приложение «Восток связь»" },
+  { icon: Download, t: "Установи приложение «aloQa»" },
   { icon: LogIn, t: "Нажми «Войти»" },
   { icon: Phone, t: "Зайди по номеру, который дали в офисе" },
   { icon: Sliders, t: "Управляй сим в приложении" },

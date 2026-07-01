@@ -1466,6 +1466,9 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   if (screen === "transfer") {
     return <BankTransfer onClose={() => setScreen("main")} onSubmit={handleTransfer} balance={balance} />;
   }
+  if (screen === "history") {
+    return <BankHistory onClose={() => setScreen("main")} onLock={onLock} history={history} />;
+  }
 
   return (
     <div className="bg-background min-h-full">

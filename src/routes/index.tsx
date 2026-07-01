@@ -1397,8 +1397,8 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       {/* Header */}
       <div className="px-5 pt-4 pb-2 flex items-center justify-between">
         <div className="w-6" />
-        <div className="text-center">
-          <div className="text-base font-bold">Карта aloqa!</div>
+      <div className="text-center">
+          <div className="text-base font-bold">Карта aloQa</div>
           <button className="text-[11px] text-brand font-semibold mt-0.5 inline-flex items-center gap-0.5">
             Цифровая карта <ChevronRight className="h-3 w-3" />
           </button>
@@ -1437,7 +1437,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         {/* Recommend block */}
         <div className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3">
           <div className="flex-1">
-            <div className="font-bold text-sm">Рекомендуйте карту aloqa!</div>
+            <div className="font-bold text-sm">Рекомендуйте карту aloQa</div>
             <div className="mt-1 grid grid-cols-2 gap-2 text-[11px]">
               <div><span className="text-muted-foreground">Вам</span> <span className="font-bold">1 200 ₽</span></div>
               <div><span className="text-muted-foreground">Другу</span> <span className="font-bold">300 ₽</span></div>

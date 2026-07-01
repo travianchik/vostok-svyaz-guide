@@ -1510,84 +1510,233 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   );
 }
 
+function WebviewChrome({
+  onClose,
+  children,
+}: {
+  onClose?: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-background min-h-full">
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+        <button
+          onClick={onClose}
+          className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1"
+        >
+          <Lock className="h-3.5 w-3.5" /> Закрыть
+        </button>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+          Webview · Альфа-Банк
+        </div>
+        <div className="w-6" />
+      </div>
+      {children}
+      <div className="px-5 pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
+        Банковские услуги предоставляет АО «Альфа-Банк».<br />
+        Экран открыт во встроенном веб-браузере приложения.
+      </div>
+    </div>
+  );
+}
+
 function BankLogin({ onDone }: { onDone: () => void }) {
-  const [step, setStep] = useState<"data" | "create-passcode">("data");
+  const [step, setStep] = useState<"data" | "waiting" | "approved" | "create-passcode">("data");
   const [fio, setFio] = useState("");
   const [birth, setBirth] = useState("");
   const [passport, setPassport] = useState("");
   const [pin, setPin] = useState("");
   const [pin2, setPin2] = useState("");
+  const [progress, setProgress] = useState(0);
+
+  // Emulate bank response waiting
+  useEffect(() => {
+    if (step !== "waiting") return;
+    setProgress(0);
+    const started = Date.now();
+    const total = 3800;
+    const id = setInterval(() => {
+      const p = Math.min(100, ((Date.now() - started) / total) * 100);
+      setProgress(p);
+      if (p >= 100) {
+        clearInterval(id);
+        setStep("approved");
+      }
+    }, 80);
+    return () => clearInterval(id);
+  }, [step]);
 
   if (step === "data") {
-    const valid = fio.trim().length > 3 && birth.length === 10 && passport.replace(/\D/g, "").length === 10;
+    const valid =
+      fio.trim().length > 3 && birth.length === 10 && passport.replace(/\D/g, "").length === 10;
     return (
-      <div className="px-5 pt-4 pb-8 space-y-4">
-        <div>
-          <h1 className="text-xl font-black tracking-tight">Билайн Банк</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Первый вход. Подтвердите свои данные, чтобы открыть счёт.
-          </p>
+      <WebviewChrome>
+        <div className="px-5 pt-4 pb-4 space-y-4">
+          <div>
+            <h1 className="text-xl font-black tracking-tight">Открытие счёта</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Заполните анкету — заявка уйдёт в Альфа-Банк.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <BankField label="ФИО" placeholder="Иванов Иван Иванович" value={fio} onChange={setFio} />
+            <BankField
+              label="Дата рождения"
+              placeholder="ДД.ММ.ГГГГ"
+              value={birth}
+              onChange={(v) => setBirth(maskDate(v))}
+              inputMode="numeric"
+            />
+            <BankField
+              label="Серия и номер паспорта"
+              placeholder="0000 000000"
+              value={passport}
+              onChange={(v) => setPassport(maskPassport(v))}
+              inputMode="numeric"
+            />
+          </div>
+          <div className="p-3 rounded-2xl bg-brand/15 text-[11px] leading-snug text-foreground/80">
+            Нажимая «Отправить заявку», вы соглашаетесь на обработку персональных данных и передачу
+            анкеты в АО «Альфа-Банк».
+          </div>
+          <button
+            disabled={!valid}
+            onClick={() => setStep("waiting")}
+            className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+          >
+            Отправить заявку
+          </button>
         </div>
-        <div className="space-y-3">
-          <BankField label="ФИО" placeholder="Иванов Иван Иванович" value={fio} onChange={setFio} />
-          <BankField
-            label="Дата рождения"
-            placeholder="ДД.ММ.ГГГГ"
-            value={birth}
-            onChange={(v) => setBirth(maskDate(v))}
-            inputMode="numeric"
-          />
-          <BankField
-            label="Серия и номер паспорта"
-            placeholder="0000 000000"
-            value={passport}
-            onChange={(v) => setPassport(maskPassport(v))}
-            inputMode="numeric"
-          />
+      </WebviewChrome>
+    );
+  }
+
+  if (step === "waiting") {
+    const stages = [
+      { at: 15, label: "Заявка отправлена в банк" },
+      { at: 45, label: "Проверка паспортных данных" },
+      { at: 75, label: "Скоринг и решение по счёту" },
+      { at: 95, label: "Формирование карты" },
+    ];
+    return (
+      <WebviewChrome>
+        <div className="px-5 pt-8 pb-8 space-y-6 flex flex-col items-center">
+          <div className="w-20 h-20 rounded-full bg-brand/15 grid place-items-center">
+            <Loader2 className="h-9 w-9 text-brand animate-spin" />
+          </div>
+          <div className="text-center">
+            <h1 className="text-xl font-black tracking-tight">Ждём ответ банка</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Обычно занимает до одной минуты. Не закрывайте окно.
+            </p>
+          </div>
+          <div className="w-full max-w-xs">
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full bg-brand transition-[width] duration-100 ease-linear"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="mt-1 text-right text-[11px] font-semibold text-muted-foreground">
+              {Math.round(progress)}%
+            </div>
+          </div>
+          <ul className="w-full space-y-2">
+            {stages.map((s) => {
+              const done = progress >= s.at;
+              const active = !done && progress >= (stages[stages.indexOf(s) - 1]?.at ?? 0);
+              return (
+                <li
+                  key={s.label}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-sm transition",
+                    done
+                      ? "border-brand/40 bg-brand/10"
+                      : active
+                        ? "border-foreground/15 bg-card"
+                        : "border-foreground/10 bg-card opacity-50",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "w-6 h-6 rounded-full grid place-items-center shrink-0",
+                      done ? "bg-brand text-brand-foreground" : "bg-muted",
+                    )}
+                  >
+                    {done ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : active ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50" />
+                    )}
+                  </div>
+                  <span className={cn("font-semibold", done && "text-foreground")}>{s.label}</span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
-        <div className="p-3 rounded-2xl bg-brand/15 text-[11px] leading-snug text-foreground/80">
-          Нажимая «Продолжить», вы соглашаетесь на обработку персональных данных и условия открытия счёта.
+      </WebviewChrome>
+    );
+  }
+
+  if (step === "approved") {
+    return (
+      <WebviewChrome>
+        <div className="px-5 pt-10 pb-8 space-y-6 flex flex-col items-center">
+          <div className="w-20 h-20 rounded-full bg-brand grid place-items-center shadow-lg">
+            <Check className="h-10 w-10 text-brand-foreground" />
+          </div>
+          <div className="text-center">
+            <h1 className="text-2xl font-black tracking-tight">Заявка одобрена!</h1>
+            <p className="text-sm text-muted-foreground mt-2">
+              Счёт открыт. Осталось придумать код-пароль для входа в банк.
+            </p>
+          </div>
+          <button
+            onClick={() => setStep("create-passcode")}
+            className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold active:scale-[0.98] transition"
+          >
+            Придумать код-пароль
+          </button>
         </div>
-        <button
-          disabled={!valid}
-          onClick={() => setStep("create-passcode")}
-          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-        >
-          Продолжить
-        </button>
-      </div>
+      </WebviewChrome>
     );
   }
 
   const ok = pin.length === 4 && pin === pin2;
   return (
-    <div className="px-5 pt-4 pb-8 space-y-5">
-      <div>
-        <h1 className="text-xl font-black tracking-tight">Придумайте код-пароль</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Код потребуется для входа в банк в следующий раз.
-        </p>
+    <WebviewChrome>
+      <div className="px-5 pt-4 pb-4 space-y-5">
+        <div>
+          <h1 className="text-xl font-black tracking-tight">Придумайте код-пароль</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Код потребуется для входа в банк в следующий раз.
+          </p>
+        </div>
+        <PinDisplay value={pin} label="Новый код" />
+        <PinDisplay value={pin2} label="Повторите код" />
+        <PinKeypad
+          onDigit={(d) => {
+            if (pin.length < 4) setPin(pin + d);
+            else if (pin2.length < 4) setPin2(pin2 + d);
+          }}
+          onBack={() => {
+            if (pin2.length > 0) setPin2(pin2.slice(0, -1));
+            else setPin(pin.slice(0, -1));
+          }}
+        />
+        <button
+          disabled={!ok}
+          onClick={onDone}
+          className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+        >
+          Сохранить и войти
+        </button>
       </div>
-      <PinDisplay value={pin} label="Новый код" />
-      <PinDisplay value={pin2} label="Повторите код" />
-      <PinKeypad
-        onDigit={(d) => {
-          if (pin.length < 4) setPin(pin + d);
-          else if (pin2.length < 4) setPin2(pin2 + d);
-        }}
-        onBack={() => {
-          if (pin2.length > 0) setPin2(pin2.slice(0, -1));
-          else setPin(pin.slice(0, -1));
-        }}
-      />
-      <button
-        disabled={!ok}
-        onClick={onDone}
-        className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-      >
-        Сохранить и войти
-      </button>
-    </div>
+    </WebviewChrome>
   );
 }
 
@@ -1596,37 +1745,37 @@ function BankPasscode({ onDone }: { onDone: () => void }) {
   const [err, setErr] = useState(false);
   useEffect(() => {
     if (pin.length === 4) {
-      // demo: any 4 digits accepted
       const t = setTimeout(onDone, 250);
       return () => clearTimeout(t);
     }
     setErr(false);
   }, [pin, onDone]);
   return (
-    <div className="px-5 pt-6 pb-8 space-y-6 flex flex-col items-center">
-      <div className="w-16 h-16 rounded-3xl bg-brand grid place-items-center shadow-lg">
-        <Lock className="h-7 w-7 text-brand-foreground" />
+    <WebviewChrome>
+      <div className="px-5 pt-6 pb-4 space-y-6 flex flex-col items-center">
+        <div className="w-16 h-16 rounded-3xl bg-brand grid place-items-center shadow-lg">
+          <Lock className="h-7 w-7 text-brand-foreground" />
+        </div>
+        <div className="text-center">
+          <h1 className="text-xl font-black tracking-tight">Введите код-пароль</h1>
+          <p className="text-sm text-muted-foreground mt-1">Для входа в банк aloQa</p>
+        </div>
+        <PinDisplay value={pin} label="" error={err} />
+        <PinKeypad
+          onDigit={(d) => pin.length < 4 && setPin(pin + d)}
+          onBack={() => setPin(pin.slice(0, -1))}
+        />
+        <button
+          onClick={() => setPin("")}
+          className="text-xs font-semibold text-muted-foreground underline"
+        >
+          Забыли код-пароль?
+        </button>
       </div>
-      <div className="text-center">
-        <h1 className="text-xl font-black tracking-tight">Введите код-пароль</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Для входа в Билайн Банк
-        </p>
-      </div>
-      <PinDisplay value={pin} label="" error={err} />
-      <PinKeypad
-        onDigit={(d) => pin.length < 4 && setPin(pin + d)}
-        onBack={() => setPin(pin.slice(0, -1))}
-      />
-      <button
-        onClick={() => setPin("")}
-        className="text-xs font-semibold text-muted-foreground underline"
-      >
-        Забыли код-пароль?
-      </button>
-    </div>
+    </WebviewChrome>
   );
 }
+
 
 function BankField({
   label,

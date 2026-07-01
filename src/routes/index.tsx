@@ -584,14 +584,14 @@ function Welcome({
 function AloqaLogo({ className }: { className?: string }) {
   return (
     <div className={cn("bg-brand grid place-items-center overflow-hidden", className)}>
-      <svg viewBox="0 0 48 48" className="w-3/5 h-3/5">
-        <g fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
-          {/* compass points */}
-          <path d="M24 6 L24 14 M24 34 L24 42 M6 24 L14 24 M34 24 L42 24" />
-          {/* Q loop / circle */}
-          <path d="M20 32 C12 29 12 19 20 16 C28 13 35 19 32 26 C30 30 24 32 18 28" />
+      <svg viewBox="0 0 48 48" className="w-[62%] h-[62%]">
+        <g fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* compass star */}
+          <path d="M24 5 L24 13 M24 35 L24 43 M5 24 L13 24 M35 24 L43 24" />
+          {/* Q body / compass ring */}
+          <path d="M32 28 C28 34 18 34 16 26 C14 18 22 12 30 16 C33 18 34 22 32 26" />
           {/* Q tail */}
-          <path d="M22 28 L30 38" />
+          <path d="M28 28 L37 39" />
         </g>
       </svg>
     </div>

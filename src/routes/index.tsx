@@ -1387,13 +1387,50 @@ function MirCard({ last4 = "4821" }: { last4?: string }) {
   );
 }
 
+type TxItem = {
+  day: string;
+  who: string;
+  cat: string;
+  sum: number;
+  sign: "+" | "-";
+  icon: string;
+  color: string;
+};
+
 function BankWebview({ onLock }: { onLock: () => void }) {
-  const history = [
+  const [screen, setScreen] = useState<"main" | "topup" | "transfer">("main");
+  const [balance, setBalance] = useState(12480);
+  const [history, setHistory] = useState<TxItem[]>([
     { day: "Сегодня", who: "Коргоо Маркет", cat: "Финансовые операции", sum: -1656.94, sign: "-", icon: "K", color: "#22c55e" },
     { day: "Вчера", who: "Иван Х.", cat: "Перевод от друга", sum: 3656.74, sign: "+", icon: "И", color: "#ef4444" },
     { day: "Вчера", who: "Иван Х.", cat: "Перевод от друга", sum: 3656.74, sign: "+", icon: "И", color: "#ef4444" },
     { day: "Вчера", who: "Lamoda", cat: "Покупки онлайн", sum: -3656.74, sign: "-", icon: "la", color: "#111827" },
-  ];
+  ]);
+
+  const handleTopup = (amount: number, fromLast4: string) => {
+    setBalance((b) => b + amount);
+    setHistory((h) => [
+      { day: "Сегодня", who: `Пополнение с •• ${fromLast4}`, cat: "Пополнение карты", sum: amount, sign: "+", icon: "₽", color: "#16a34a" },
+      ...h,
+    ]);
+    setScreen("main");
+  };
+
+  const handleTransfer = (amount: number, toLast4: string, recipient: string) => {
+    setBalance((b) => b - amount);
+    setHistory((h) => [
+      { day: "Сегодня", who: recipient || `Перевод на •• ${toLast4}`, cat: "Перевод на карту РФ", sum: -amount, sign: "-", icon: "→", color: "#0ea5e9" },
+      ...h,
+    ]);
+    setScreen("main");
+  };
+
+  if (screen === "topup") {
+    return <BankTopup onClose={() => setScreen("main")} onSubmit={handleTopup} />;
+  }
+  if (screen === "transfer") {
+    return <BankTransfer onClose={() => setScreen("main")} onSubmit={handleTransfer} balance={balance} />;
+  }
 
   return (
     <div className="bg-background min-h-full">
@@ -1424,28 +1461,29 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       </div>
 
       <div className="px-5 pt-3 space-y-5">
-        {/* Card */}
         <MirCard />
 
         {/* Balance */}
         <div className="text-center">
-          <div className="text-4xl font-black tracking-tight">12 480,00 ₽</div>
+          <div className="text-4xl font-black tracking-tight">
+            {balance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
+          </div>
           <div className="text-xs text-muted-foreground mt-1">Доступно на карте</div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-around">
           {[
-            { icon: Plus, label: "Пополнить" },
-            { icon: ArrowRight, label: "Перевести" },
-            { icon: Sliders, label: "Действия" },
+            { icon: Plus, label: "Пополнить", onClick: () => setScreen("topup") },
+            { icon: ArrowRight, label: "Перевести", onClick: () => setScreen("transfer") },
+            { icon: Sliders, label: "Действия", onClick: () => {} },
           ].map((a) => (
-            <div key={a.label} className="flex flex-col items-center gap-2">
+            <button key={a.label} onClick={a.onClick} className="flex flex-col items-center gap-2">
               <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center shadow-sm">
                 <a.icon className="h-5 w-5" />
               </div>
               <div className="text-[11px] font-semibold">{a.label}</div>
-            </div>
+            </button>
           ))}
         </div>
 
@@ -1504,6 +1542,260 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
           Банковские услуги предоставляет АО «Альфа-Банк».<br />
           Экран открыт во встроенном веб-браузере приложения.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- Card number helpers (RU cards only) ----
+function formatCardNumber(v: string) {
+  const digits = v.replace(/\D/g, "").slice(0, 19);
+  return digits.replace(/(.{4})/g, "$1 ").trim();
+}
+function isRuCard(digits: string) {
+  // МИР 2200-2204, Visa/MC/Maestro РФ по BIN — здесь принимаем МИР + большинство рос. BIN
+  if (digits.length < 16) return false;
+  const bin4 = digits.slice(0, 4);
+  const bin6 = digits.slice(0, 6);
+  // МИР
+  if (/^220[0-4]/.test(bin4)) return true;
+  // Основные российские BIN (Сбер, ВТБ, Альфа, Тинькофф, Газпром и др.)
+  const ruBins = ["427601","427644","427683","437772","437773","510621","521324","521178","533669","546918","676280","676530","220220","220138","220070"];
+  if (ruBins.some((b) => bin6.startsWith(b))) return true;
+  return false;
+}
+
+function BankTopup({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (amount: number, fromLast4: string) => void;
+}) {
+  const [amount, setAmount] = useState("");
+  const [card, setCard] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const digits = card.replace(/\D/g, "");
+  const amt = Number(amount.replace(/\s/g, ""));
+  const canSubmit = amt > 0 && amt <= 300000 && isRuCard(digits);
+
+  const submit = () => {
+    setError(null);
+    if (!isRuCard(digits)) {
+      setError("Пополнение доступно только с карт российских банков");
+      return;
+    }
+    if (!(amt > 0)) {
+      setError("Введите сумму");
+      return;
+    }
+    setProcessing(true);
+    setTimeout(() => {
+      setProcessing(false);
+      onSubmit(amt, digits.slice(-4));
+    }, 1400);
+  };
+
+  return (
+    <div className="bg-background min-h-full">
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+        <button onClick={onClose} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
+          <ArrowLeft className="h-3.5 w-3.5" /> Назад
+        </button>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+          Webview · Альфа-Банк
+        </div>
+        <div className="w-6" />
+      </div>
+
+      <div className="px-5 pt-5 space-y-5">
+        <div>
+          <div className="text-2xl font-black">Пополнить карту</div>
+          <div className="text-xs text-muted-foreground mt-1">С карты другого банка РФ</div>
+        </div>
+
+        <div className="rounded-2xl bg-card border border-border p-4 space-y-4">
+          <div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">С карты</div>
+            <input
+              inputMode="numeric"
+              placeholder="0000 0000 0000 0000"
+              value={card}
+              onChange={(e) => setCard(formatCardNumber(e.target.value))}
+              className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
+            />
+            <div className="text-[10px] text-muted-foreground mt-1">
+              Принимаются только карты российских банков (МИР, Visa/Mastercard РФ)
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Сумма</div>
+            <div className="relative">
+              <input
+                inputMode="decimal"
+                placeholder="0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))}
+                className="w-full h-14 px-3 pr-10 rounded-xl bg-muted border border-border text-2xl font-black outline-none focus:border-brand"
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xl font-black text-muted-foreground">₽</div>
+            </div>
+            <div className="flex gap-2 mt-2">
+              {[500, 1000, 3000, 5000].map((v) => (
+                <button key={v} onClick={() => setAmount(String(v))}
+                        className="flex-1 h-8 rounded-full bg-muted text-xs font-semibold hover:bg-muted/70">
+                  {v.toLocaleString("ru-RU")} ₽
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-[11px] text-muted-foreground">Комиссия: 0 ₽ · Зачисление: мгновенно</div>
+        </div>
+
+        {error && (
+          <div className="rounded-xl bg-red-500/10 text-red-600 text-xs font-semibold px-3 py-2">{error}</div>
+        )}
+
+        <button
+          disabled={!canSubmit || processing}
+          onClick={submit}
+          className="w-full h-12 rounded-full bg-brand text-white font-bold disabled:opacity-40 inline-flex items-center justify-center gap-2"
+        >
+          {processing ? (<><Loader2 className="h-4 w-4 animate-spin" /> Обработка…</>) : "Пополнить"}
+        </button>
+
+        <div className="pb-8 text-center text-[10px] text-muted-foreground leading-relaxed">
+          Банковские услуги предоставляет АО «Альфа-Банк».
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BankTransfer({
+  onClose,
+  onSubmit,
+  balance,
+}: {
+  onClose: () => void;
+  onSubmit: (amount: number, toLast4: string, recipient: string) => void;
+  balance: number;
+}) {
+  const [amount, setAmount] = useState("");
+  const [card, setCard] = useState("");
+  const [name, setName] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const digits = card.replace(/\D/g, "");
+  const amt = Number(amount.replace(/\s/g, ""));
+  const canSubmit = amt > 0 && amt <= balance && isRuCard(digits);
+
+  const submit = () => {
+    setError(null);
+    if (!isRuCard(digits)) {
+      setError("Переводы возможны только на карты российских банков (РФ → РФ)");
+      return;
+    }
+    if (!(amt > 0)) {
+      setError("Введите сумму");
+      return;
+    }
+    if (amt > balance) {
+      setError("Недостаточно средств на карте");
+      return;
+    }
+    setProcessing(true);
+    setTimeout(() => {
+      setProcessing(false);
+      onSubmit(amt, digits.slice(-4), name.trim());
+    }, 1400);
+  };
+
+  return (
+    <div className="bg-background min-h-full">
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+        <button onClick={onClose} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
+          <ArrowLeft className="h-3.5 w-3.5" /> Назад
+        </button>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+          Webview · Альфа-Банк
+        </div>
+        <div className="w-6" />
+      </div>
+
+      <div className="px-5 pt-5 space-y-5">
+        <div>
+          <div className="text-2xl font-black">Перевод на карту</div>
+          <div className="text-xs text-muted-foreground mt-1">Только с карты РФ на карту РФ</div>
+        </div>
+
+        <div className="rounded-2xl bg-card border border-border p-4 space-y-4">
+          <div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Номер карты получателя</div>
+            <input
+              inputMode="numeric"
+              placeholder="0000 0000 0000 0000"
+              value={card}
+              onChange={(e) => setCard(formatCardNumber(e.target.value))}
+              className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
+            />
+            <div className="text-[10px] text-muted-foreground mt-1">
+              Только карты российских банков. Переводы за рубеж недоступны.
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Получатель (необязательно)</div>
+            <input
+              placeholder="Имя получателя"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-sm outline-none focus:border-brand"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Сумма</div>
+              <div className="text-[11px] text-muted-foreground">
+                Доступно: {balance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
+              </div>
+            </div>
+            <div className="relative">
+              <input
+                inputMode="decimal"
+                placeholder="0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))}
+                className="w-full h-14 px-3 pr-10 rounded-xl bg-muted border border-border text-2xl font-black outline-none focus:border-brand"
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xl font-black text-muted-foreground">₽</div>
+            </div>
+          </div>
+
+          <div className="text-[11px] text-muted-foreground">Комиссия: 0 ₽ · Лимит: 150 000 ₽ / сутки</div>
+        </div>
+
+        {error && (
+          <div className="rounded-xl bg-red-500/10 text-red-600 text-xs font-semibold px-3 py-2">{error}</div>
+        )}
+
+        <button
+          disabled={!canSubmit || processing}
+          onClick={submit}
+          className="w-full h-12 rounded-full bg-brand text-white font-bold disabled:opacity-40 inline-flex items-center justify-center gap-2"
+        >
+          {processing ? (<><Loader2 className="h-4 w-4 animate-spin" /> Перевод…</>) : "Перевести"}
+        </button>
+
+        <div className="pb-8 text-center text-[10px] text-muted-foreground leading-relaxed">
+          Банковские услуги предоставляет АО «Альфа-Банк».
         </div>
       </div>
     </div>

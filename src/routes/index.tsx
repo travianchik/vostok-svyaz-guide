@@ -1447,7 +1447,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             </button>
           </div>
           <div className="w-16 h-16 rounded-xl grid place-items-center shrink-0"
-               style={{ background: "linear-gradient(135deg,#1b8a5a,#094e33)" }}>
+               style={{ background: "linear-gradient(135deg,hsl(160 100% 33%),hsl(165 100% 22%))" }}>
             <CreditCard className="h-7 w-7 text-white" />
           </div>
         </div>

@@ -1547,7 +1547,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="text-lg font-black">История</div>
-            <button className="text-xs font-semibold text-muted-foreground">Все</button>
+            <button onClick={() => setScreen("history")} className="text-xs font-semibold text-brand hover:underline">Все</button>
           </div>
           <div className="space-y-3">
             {history.map((h, i) => {

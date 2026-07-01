@@ -1158,7 +1158,6 @@ function TabSvyaz({
                 Пополнить
               </button>
             </div>
-            
           </div>
 
           {/* Tariff */}

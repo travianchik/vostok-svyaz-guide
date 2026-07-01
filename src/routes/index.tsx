@@ -731,7 +731,7 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
           <StepHeader
             n="3"
             title="Настрой сим и управляй тарифом"
-            subtitle="Через приложение «Восток связь»"
+            subtitle="Через приложение «aloQa»"
           />
           <div className="mt-4 space-y-2.5">
             {appSteps.map((s) => {
@@ -1264,7 +1264,7 @@ function TabSvyaz({
                 Закажите номер Билайн
               </div>
               <p className="text-surface/80 text-sm mt-1">
-                Полный доступ к сервисам «Восток связь» — только с сим-картой Билайн.
+                Полный доступ к сервисам «aloQa» — только с сим-картой Билайн.
               </p>
               <button
                 onClick={onOrderSim}

@@ -321,7 +321,7 @@ function Splash({
     <div className={`relative flex flex-col h-[calc(100vh-44px)] ${showLangPopup ? "" : ""}`}>
       <div className={`flex-1 flex flex-col items-center justify-center px-6 transition ${showLangPopup ? "blur-md scale-[0.98]" : ""}`}>
         <AloqaLogo className="w-20 h-20 rounded-3xl shadow-xl mb-8" />
-        <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
+        <div className="text-sm font-black tracking-tight text-muted-foreground mb-3">
           aloQa
         </div>
         <div className="h-32 flex flex-col items-center justify-center">

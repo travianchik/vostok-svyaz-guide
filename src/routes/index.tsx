@@ -319,9 +319,7 @@ function Splash({
   return (
     <div className={`relative flex flex-col h-[calc(100vh-44px)] ${showLangPopup ? "" : ""}`}>
       <div className={`flex-1 flex flex-col items-center justify-center px-6 transition ${showLangPopup ? "blur-md scale-[0.98]" : ""}`}>
-        <div className="w-20 h-20 rounded-3xl bg-brand grid place-items-center shadow-xl mb-8">
-          <div className="w-8 h-8 rounded-full bg-surface" />
-        </div>
+        <AloqaLogo className="w-20 h-20 rounded-3xl shadow-xl mb-8" />
         <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
           aloQa
         </div>

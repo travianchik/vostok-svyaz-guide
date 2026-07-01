@@ -580,12 +580,27 @@ function Welcome({
   );
 }
 
+function AloqaLogo({ className }: { className?: string }) {
+  return (
+    <div className={cn("bg-brand grid place-items-center overflow-hidden", className)}>
+      <svg viewBox="0 0 48 48" className="w-3/5 h-3/5">
+        <g fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+          {/* compass points */}
+          <path d="M24 6 L24 14 M24 34 L24 42 M6 24 L14 24 M34 24 L42 24" />
+          {/* Q loop / circle */}
+          <path d="M20 32 C12 29 12 19 20 16 C28 13 35 19 32 26 C30 30 24 32 18 28" />
+          {/* Q tail */}
+          <path d="M22 28 L30 38" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 function Logo() {
   return (
     <div className="flex items-center gap-2">
-      <div className="w-9 h-9 rounded-xl bg-brand grid place-items-center">
-        <div className="w-4 h-4 rounded-full bg-surface" />
-      </div>
+      <AloqaLogo className="w-9 h-9 rounded-xl" />
       <div className="leading-tight">
         <div className="text-[15px] font-black tracking-tight">aloQa</div>
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground">

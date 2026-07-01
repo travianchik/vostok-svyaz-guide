@@ -1433,7 +1433,7 @@ type TxItem = {
 };
 
 function BankWebview({ onLock }: { onLock: () => void }) {
-  const [screen, setScreen] = useState<"main" | "topup" | "transfer">("main");
+  const [screen, setScreen] = useState<"main" | "topup" | "transfer" | "history">("main");
   const [balance, setBalance] = useState(12480);
   const [history, setHistory] = useState<TxItem[]>([
     { day: "Сегодня", who: "Коргоо Маркет", cat: "Финансовые операции", sum: -1656.94, sign: "-", icon: "K", color: "#22c55e" },
@@ -1465,6 +1465,9 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   }
   if (screen === "transfer") {
     return <BankTransfer onClose={() => setScreen("main")} onSubmit={handleTransfer} balance={balance} />;
+  }
+  if (screen === "history") {
+    return <BankHistory onClose={() => setScreen("main")} onLock={onLock} history={history} />;
   }
 
   return (
@@ -1544,7 +1547,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="text-lg font-black">История</div>
-            <button className="text-xs font-semibold text-muted-foreground">Все</button>
+            <button onClick={() => setScreen("history")} className="text-xs font-semibold text-brand hover:underline">Все</button>
           </div>
           <div className="space-y-3">
             {history.map((h, i) => {
@@ -1582,6 +1585,114 @@ function BankWebview({ onLock }: { onLock: () => void }) {
     </div>
   );
 }
+
+function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock: () => void; history: TxItem[] }) {
+  const [filter, setFilter] = useState<"all" | "in" | "out">("all");
+  const filtered = history.filter((h) =>
+    filter === "all" ? true : filter === "in" ? h.sign === "+" : h.sign === "-",
+  );
+  const income = history.filter((h) => h.sign === "+").reduce((s, h) => s + Math.abs(h.sum), 0);
+  const outcome = history.filter((h) => h.sign === "-").reduce((s, h) => s + Math.abs(h.sum), 0);
+
+  return (
+    <div className="bg-background min-h-full">
+      {/* Webview browser bar */}
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+        <button onClick={onLock} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
+          <Lock className="h-3.5 w-3.5" /> Закрыть
+        </button>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+          Webview · Альфа-Банк
+        </div>
+        <div className="w-6" />
+      </div>
+
+      {/* Header */}
+      <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+        <button onClick={onClose} className="w-8 h-8 grid place-items-center rounded-full bg-muted">
+          <ChevronRight className="h-4 w-4 rotate-180" />
+        </button>
+        <div className="text-base font-bold">История операций</div>
+        <div className="w-8" />
+      </div>
+
+      <div className="px-5 pt-3 space-y-4">
+        {/* Summary */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-card border border-border p-4">
+            <div className="text-[11px] text-muted-foreground">Поступления</div>
+            <div className="text-lg font-black text-green-600 mt-1">
+              +{income.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
+            </div>
+          </div>
+          <div className="rounded-2xl bg-card border border-border p-4">
+            <div className="text-[11px] text-muted-foreground">Списания</div>
+            <div className="text-lg font-black mt-1">
+              −{outcome.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
+            </div>
+          </div>
+        </div>
+
+        {/* Filter tabs */}
+        <div className="inline-flex w-full rounded-full bg-muted p-1">
+          {([
+            { k: "all", l: "Все" },
+            { k: "in", l: "Пополнения" },
+            { k: "out", l: "Списания" },
+          ] as const).map((t) => (
+            <button
+              key={t.k}
+              onClick={() => setFilter(t.k)}
+              className={`flex-1 h-8 rounded-full text-xs font-bold transition-colors ${
+                filter === t.k ? "bg-background shadow-sm" : "text-muted-foreground"
+              }`}
+            >
+              {t.l}
+            </button>
+          ))}
+        </div>
+
+        {/* List */}
+        <div className="space-y-3">
+          {filtered.length === 0 && (
+            <div className="text-center text-sm text-muted-foreground py-10">Операций нет</div>
+          )}
+          {filtered.map((h, i) => {
+            const showDay = i === 0 || filtered[i - 1].day !== h.day;
+            return (
+              <React.Fragment key={i}>
+                {showDay && (
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground pt-2">{h.day}</div>
+                )}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full grid place-items-center text-white font-black text-sm shrink-0"
+                       style={{ background: h.color }}>
+                    {h.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-bold truncate">{h.who}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">{h.cat}</div>
+                  </div>
+                  <div className={`text-sm font-bold ${h.sign === "+" ? "text-green-600" : "text-foreground"}`}>
+                    {h.sign === "+" ? "+" : "−"}{Math.abs(h.sum).toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
+                  </div>
+                </div>
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
+          Банковские услуги предоставляет АО «Альфа-Банк».<br />
+          Экран открыт во встроенном веб-браузере приложения.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 
 // ---- Card number helpers (RU cards only) ----
 function formatCardNumber(v: string) {

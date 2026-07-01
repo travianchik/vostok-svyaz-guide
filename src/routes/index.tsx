@@ -1433,7 +1433,7 @@ type TxItem = {
 };
 
 function BankWebview({ onLock }: { onLock: () => void }) {
-  const [screen, setScreen] = useState<"main" | "topup" | "transfer">("main");
+  const [screen, setScreen] = useState<"main" | "topup" | "transfer" | "history">("main");
   const [balance, setBalance] = useState(12480);
   const [history, setHistory] = useState<TxItem[]>([
     { day: "Сегодня", who: "Коргоо Маркет", cat: "Финансовые операции", sum: -1656.94, sign: "-", icon: "K", color: "#22c55e" },

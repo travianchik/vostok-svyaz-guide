@@ -384,7 +384,7 @@ function Splash({
                   }`}
                 >
                   <div className="flex items-center gap-3 text-left">
-                    <span className="text-2xl leading-none" aria-hidden>{l.flag}</span>
+                    <span className="flex items-center justify-center" aria-hidden>{l.flag}</span>
                     <div>
                       <div className="font-bold">{l.native}</div>
                       <div className="text-xs text-muted-foreground">{l.hello}</div>

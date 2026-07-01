@@ -1079,6 +1079,8 @@ function Home({
             auth={bankAuth}
             setAuth={setBankAuth}
             onLock={() => setBankAuth("passcode")}
+            operator={operator}
+            onOrderSim={onOrderSim}
           />
         )}
         {tab === "uslugi" && <TabUslugi />}

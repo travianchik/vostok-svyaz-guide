@@ -47,28 +47,30 @@
   --card-foreground: hsl(0 0% 7%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(0 0% 7%);
-  --primary: hsl(47 100% 50%);
-  --primary-foreground: hsl(0 0% 0%);
+  --primary: hsl(160 100% 33%);
+  --primary-foreground: hsl(0 0% 100%);
   --secondary: hsl(0 0% 93%);
   --secondary-foreground: hsl(0 0% 15%);
   --muted: hsl(0 0% 93%);
   --muted-foreground: hsl(0 0% 45%);
-  --accent: hsl(47 100% 50%);
-  --accent-foreground: hsl(0 0% 0%);
+  --accent: hsl(160 100% 33%);
+  --accent-foreground: hsl(0 0% 100%);
   --destructive: hsl(0 72% 51%);
   --destructive-foreground: hsl(0 0% 100%);
   --border: hsl(0 0% 88%);
   --input: hsl(0 0% 88%);
-  --ring: hsl(47 100% 50%);
+  --ring: hsl(160 100% 33%);
   --success: hsl(142 71% 45%);
   --success-foreground: hsl(0 0% 100%);
 
-  /* Beeline brand */
-  --brand: hsl(47 100% 50%);
-  --brand-foreground: hsl(0 0% 0%);
+  /* aloQa brand */
+  --brand: hsl(160 100% 33%);
+  --brand-foreground: hsl(0 0% 100%);
   --surface: hsl(0 0% 7%);
+  --aloqa-green: 160 100% 33%;
+  --aloqa-teal: 165 100% 40%;
   --beeline-black: 0 0% 7%;
-  --beeline-stripe: 47 100% 50%;
+  --beeline-stripe: 160 100% 33%;
 }
 
 @layer base {

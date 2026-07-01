@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useState, useMemo, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowRight,
@@ -39,8 +40,8 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Восток связь — мобильное приложение" },
-      { name: "description", content: "CJM прототип мобильного приложения Восток связь" },
+      { title: "aloQa — мобильное приложение" },
+      { name: "description", content: "CJM прототип мобильного приложения aloQa" },
     ],
   }),
   component: App,
@@ -319,11 +320,9 @@ function Splash({
   return (
     <div className={`relative flex flex-col h-[calc(100vh-44px)] ${showLangPopup ? "" : ""}`}>
       <div className={`flex-1 flex flex-col items-center justify-center px-6 transition ${showLangPopup ? "blur-md scale-[0.98]" : ""}`}>
-        <div className="w-20 h-20 rounded-3xl bg-brand grid place-items-center shadow-xl mb-8">
-          <div className="w-8 h-8 rounded-full bg-surface" />
-        </div>
-        <div className="text-[11px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
-          Восток связь · от Билайн
+        <AloqaLogo className="w-20 h-20 rounded-3xl shadow-xl mb-8" />
+        <div className="text-sm font-black tracking-tight text-muted-foreground mb-3">
+          aloQa
         </div>
         <div className="h-32 flex flex-col items-center justify-center">
           {showLangPopup ? (
@@ -414,7 +413,7 @@ function Splash({
 /* ---------- WELCOME ---------- */
 const slides = [
   {
-    title: "Связь, которая работает на Востоке",
+    title: "aloQa — связь, которая ведёт к цели",
     text: "Управляйте номером и балансом в одном приложении.",
     icon: Sparkles,
   },
@@ -582,16 +581,31 @@ function Welcome({
   );
 }
 
+function AloqaLogo({ className }: { className?: string }) {
+  return (
+    <div className={cn("bg-brand grid place-items-center overflow-hidden", className)}>
+      <svg viewBox="0 0 48 48" className="w-[62%] h-[62%]">
+        <g fill="none" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+          {/* compass star */}
+          <path d="M24 5 L24 13 M24 35 L24 43 M5 24 L13 24 M35 24 L43 24" />
+          {/* Q body / compass ring */}
+          <path d="M32 28 C28 34 18 34 16 26 C14 18 22 12 30 16 C33 18 34 22 32 26" />
+          {/* Q tail */}
+          <path d="M28 28 L37 39" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
 function Logo() {
   return (
     <div className="flex items-center gap-2">
-      <div className="w-9 h-9 rounded-xl bg-brand grid place-items-center">
-        <div className="w-4 h-4 rounded-full bg-surface" />
-      </div>
+      <AloqaLogo className="w-9 h-9 rounded-xl" />
       <div className="leading-tight">
-        <div className="text-[15px] font-black tracking-tight">Восток связь</div>
+        <div className="text-[15px] font-black tracking-tight">aloQa</div>
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-          от Билайн
+          связь с целью
         </div>
       </div>
     </div>
@@ -644,7 +658,7 @@ const noticeDocs = [
 
 const appSteps = [
   { icon: Smartphone, t: "Установи сим в смартфон" },
-  { icon: Download, t: "Установи приложение «Восток связь»" },
+  { icon: Download, t: "Установи приложение «aloQa»" },
   { icon: LogIn, t: "Нажми «Войти»" },
   { icon: Phone, t: "Зайди по номеру, который дали в офисе" },
   { icon: Sliders, t: "Управляй сим в приложении" },
@@ -731,7 +745,7 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
           <StepHeader
             n="3"
             title="Настрой сим и управляй тарифом"
-            subtitle="Через приложение «Восток связь»"
+            subtitle="Через приложение «aloQa»"
           />
           <div className="mt-4 space-y-2.5">
             {appSteps.map((s) => {
@@ -1264,7 +1278,7 @@ function TabSvyaz({
                 Закажите номер Билайн
               </div>
               <p className="text-surface/80 text-sm mt-1">
-                Полный доступ к сервисам «Восток связь» — только с сим-картой Билайн.
+                Полный доступ к сервисам «aloQa» — только с сим-картой Билайн.
               </p>
               <button
                 onClick={onOrderSim}
@@ -1343,9 +1357,9 @@ function TajikFlag() {
 
 function MirCard({ last4 = "4821" }: { last4?: string }) {
   return (
-    <div className="relative rounded-2xl overflow-hidden aspect-[1.586/1] shadow-lg" style={{ background: "#1b8a5a" }}>
+    <div className="relative rounded-2xl overflow-hidden aspect-[1.586/1] shadow-lg" style={{ background: "hsl(160 100% 33%)" }}>
       <div className="absolute inset-0 opacity-90"
-           style={{ background: "linear-gradient(135deg, #1b8a5a 0%, #0f6b45 60%, #094e33 100%)" }} />
+           style={{ background: "linear-gradient(135deg, hsl(160 100% 33%) 0%, hsl(165 100% 28%) 60%, hsl(165 100% 22%) 100%)" }} />
       {/* Flag circle */}
       <div className="absolute -left-6 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full overflow-hidden ring-4 ring-white/10">
         <TajikFlag />
@@ -1356,9 +1370,9 @@ function MirCard({ last4 = "4821" }: { last4?: string }) {
           <div key={i} className="bg-yellow-800/40 rounded-sm" />
         ))}
       </div>
-      {/* aloqa! label */}
+      {/* aloQa label */}
       <div className="absolute left-16 top-5 text-white font-black text-lg leading-none tracking-tight">
-        aloqa<span className="text-yellow-300">!</span>
+        aloQa
       </div>
       {/* Number */}
       <div className="absolute left-5 bottom-10 text-white/90 font-mono text-sm tracking-widest">
@@ -1397,8 +1411,8 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       {/* Header */}
       <div className="px-5 pt-4 pb-2 flex items-center justify-between">
         <div className="w-6" />
-        <div className="text-center">
-          <div className="text-base font-bold">Карта aloqa!</div>
+      <div className="text-center">
+          <div className="text-base font-bold">Карта aloQa</div>
           <button className="text-[11px] text-brand font-semibold mt-0.5 inline-flex items-center gap-0.5">
             Цифровая карта <ChevronRight className="h-3 w-3" />
           </button>
@@ -1437,7 +1451,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         {/* Recommend block */}
         <div className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3">
           <div className="flex-1">
-            <div className="font-bold text-sm">Рекомендуйте карту aloqa!</div>
+            <div className="font-bold text-sm">Рекомендуйте карту aloQa</div>
             <div className="mt-1 grid grid-cols-2 gap-2 text-[11px]">
               <div><span className="text-muted-foreground">Вам</span> <span className="font-bold">1 200 ₽</span></div>
               <div><span className="text-muted-foreground">Другу</span> <span className="font-bold">300 ₽</span></div>
@@ -1447,7 +1461,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             </button>
           </div>
           <div className="w-16 h-16 rounded-xl grid place-items-center shrink-0"
-               style={{ background: "linear-gradient(135deg,#1b8a5a,#094e33)" }}>
+               style={{ background: "linear-gradient(135deg,hsl(160 100% 33%),hsl(165 100% 22%))" }}>
             <CreditCard className="h-7 w-7 text-white" />
           </div>
         </div>

@@ -2124,24 +2124,45 @@ function isRuCard(digits: string) {
 }
 
 function BankTopup({
+  method,
   onClose,
   onSubmit,
 }: {
+  method: "card" | "phone" | "account";
   onClose: () => void;
   onSubmit: (amount: number, fromLast4: string) => void;
 }) {
   const [amount, setAmount] = useState("");
   const [card, setCard] = useState("");
+  const [phone, setPhone] = useState("");
+  const [account, setAccount] = useState("");
+  const [bank, setBank] = useState("sber");
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const digits = card.replace(/\D/g, "");
+
+  const cardDigits = card.replace(/\D/g, "");
+  const phoneDigits = phone.replace(/\D/g, "");
+  const accDigits = account.replace(/\D/g, "");
   const amt = Number(amount.replace(/\s/g, ""));
-  const canSubmit = amt > 0 && amt <= 300000 && isRuCard(digits);
+
+  const sourceValid =
+    method === "card"
+      ? isRuCard(cardDigits)
+      : method === "phone"
+        ? phoneDigits.length === 10
+        : accDigits.length === 20;
+  const canSubmit = amt > 0 && amt <= 300000 && sourceValid;
 
   const submit = () => {
     setError(null);
-    if (!isRuCard(digits)) {
-      setError("Пополнение доступно только с карт российских банков");
+    if (!sourceValid) {
+      setError(
+        method === "card"
+          ? "Пополнение доступно только с карт российских банков"
+          : method === "phone"
+            ? "Введите корректный номер телефона плательщика"
+            : "Номер счёта должен содержать 20 цифр",
+      );
       return;
     }
     if (!(amt > 0)) {
@@ -2151,9 +2172,22 @@ function BankTopup({
     setProcessing(true);
     setTimeout(() => {
       setProcessing(false);
-      onSubmit(amt, digits.slice(-4));
+      const last4 =
+        method === "card"
+          ? cardDigits.slice(-4)
+          : method === "phone"
+            ? phoneDigits.slice(-4)
+            : accDigits.slice(-4);
+      onSubmit(amt, last4);
     }, 1400);
   };
+
+  const title =
+    method === "card"
+      ? "С карты другого банка РФ"
+      : method === "phone"
+        ? "По номеру телефона через СБП"
+        : "С моего счёта в другом банке";
 
   return (
     <div className="bg-background min-h-full">
@@ -2171,23 +2205,78 @@ function BankTopup({
       <div className="px-5 pt-5 space-y-5">
         <div>
           <div className="text-2xl font-black">Пополнить карту</div>
-          <div className="text-xs text-muted-foreground mt-1">С карты другого банка РФ</div>
+          <div className="text-xs text-muted-foreground mt-1">{title}</div>
         </div>
 
         <div className="rounded-2xl bg-card border border-border p-4 space-y-4">
-          <div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">С карты</div>
-            <input
-              inputMode="numeric"
-              placeholder="0000 0000 0000 0000"
-              value={card}
-              onChange={(e) => setCard(formatCardNumber(e.target.value))}
-              className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
-            />
-            <div className="text-[10px] text-muted-foreground mt-1">
-              Принимаются только карты российских банков (МИР, Visa/Mastercard РФ)
+          {method === "card" && (
+            <div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">С карты</div>
+              <input
+                inputMode="numeric"
+                placeholder="0000 0000 0000 0000"
+                value={card}
+                onChange={(e) => setCard(formatCardNumber(e.target.value))}
+                className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
+              />
+              <div className="text-[10px] text-muted-foreground mt-1">
+                Принимаются только карты российских банков (МИР, Visa/Mastercard РФ)
+              </div>
             </div>
-          </div>
+          )}
+
+          {method === "phone" && (
+            <>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Номер телефона плательщика
+                </div>
+                <div className="flex items-center gap-2 h-11 px-3 rounded-xl bg-muted border border-border focus-within:border-brand">
+                  <span className="text-sm font-semibold text-muted-foreground">+7</span>
+                  <input
+                    inputMode="tel"
+                    placeholder="(___) ___-__-__"
+                    value={formatPhoneInput(phoneDigits)}
+                    onChange={(e) => setPhone(normalizePhoneDigits(e.target.value))}
+                    className="flex-1 bg-transparent outline-none text-base font-semibold"
+                  />
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-1">
+                  СБП: деньги придут за секунды, комиссия 0 ₽ до 100 000 ₽ / мес
+                </div>
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Банк отправителя</div>
+                <select
+                  value={bank}
+                  onChange={(e) => setBank(e.target.value)}
+                  className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-sm font-semibold outline-none focus:border-brand"
+                >
+                  <option value="sber">Сбербанк</option>
+                  <option value="tinkoff">Т-Банк</option>
+                  <option value="vtb">ВТБ</option>
+                  <option value="alfa">Альфа-Банк</option>
+                  <option value="other">Другой банк СБП</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {method === "account" && (
+            <div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Номер счёта (20 цифр)</div>
+              <input
+                inputMode="numeric"
+                placeholder="40817 810 0 0000 0000000"
+                value={account}
+                onChange={(e) => setAccount(e.target.value.replace(/[^\d\s]/g, "").slice(0, 24))}
+                className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
+              />
+              <div className="text-[10px] text-muted-foreground mt-1">
+                Счёт в стороннем банке РФ. Зачисление 1–2 рабочих дня.
+              </div>
+            </div>
+          )}
 
           <div>
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Сумма</div>
@@ -2211,7 +2300,11 @@ function BankTopup({
             </div>
           </div>
 
-          <div className="text-[11px] text-muted-foreground">Комиссия: 0 ₽ · Зачисление: мгновенно</div>
+          <div className="text-[11px] text-muted-foreground">
+            {method === "account"
+              ? "Комиссия: 0 ₽ · Зачисление: 1–2 рабочих дня"
+              : "Комиссия: 0 ₽ · Зачисление: мгновенно"}
+          </div>
         </div>
 
         {error && (
@@ -2235,27 +2328,38 @@ function BankTopup({
 }
 
 function BankTransfer({
+  method,
   onClose,
   onSubmit,
   balance,
 }: {
+  method: "card" | "phone";
   onClose: () => void;
   onSubmit: (amount: number, toLast4: string, recipient: string) => void;
   balance: number;
 }) {
   const [amount, setAmount] = useState("");
   const [card, setCard] = useState("");
+  const [phone, setPhone] = useState("");
+  const [bank, setBank] = useState("sber");
   const [name, setName] = useState("");
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const digits = card.replace(/\D/g, "");
+
+  const cardDigits = card.replace(/\D/g, "");
+  const phoneDigits = phone.replace(/\D/g, "");
   const amt = Number(amount.replace(/\s/g, ""));
-  const canSubmit = amt > 0 && amt <= balance && isRuCard(digits);
+  const destValid = method === "card" ? isRuCard(cardDigits) : phoneDigits.length === 10;
+  const canSubmit = amt > 0 && amt <= balance && destValid;
 
   const submit = () => {
     setError(null);
-    if (!isRuCard(digits)) {
-      setError("Переводы возможны только на карты российских банков (РФ → РФ)");
+    if (!destValid) {
+      setError(
+        method === "card"
+          ? "Переводы возможны только на карты российских банков (РФ → РФ)"
+          : "Введите корректный номер телефона получателя",
+      );
       return;
     }
     if (!(amt > 0)) {
@@ -2269,9 +2373,15 @@ function BankTransfer({
     setProcessing(true);
     setTimeout(() => {
       setProcessing(false);
-      onSubmit(amt, digits.slice(-4), name.trim());
+      const last4 = method === "card" ? cardDigits.slice(-4) : phoneDigits.slice(-4);
+      onSubmit(amt, last4, name.trim());
     }, 1400);
   };
+
+  const subtitle =
+    method === "card"
+      ? "Только с карты РФ на карту РФ"
+      : "По номеру телефона через СБП";
 
   return (
     <div className="bg-background min-h-full">
@@ -2288,29 +2398,70 @@ function BankTransfer({
 
       <div className="px-5 pt-5 space-y-5">
         <div>
-          <div className="text-2xl font-black">Перевод на карту</div>
-          <div className="text-xs text-muted-foreground mt-1">Только с карты РФ на карту РФ</div>
+          <div className="text-2xl font-black">
+            {method === "card" ? "Перевод на карту" : "Перевод по телефону"}
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>
         </div>
 
         <div className="rounded-2xl bg-card border border-border p-4 space-y-4">
-          <div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Номер карты получателя</div>
-            <input
-              inputMode="numeric"
-              placeholder="0000 0000 0000 0000"
-              value={card}
-              onChange={(e) => setCard(formatCardNumber(e.target.value))}
-              className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
-            />
-            <div className="text-[10px] text-muted-foreground mt-1">
-              Только карты российских банков. Переводы за рубеж недоступны.
+          {method === "card" ? (
+            <div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Номер карты получателя</div>
+              <input
+                inputMode="numeric"
+                placeholder="0000 0000 0000 0000"
+                value={card}
+                onChange={(e) => setCard(formatCardNumber(e.target.value))}
+                className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
+              />
+              <div className="text-[10px] text-muted-foreground mt-1">
+                Только карты российских банков. Переводы за рубеж недоступны.
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
+                  Номер телефона получателя
+                </div>
+                <div className="flex items-center gap-2 h-11 px-3 rounded-xl bg-muted border border-border focus-within:border-brand">
+                  <span className="text-sm font-semibold text-muted-foreground">+7</span>
+                  <input
+                    inputMode="tel"
+                    placeholder="(___) ___-__-__"
+                    value={formatPhoneInput(phoneDigits)}
+                    onChange={(e) => setPhone(normalizePhoneDigits(e.target.value))}
+                    className="flex-1 bg-transparent outline-none text-base font-semibold"
+                  />
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-1">
+                  СБП РФ — комиссия 0 ₽ до 100 000 ₽ / мес
+                </div>
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Банк получателя</div>
+                <select
+                  value={bank}
+                  onChange={(e) => setBank(e.target.value)}
+                  className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-sm font-semibold outline-none focus:border-brand"
+                >
+                  <option value="sber">Сбербанк</option>
+                  <option value="tinkoff">Т-Банк</option>
+                  <option value="vtb">ВТБ</option>
+                  <option value="alfa">Альфа-Банк</option>
+                  <option value="other">Другой банк СБП</option>
+                </select>
+              </div>
+            </>
+          )}
 
           <div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Получатель (необязательно)</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
+              {method === "card" ? "Получатель (необязательно)" : "Имя получателя"}
+            </div>
             <input
-              placeholder="Имя получателя"
+              placeholder="Иван И."
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-sm outline-none focus:border-brand"
@@ -2358,6 +2509,8 @@ function BankTransfer({
     </div>
   );
 }
+
+
 
 function WebviewChrome({
   onClose,

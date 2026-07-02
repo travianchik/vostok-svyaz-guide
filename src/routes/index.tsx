@@ -1950,19 +1950,22 @@ function BankTransfer({
 
 function WebviewChrome({
   onClose,
+  onBack,
   children,
 }: {
   onClose?: () => void;
+  onBack?: () => void;
   children: React.ReactNode;
 }) {
   return (
     <div className="bg-background min-h-full">
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button
-          onClick={onClose}
+          onClick={onBack ?? onClose}
           className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1"
         >
-          <Lock className="h-3.5 w-3.5" /> Закрыть
+          {onBack ? <ArrowLeft className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+          {onBack ? "Назад" : "Закрыть"}
         </button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -1979,14 +1982,41 @@ function WebviewChrome({
   );
 }
 
+
+type BankStep =
+  | "welcome"
+  | "form"
+  | "sms"
+  | "delivery"
+  | "waiting"
+  | "approved"
+  | "create-passcode";
+
 function BankLogin({ onDone }: { onDone: () => void }) {
-  const [step, setStep] = useState<"data" | "waiting" | "approved" | "create-passcode">("data");
+  const [step, setStep] = useState<BankStep>("welcome");
+  const [gender, setGender] = useState<"m" | "f">("m");
+  const [citizenship, setCitizenship] = useState("");
   const [fio, setFio] = useState("");
   const [birth, setBirth] = useState("");
-  const [passport, setPassport] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [sms, setSms] = useState("");
+  const [smsTimer, setSmsTimer] = useState(25);
+  const [addressType, setAddressType] = useState<"courier" | "office">("courier");
+  const [address, setAddress] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("15");
+  const [deliveryTime, setDeliveryTime] = useState("");
   const [pin, setPin] = useState("");
   const [pin2, setPin2] = useState("");
   const [progress, setProgress] = useState(0);
+
+  // SMS resend timer
+  useEffect(() => {
+    if (step !== "sms") return;
+    setSmsTimer(25);
+    const id = setInterval(() => setSmsTimer((t) => (t > 0 ? t - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, [step]);
 
   // Emulate bank response waiting
   useEffect(() => {
@@ -2005,45 +2035,331 @@ function BankLogin({ onDone }: { onDone: () => void }) {
     return () => clearInterval(id);
   }, [step]);
 
-  if (step === "data") {
-    const valid =
-      fio.trim().length > 3 && birth.length === 10 && passport.replace(/\D/g, "").length === 10;
+  // --- WELCOME ---
+  if (step === "welcome") {
     return (
       <WebviewChrome>
-        <div className="px-5 pt-4 pb-4 space-y-4">
-          <div>
-            <h1 className="text-xl font-black tracking-tight">Открытие счёта</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Заполните анкету — заявка уйдёт в Альфа-Банк.
+        <div className="px-5 pt-6 pb-6 space-y-6 flex flex-col items-center">
+          <div className="relative w-40 h-52 mt-4">
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-brand to-brand/70 shadow-2xl rotate-[-8deg]" />
+            <div className="absolute inset-0 rounded-3xl grid place-items-center rotate-[-8deg]">
+              <div className="text-brand-foreground text-5xl font-black">a</div>
+            </div>
+            <Sparkles className="absolute -top-2 -right-3 h-8 w-8 text-brand" />
+            <Sparkles className="absolute bottom-4 -left-4 h-6 w-6 text-brand/70" />
+          </div>
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-black tracking-tight">Дебетовая карта для мигрантов</h1>
+            <p className="text-sm text-muted-foreground">
+              Бесплатное обслуживание. Переводы на родину, оплата покупок и снятие наличных.
             </p>
           </div>
-          <div className="space-y-3">
-            <BankField label="ФИО" placeholder="Иванов Иван Иванович" value={fio} onChange={setFio} />
-            <BankField
-              label="Дата рождения"
-              placeholder="ДД.ММ.ГГГГ"
-              value={birth}
-              onChange={(v) => setBirth(maskDate(v))}
-              inputMode="numeric"
-            />
-            <BankField
-              label="Серия и номер паспорта"
-              placeholder="0000 000000"
-              value={passport}
-              onChange={(v) => setPassport(maskPassport(v))}
-              inputMode="numeric"
-            />
+          <div className="w-full space-y-2 pt-2">
+            <button
+              onClick={() => setStep("form")}
+              className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold active:scale-[0.98] transition"
+            >
+              Оформить карту
+            </button>
+            <button
+              onClick={onDone}
+              className="w-full h-12 text-sm font-semibold text-muted-foreground hover:text-foreground transition"
+            >
+              Уже есть карта? Войти
+            </button>
           </div>
-          <div className="p-3 rounded-2xl bg-brand/15 text-[11px] leading-snug text-foreground/80">
-            Нажимая «Отправить заявку», вы соглашаетесь на обработку персональных данных и передачу
-            анкеты в АО «Альфа-Банк».
+          <div className="w-full flex items-start gap-2 p-3 rounded-2xl bg-brand/10">
+            <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
+            <p className="text-[11px] leading-snug text-foreground/70">
+              Мы гарантируем безопасность и сохранность ваших данных
+            </p>
           </div>
+          <p className="text-[10px] leading-snug text-center text-muted-foreground">
+            Нажимая «Оформить карту», я подтверждаю, что ознакомлен с условиями обработки
+            персональных данных
+          </p>
+        </div>
+      </WebviewChrome>
+    );
+  }
+
+  // --- FORM (step 2 of 4) ---
+  if (step === "form") {
+    const valid =
+      citizenship.length > 0 &&
+      fio.trim().length > 3 &&
+      birth.length === 10 &&
+      phone.replace(/\D/g, "").length >= 11 &&
+      email.includes("@");
+    return (
+      <WebviewChrome onBack={() => setStep("welcome")}>
+        <div className="px-5 pt-4 pb-6 space-y-4">
+          <div>
+            <h1 className="text-xl font-black tracking-tight leading-snug">
+              Заполните заявку<br />и зелёная карта ваша
+            </h1>
+            <StepProgress step={2} total={4} percent={30} />
+          </div>
+          <div className="text-sm font-bold">Заполните ваши данные:</div>
+          <div>
+            <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+              Пол
+            </div>
+            <div className="flex gap-2">
+              {(["m", "f"] as const).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setGender(g)}
+                  className={cn(
+                    "px-5 h-10 rounded-full text-sm font-bold transition",
+                    gender === g
+                      ? "bg-foreground text-background"
+                      : "bg-muted text-foreground",
+                  )}
+                >
+                  {g === "m" ? "Муж" : "Жен"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <BankSelect
+            label="Гражданство"
+            value={citizenship}
+            onChange={setCitizenship}
+            options={["Узбекистан", "Таджикистан", "Кыргызстан", "Казахстан", "Армения"]}
+          />
+          <BankField
+            label="Фамилия Имя Отчество"
+            placeholder="Как в паспорте"
+            value={fio}
+            onChange={setFio}
+            hint="Укажите точно как в паспорте"
+          />
+          <BankField
+            label="Дата рождения"
+            placeholder="ДД.ММ.ГГГГ"
+            value={birth}
+            onChange={(v) => setBirth(maskDate(v))}
+            inputMode="numeric"
+            hint="Заказать карту можно только с 18 лет"
+          />
+          <BankField
+            label="Мобильный телефон"
+            placeholder="+7 (___) ___-__-__"
+            value={phone}
+            onChange={setPhone}
+            inputMode="numeric"
+          />
+          <BankField
+            label="Электронная почта"
+            placeholder="you@example.com"
+            value={email}
+            onChange={setEmail}
+          />
+          <button
+            disabled={!valid}
+            onClick={() => setStep("sms")}
+            className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+          >
+            Продолжить
+          </button>
+          <div className="flex items-start gap-2 p-3 rounded-2xl bg-brand/10">
+            <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
+            <p className="text-[11px] leading-snug text-foreground/70">
+              Мы гарантируем безопасность и сохранность ваших данных
+            </p>
+          </div>
+          <p className="text-[10px] leading-snug text-center text-muted-foreground">
+            Нажимая «Продолжить», я подтверждаю, что ознакомлен с Памяткой об ЭДС, соглашаюсь
+            на выпуск предоплаченной карты и заказ расчётной карты, соглашаюсь с условиями,
+            договором, даю согласие
+          </p>
+        </div>
+      </WebviewChrome>
+    );
+  }
+
+  // --- SMS ---
+  if (step === "sms") {
+    const masked = phone.slice(0, 3) + " ••• ••" + phone.slice(-2);
+    return (
+      <WebviewChrome onBack={() => setStep("form")}>
+        <div className="px-5 pt-4 pb-6 space-y-5">
+          <StepProgress step={3} total={4} percent={55} />
+          <div className="text-center space-y-1 pt-4">
+            <h1 className="text-lg font-black tracking-tight">Введите код из смс</h1>
+            <p className="text-sm text-muted-foreground">
+              Код отправлен на {masked || "+7 ••• ••••••"}
+            </p>
+          </div>
+          <div className="flex justify-center gap-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className={cn(
+                  "w-14 h-14 rounded-2xl grid place-items-center text-xl font-black transition",
+                  sms.length === i
+                    ? "bg-card border-2 border-brand"
+                    : "bg-muted border-2 border-transparent",
+                )}
+              >
+                {sms[i] ?? ""}
+              </div>
+            ))}
+          </div>
+          <div className="text-center text-xs text-muted-foreground">
+            {smsTimer > 0 ? (
+              <>Запросить повторно можно через 00:{smsTimer.toString().padStart(2, "0")}</>
+            ) : (
+              <button onClick={() => setSmsTimer(25)} className="font-bold text-brand">
+                Отправить код повторно
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => setStep("form")}
+            className="w-full text-center text-sm font-bold text-foreground"
+          >
+            Изменить номер телефона
+          </button>
+          <div className="flex-1" />
+          <PinKeypad
+            onDigit={(d) => {
+              if (sms.length < 4) {
+                const next = sms + d;
+                setSms(next);
+                if (next.length === 4) setTimeout(() => setStep("delivery"), 250);
+              }
+            }}
+            onBack={() => setSms(sms.slice(0, -1))}
+          />
+        </div>
+      </WebviewChrome>
+    );
+  }
+
+  // --- DELIVERY ---
+  if (step === "delivery") {
+    const noZone = address.toLowerCase().includes("ленин");
+    const dates = [
+      { d: "15", m: "апр.", w: "Сегодня" },
+      { d: "16", m: "", w: "Вт" },
+      { d: "17", m: "", w: "Ср" },
+    ];
+    const times = ["9:15–9:35", "10:00–11:00", "11:00–12:00", "12:00–13:00", "13:00–15:00", "15:00–17:00"];
+    const valid = address.trim().length > 5 && deliveryTime.length > 0 && !noZone;
+    return (
+      <WebviewChrome onBack={() => setStep("sms")}>
+        <div className="px-5 pt-4 pb-6 space-y-5">
+          <div>
+            <h1 className="text-xl font-black tracking-tight">Осталось заказать доставку</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Введите адрес — предложим варианты доставки
+            </p>
+            <StepProgress step={4} total={4} percent={80} />
+          </div>
+          <div className="relative">
+            <BankField
+              label="Адрес"
+              placeholder="г Москва, ул Арбат, д 40"
+              value={address}
+              onChange={setAddress}
+            />
+            {address.length > 3 && (
+              <div className="absolute right-4 top-9">
+                {noZone ? (
+                  <div className="w-6 h-6 rounded-full bg-destructive grid place-items-center">
+                    <span className="text-destructive-foreground text-xs font-black">!</span>
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-brand grid place-items-center">
+                    <Check className="h-3.5 w-3.5 text-brand-foreground" />
+                  </div>
+                )}
+              </div>
+            )}
+            {noZone && (
+              <p className="text-xs font-semibold text-destructive mt-1 px-1">
+                В эту зону нет доставки
+              </p>
+            )}
+            {!noZone && address.length > 3 && (
+              <p className="text-[11px] text-muted-foreground mt-1 px-1">
+                Например: г Москва, ул Арбат, д 1
+              </p>
+            )}
+          </div>
+          {!noZone && (
+            <>
+              <div>
+                <div className="text-sm font-bold mb-2">Куда доставить</div>
+                <div className="flex gap-2">
+                  {(
+                    [
+                      { k: "courier", l: "По адресу" },
+                      { k: "office", l: "В офис банка" },
+                    ] as const
+                  ).map((o) => (
+                    <button
+                      key={o.k}
+                      onClick={() => setAddressType(o.k)}
+                      className={cn(
+                        "px-4 h-10 rounded-full text-sm font-bold transition",
+                        addressType === o.k
+                          ? "bg-foreground text-background"
+                          : "bg-muted text-foreground",
+                      )}
+                    >
+                      {o.l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm font-bold mb-2">Дата и время</div>
+                <div className="flex gap-2 mb-3">
+                  {dates.map((d) => (
+                    <button
+                      key={d.d}
+                      onClick={() => setDeliveryDate(d.d)}
+                      className={cn(
+                        "flex flex-col items-center justify-center w-16 h-16 rounded-2xl font-bold transition",
+                        deliveryDate === d.d
+                          ? "bg-foreground text-background"
+                          : "bg-muted text-foreground",
+                      )}
+                    >
+                      <span className="text-lg leading-none">{d.d}</span>
+                      <span className="text-[10px] opacity-80 mt-1">{d.m || d.w}</span>
+                      {d.m && <span className="text-[10px] opacity-80">{d.w}</span>}
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {times.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setDeliveryTime(t)}
+                      className={cn(
+                        "h-10 rounded-full text-xs font-bold transition",
+                        deliveryTime === t
+                          ? "bg-foreground text-background"
+                          : "bg-muted text-foreground",
+                      )}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
           <button
             disabled={!valid}
             onClick={() => setStep("waiting")}
             className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
           >
-            Отправить заявку
+            Заказать доставку
           </button>
         </div>
       </WebviewChrome>
@@ -2123,21 +2439,42 @@ function BankLogin({ onDone }: { onDone: () => void }) {
   if (step === "approved") {
     return (
       <WebviewChrome>
-        <div className="px-5 pt-10 pb-8 space-y-6 flex flex-col items-center">
-          <div className="w-20 h-20 rounded-full bg-brand grid place-items-center shadow-lg">
-            <Check className="h-10 w-10 text-brand-foreground" />
+        <div className="px-5 pt-6 pb-6 space-y-5">
+          <div className="w-14 h-14 rounded-full bg-brand grid place-items-center shadow-lg">
+            <Check className="h-7 w-7 text-brand-foreground" />
           </div>
-          <div className="text-center">
-            <h1 className="text-2xl font-black tracking-tight">Заявка одобрена!</h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Счёт открыт. Осталось придумать код-пароль для входа в банк.
-            </p>
+          <div>
+            <h1 className="text-2xl font-black tracking-tight">Дождитесь курьера</h1>
+            <div className="mt-3 space-y-1 text-sm">
+              <div className="flex items-center gap-2 text-foreground/80">
+                <span className="w-4 h-4 rounded-full border-2 border-brand grid place-items-center">
+                  <span className="w-1 h-1 rounded-full bg-brand" />
+                </span>
+                14.03.2028, 13:45
+              </div>
+              <div className="flex items-center gap-2 text-foreground/80">
+                <MapPin className="h-4 w-4 text-brand" />
+                {address || "г. Москва, ул Арбат, д 40"}
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2 className="text-lg font-black tracking-tight mb-3">Возьмите документы</h2>
+            <ul className="space-y-2.5 text-sm">
+              <DocRow>Паспорт иностранного гражданина (с заверенным переводом)</DocRow>
+              <DocRow>Миграционная карта (можно с истёкшим сроком)</DocRow>
+              <li className="pt-1 font-bold">И один из документов:</li>
+              <li className="pl-4 text-foreground/80">• Отрывная часть уведомления о прибытии</li>
+              <li className="pl-4 text-foreground/80">• Разрешение на временное проживание</li>
+              <li className="pl-4 text-foreground/80">• Заявление участника ЭПР</li>
+              <li className="pl-4 text-foreground/80">• Вид на жительство РФ</li>
+            </ul>
           </div>
           <button
             onClick={() => setStep("create-passcode")}
             className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold active:scale-[0.98] transition"
           >
-            Придумать код-пароль
+            Хорошо
           </button>
         </div>
       </WebviewChrome>
@@ -2175,6 +2512,66 @@ function BankLogin({ onDone }: { onDone: () => void }) {
         </button>
       </div>
     </WebviewChrome>
+  );
+}
+
+function StepProgress({ step, total, percent }: { step: number; total: number; percent: number }) {
+  return (
+    <div className="mt-3">
+      <div className="text-[11px] font-bold text-foreground/70 mb-1.5">
+        Шаг {step} из {total}. Заявка заполнена на {percent}%
+      </div>
+      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div className="h-full bg-brand transition-all" style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function BankSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  return (
+    <label className="block">
+      <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+        {label}
+      </div>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={cn(
+            "w-full h-14 px-4 pr-10 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition appearance-none",
+            !value && "text-muted-foreground",
+          )}
+        >
+          <option value="">Выберите</option>
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 rotate-90 text-muted-foreground pointer-events-none" />
+      </div>
+    </label>
+  );
+}
+
+function DocRow({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-2">
+      <FileText className="h-4 w-4 text-brand shrink-0 mt-0.5" />
+      <span className="text-foreground/85">{children}</span>
+    </li>
   );
 }
 
@@ -2221,12 +2618,14 @@ function BankField({
   value,
   onChange,
   inputMode,
+  hint,
 }: {
   label: string;
   placeholder: string;
   value: string;
   onChange: (v: string) => void;
   inputMode?: "text" | "numeric";
+  hint?: string;
 }) {
   return (
     <label className="block">
@@ -2240,6 +2639,7 @@ function BankField({
         onChange={(e) => onChange(e.target.value)}
         className="w-full h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
       />
+      {hint && <div className="text-[11px] text-muted-foreground mt-1 px-1">{hint}</div>}
     </label>
   );
 }

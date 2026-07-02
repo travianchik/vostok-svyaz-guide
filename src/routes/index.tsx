@@ -36,7 +36,18 @@ import {
   Lock,
   Delete,
   Loader2,
+  Eye,
+  EyeOff,
+  Info,
+  Snowflake,
+  ArrowLeftRight,
+  Utensils,
+  Fuel,
+  Home as HomeIcon,
+  Heart,
+  Headphones,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -1432,9 +1443,16 @@ type TxItem = {
   color: string;
 };
 
+
 function BankWebview({ onLock }: { onLock: () => void }) {
-  const [screen, setScreen] = useState<"main" | "topup" | "transfer" | "history">("main");
+  const [screen, setScreen] = useState<
+    "main" | "topup" | "transfer" | "history" | "requisites" | "cashback"
+  >("main");
+  const [cardType, setCardType] = useState<"plastic" | "virtual" | "digital">("plastic");
+  const [sheet, setSheet] = useState<null | "topup" | "transfer" | "actions">(null);
+  const [showTerms, setShowTerms] = useState(true);
   const [balance, setBalance] = useState(12480);
+  const [cashback, setCashback] = useState(1200);
   const [history, setHistory] = useState<TxItem[]>([
     { day: "Сегодня", who: "Коргоо Маркет", cat: "Финансовые операции", sum: -1656.94, sign: "-", icon: "K", color: "#22c55e" },
     { day: "Вчера", who: "Иван Х.", cat: "Перевод от друга", sum: 3656.74, sign: "+", icon: "И", color: "#ef4444" },
@@ -1469,9 +1487,26 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   if (screen === "history") {
     return <BankHistory onClose={() => setScreen("main")} onLock={onLock} history={history} />;
   }
+  if (screen === "requisites") {
+    return <BankRequisites onBack={() => setScreen("main")} onLock={onLock} />;
+  }
+  if (screen === "cashback") {
+    return (
+      <BankCashback
+        onBack={() => setScreen("main")}
+        onLock={onLock}
+        onDone={(v) => {
+          setCashback(v);
+          setScreen("main");
+        }}
+      />
+    );
+  }
+
+  const displayBalance = cardType === "virtual" ? balance + 4172 : balance;
 
   return (
-    <div className="bg-background min-h-full">
+    <div className="bg-background min-h-full relative">
       {/* Webview browser bar */}
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button onClick={onLock} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
@@ -1487,11 +1522,9 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       {/* Header */}
       <div className="px-5 pt-4 pb-2 flex items-center justify-between">
         <div className="w-6" />
-      <div className="text-center">
+        <div className="text-center">
           <div className="text-base font-bold">Карта aloQa</div>
-          <button className="text-[11px] text-brand font-semibold mt-0.5 inline-flex items-center gap-0.5">
-            Цифровая карта <ChevronRight className="h-3 w-3" />
-          </button>
+          <CardTypeSwitcher value={cardType} onChange={setCardType} />
         </div>
         <button onClick={onLock} className="w-8 h-8 grid place-items-center rounded-full bg-muted">
           <X className="h-4 w-4" />
@@ -1499,12 +1532,12 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       </div>
 
       <div className="px-5 pt-3 space-y-5">
-        <MirCard />
+        <BankCard type={cardType} />
 
         {/* Balance */}
         <div className="text-center">
           <div className="text-4xl font-black tracking-tight">
-            {balance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
+            {displayBalance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
           </div>
           <div className="text-xs text-muted-foreground mt-1">Доступно на карте</div>
         </div>
@@ -1512,9 +1545,9 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         {/* Actions */}
         <div className="flex items-center justify-around">
           {[
-            { icon: Plus, label: "Пополнить", onClick: () => setScreen("topup") },
-            { icon: ArrowRight, label: "Перевести", onClick: () => setScreen("transfer") },
-            { icon: Sliders, label: "Действия", onClick: () => {} },
+            { icon: Plus, label: "Пополнить", onClick: () => setSheet("topup") },
+            { icon: ArrowLeftRight, label: "Перевести", onClick: () => setSheet("transfer") },
+            { icon: Sliders, label: "Действия", onClick: () => setSheet("actions") },
           ].map((a) => (
             <button key={a.label} onClick={a.onClick} className="flex flex-col items-center gap-2">
               <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center shadow-sm">
@@ -1525,22 +1558,47 @@ function BankWebview({ onLock }: { onLock: () => void }) {
           ))}
         </div>
 
-        {/* Recommend block */}
-        <div className="rounded-2xl bg-card border border-border p-4 flex items-center gap-3">
-          <div className="flex-1">
-            <div className="font-bold text-sm">Рекомендуйте карту aloQa</div>
-            <div className="mt-1 grid grid-cols-2 gap-2 text-[11px]">
-              <div><span className="text-muted-foreground">Вам</span> <span className="font-bold">1 200 ₽</span></div>
-              <div><span className="text-muted-foreground">Другу</span> <span className="font-bold">300 ₽</span></div>
-            </div>
-            <button className="mt-3 h-9 px-4 rounded-full bg-foreground text-background text-xs font-bold">
-              Рекомендовать
+        {/* Info banner */}
+        {showTerms && (
+          <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-card border border-border">
+            <Info className="h-4 w-4 text-brand shrink-0" />
+            <div className="flex-1 text-xs font-semibold">Обновили условия переводов</div>
+            <button onClick={() => setShowTerms(false)} className="w-6 h-6 grid place-items-center rounded-full hover:bg-muted">
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
-          <div className="w-16 h-16 rounded-xl grid place-items-center shrink-0"
-               style={{ background: "linear-gradient(135deg,hsl(160 100% 33%),hsl(165 100% 22%))" }}>
-            <CreditCard className="h-7 w-7 text-white" />
-          </div>
+        )}
+
+        {/* Cashback + Categories */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => setScreen("cashback")}
+            className="text-left rounded-2xl p-4 h-28 relative overflow-hidden shadow-sm"
+            style={{ background: "linear-gradient(135deg, hsl(160 100% 33%), hsl(165 100% 22%))" }}
+          >
+            <div className="text-[11px] font-bold text-white/80">Кэшбэк</div>
+            <div className="absolute inset-x-4 bottom-3 text-white text-lg font-black">
+              {cashback.toLocaleString("ru-RU")} ₽
+            </div>
+            <div className="absolute right-2 top-2 w-10 h-10 rounded-full bg-white/15" />
+          </button>
+          <button
+            onClick={() => setScreen("cashback")}
+            className="text-left rounded-2xl p-4 h-28 relative overflow-hidden shadow-sm bg-card border border-border"
+          >
+            <div className="text-[11px] font-bold text-muted-foreground">Ваши категории</div>
+            <div className="absolute bottom-3 left-3 flex -space-x-2">
+              <span className="w-8 h-8 rounded-full bg-orange-100 grid place-items-center ring-2 ring-card">
+                <Utensils className="h-4 w-4 text-orange-600" />
+              </span>
+              <span className="w-8 h-8 rounded-full bg-red-100 grid place-items-center ring-2 ring-card">
+                <Fuel className="h-4 w-4 text-red-600" />
+              </span>
+              <span className="w-8 h-8 rounded-full bg-blue-100 grid place-items-center ring-2 ring-card">
+                <Headphones className="h-4 w-4 text-blue-600" />
+              </span>
+            </div>
+          </button>
         </div>
 
         {/* History */}
@@ -1576,10 +1634,346 @@ function BankWebview({ onLock }: { onLock: () => void }) {
           </div>
         </div>
 
+        {/* Q&A */}
+        <button className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-card border border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-muted grid place-items-center">
+              <FileText className="h-4 w-4" />
+            </div>
+            <div className="text-sm font-bold">Ответы на вопросы</div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </button>
+
         {/* Footer note */}
         <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
           Банковские услуги предоставляет АО «Альфа-Банк».<br />
           Экран открыт во встроенном веб-браузере приложения.
+        </div>
+      </div>
+
+      {/* Bottom sheets */}
+      {sheet === "topup" && (
+        <BottomSheet title="Пополнить" onClose={() => setSheet(null)}>
+          <SheetItem
+            icon={Building2}
+            label="С моего счёта в другом банке"
+            onClick={() => {
+              setSheet(null);
+              setScreen("topup");
+            }}
+          />
+          <SheetItem
+            icon={Smartphone}
+            label="По номеру телефона"
+            onClick={() => {
+              setSheet(null);
+              setScreen("topup");
+            }}
+          />
+          <SheetItem
+            icon={CreditCard}
+            label="С карты другого банка"
+            onClick={() => {
+              setSheet(null);
+              setScreen("topup");
+            }}
+          />
+        </BottomSheet>
+      )}
+      {sheet === "transfer" && (
+        <BottomSheet title="Перевести" onClose={() => setSheet(null)}>
+          <SheetItem
+            icon={Smartphone}
+            label="По номеру телефона"
+            onClick={() => {
+              setSheet(null);
+              setScreen("transfer");
+            }}
+          />
+          <SheetItem
+            icon={CreditCard}
+            label="По номеру карты"
+            onClick={() => {
+              setSheet(null);
+              setScreen("transfer");
+            }}
+          />
+        </BottomSheet>
+      )}
+      {sheet === "actions" && (
+        <BottomSheet title="Действия" onClose={() => setSheet(null)}>
+          <SheetItem
+            icon={FileText}
+            label="Реквизиты карты"
+            onClick={() => {
+              setSheet(null);
+              setScreen("requisites");
+            }}
+          />
+          <SheetItem icon={CreditCard} label="Заказать пластик" onClick={() => setSheet(null)} />
+          <SheetItem icon={Snowflake} label="Заморозить карту" onClick={() => setSheet(null)} />
+        </BottomSheet>
+      )}
+    </div>
+  );
+}
+
+function CardTypeSwitcher({
+  value,
+  onChange,
+}: {
+  value: "plastic" | "virtual" | "digital";
+  onChange: (v: "plastic" | "virtual" | "digital") => void;
+}) {
+  const label = { plastic: "Пластиковая карта", virtual: "Виртуальная карта", digital: "Цифровой тариф" }[value];
+  const order: Array<"plastic" | "virtual" | "digital"> = ["plastic", "virtual", "digital"];
+  return (
+    <button
+      onClick={() => onChange(order[(order.indexOf(value) + 1) % order.length])}
+      className="text-[11px] text-brand font-semibold mt-0.5 inline-flex items-center gap-0.5"
+    >
+      {label} <ChevronRight className="h-3 w-3" />
+    </button>
+  );
+}
+
+function BankCard({ type }: { type: "plastic" | "virtual" | "digital" }) {
+  if (type === "virtual") {
+    return (
+      <div
+        className="relative rounded-2xl overflow-hidden aspect-[1.586/1] shadow-lg"
+        style={{ background: "linear-gradient(135deg, hsl(0 0% 12%), hsl(0 0% 22%))" }}
+      >
+        <div className="absolute left-5 top-5 text-white/60 text-xs font-bold">*4567</div>
+        <div className="absolute left-5 top-11 text-white/40 text-[10px] font-semibold">12/34</div>
+        <div className="absolute left-5 bottom-5 text-white text-3xl font-black tracking-tight">
+          10 652<span className="text-lg">,00 ₽</span>
+        </div>
+        <div className="absolute right-4 top-4 px-2 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold">
+          Виртуальная
+        </div>
+        <div className="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-brand/20" />
+      </div>
+    );
+  }
+  return <MirCard />;
+}
+
+function BottomSheet({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="absolute inset-0 z-40 flex items-end bg-black/50 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="w-full bg-background rounded-t-3xl p-5 pb-6 animate-in slide-in-from-bottom duration-200">
+        <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4" />
+        <div className="text-lg font-black tracking-tight mb-3">{title}</div>
+        <div className="space-y-2">{children}</div>
+        <button
+          onClick={onClose}
+          className="mt-4 w-full h-12 rounded-2xl bg-foreground text-background font-bold"
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SheetItem({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-card border border-border hover:bg-muted transition"
+    >
+      <div className="w-10 h-10 rounded-full bg-muted grid place-items-center">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="flex-1 text-left text-sm font-bold">{label}</div>
+      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+    </button>
+  );
+}
+
+function BankRequisites({ onBack, onLock }: { onBack: () => void; onLock: () => void }) {
+  const [showNum, setShowNum] = useState(false);
+  const [showCvc, setShowCvc] = useState(false);
+  const num = "4664 5512 7788 4333";
+  return (
+    <div className="bg-background min-h-full">
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+        <button onClick={onBack} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
+          <ArrowLeft className="h-3.5 w-3.5" /> Назад
+        </button>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Webview · Альфа-Банк
+        </div>
+        <button onClick={onLock} className="w-6 h-6 grid place-items-center">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="px-5 pt-5 pb-6">
+        <h1 className="text-xl font-black text-center mb-6">Реквизиты карты</h1>
+        <div className="space-y-5">
+          <div>
+            <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+              Номер карты
+            </div>
+            <div className="flex items-center gap-2 h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-mono font-bold text-base">
+              <span className="flex-1">{showNum ? num : "4664 •••• •••• 4333"}</span>
+              <button onClick={() => setShowNum((v) => !v)} className="text-muted-foreground">
+                {showNum ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+                ММ/ГГ
+              </div>
+              <div className="h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-bold text-base flex items-center">
+                07/34
+              </div>
+            </div>
+            <div>
+              <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+                CVC
+              </div>
+              <div className="flex items-center gap-2 h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-bold text-base">
+                <span className="flex-1">{showCvc ? "421" : "•••"}</span>
+                <button onClick={() => setShowCvc((v) => !v)} className="text-muted-foreground">
+                  {showCvc ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="p-3 rounded-2xl bg-brand/10 text-[11px] leading-snug text-foreground/80">
+            Никому не сообщайте CVC и код из СМС. Сотрудники банка их не спрашивают.
+          </div>
+          <button className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold">
+            Скопировать реквизиты
+          </button>
+        </div>
+        <div className="pt-6 text-center text-[10px] text-muted-foreground">
+          Банковские услуги предоставляет АО «Альфа-Банк».
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BankCashback({
+  onBack,
+  onLock,
+  onDone,
+}: {
+  onBack: () => void;
+  onLock: () => void;
+  onDone: (cashback: number) => void;
+}) {
+  const cats = [
+    { id: "all", pct: 1, label: "За все покупки", icon: Sparkles, color: "bg-emerald-100 text-emerald-700", locked: true },
+    { id: "food", pct: 10, label: "Фастфуд", icon: Utensils, color: "bg-orange-100 text-orange-700" },
+    { id: "fuel", pct: 5, label: "АЗС", icon: Fuel, color: "bg-red-100 text-red-700" },
+    { id: "home", pct: 5, label: "Дом и ремонт", icon: HomeIcon, color: "bg-amber-100 text-amber-700" },
+    { id: "health", pct: 5, label: "Здоровье", icon: Heart, color: "bg-rose-100 text-rose-700" },
+    { id: "tech", pct: 5, label: "Техника", icon: Headphones, color: "bg-sky-100 text-sky-700" },
+  ];
+  const [sel, setSel] = useState<Set<string>>(new Set(["all"]));
+  const toggle = (id: string, locked?: boolean) => {
+    if (locked) return;
+    setSel((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else if (n.size < 3) n.add(id);
+      return n;
+    });
+  };
+  const canPick = sel.size >= 2;
+  return (
+    <div className="bg-background min-h-full">
+      <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+        <button onClick={onBack} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
+          <ArrowLeft className="h-3.5 w-3.5" /> Назад
+        </button>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Webview · Альфа-Банк
+        </div>
+        <button onClick={onLock} className="w-6 h-6 grid place-items-center">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="px-5 pt-4 pb-6">
+        <h1 className="text-xl font-black leading-snug mb-4">
+          Выберите категории<br />кэшбэка на сентябрь
+        </h1>
+        <div className="space-y-2">
+          {cats.map((c) => {
+            const active = sel.has(c.id);
+            return (
+              <button
+                key={c.id}
+                onClick={() => toggle(c.id, c.locked)}
+                className={cn(
+                  "w-full flex items-center gap-3 p-3 rounded-2xl border-2 transition text-left",
+                  active ? "border-brand bg-brand/5" : "border-transparent bg-card",
+                )}
+              >
+                <span className={cn("w-9 h-9 rounded-full grid place-items-center", c.color)}>
+                  <c.icon className="h-4 w-4" />
+                </span>
+                <div className="flex-1 text-sm font-bold">
+                  {c.pct}% {c.label}
+                </div>
+                {c.locked ? (
+                  <span className="text-[10px] font-bold text-muted-foreground px-2 py-1 rounded-full bg-muted">
+                    Всегда
+                  </span>
+                ) : (
+                  <span
+                    className={cn(
+                      "w-5 h-5 rounded-md border-2 grid place-items-center",
+                      active ? "bg-brand border-brand" : "border-border",
+                    )}
+                  >
+                    {active && <Check className="h-3 w-3 text-brand-foreground" />}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-4 text-[11px] text-muted-foreground text-center">
+          Можно выбрать до 3 категорий, минимум 2
+        </div>
+        <div className="mt-5 space-y-2">
+          <button
+            disabled={!canPick}
+            onClick={() => onDone(1500)}
+            className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40"
+          >
+            Выбрать
+          </button>
+          <button
+            onClick={() => onDone(1200)}
+            className="w-full h-12 rounded-2xl bg-muted text-foreground font-bold"
+          >
+            Пропустить
+          </button>
         </div>
       </div>
     </div>
@@ -1596,8 +1990,8 @@ function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock
 
   return (
     <div className="bg-background min-h-full">
-      {/* Webview browser bar */}
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
+
         <button onClick={onLock} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
           <Lock className="h-3.5 w-3.5" /> Закрыть
         </button>

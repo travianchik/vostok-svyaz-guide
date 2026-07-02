@@ -1450,7 +1450,10 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   >("main");
   const [cardType, setCardType] = useState<"plastic" | "virtual" | "digital">("plastic");
   const [sheet, setSheet] = useState<null | "topup" | "transfer" | "actions">(null);
+  const [topupMethod, setTopupMethod] = useState<"card" | "phone" | "account">("card");
+  const [transferMethod, setTransferMethod] = useState<"card" | "phone">("card");
   const [showTerms, setShowTerms] = useState(true);
+
   const [balance, setBalance] = useState(12480);
   const [cashback, setCashback] = useState(1200);
   const [history, setHistory] = useState<TxItem[]>([

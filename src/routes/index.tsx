@@ -2618,12 +2618,14 @@ function BankField({
   value,
   onChange,
   inputMode,
+  hint,
 }: {
   label: string;
   placeholder: string;
   value: string;
   onChange: (v: string) => void;
   inputMode?: "text" | "numeric";
+  hint?: string;
 }) {
   return (
     <label className="block">
@@ -2637,6 +2639,7 @@ function BankField({
         onChange={(e) => onChange(e.target.value)}
         className="w-full h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
       />
+      {hint && <div className="text-[11px] text-muted-foreground mt-1 px-1">{hint}</div>}
     </label>
   );
 }

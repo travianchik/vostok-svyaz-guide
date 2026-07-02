@@ -1670,6 +1670,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             icon={Building2}
             label="С моего счёта в другом банке"
             onClick={() => {
+              setTopupMethod("account");
               setSheet(null);
               setScreen("topup");
             }}
@@ -1678,6 +1679,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             icon={Smartphone}
             label="По номеру телефона"
             onClick={() => {
+              setTopupMethod("phone");
               setSheet(null);
               setScreen("topup");
             }}
@@ -1686,6 +1688,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             icon={CreditCard}
             label="С карты другого банка"
             onClick={() => {
+              setTopupMethod("card");
               setSheet(null);
               setScreen("topup");
             }}
@@ -1698,6 +1701,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             icon={Smartphone}
             label="По номеру телефона"
             onClick={() => {
+              setTransferMethod("phone");
               setSheet(null);
               setScreen("transfer");
             }}
@@ -1706,12 +1710,14 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             icon={CreditCard}
             label="По номеру карты"
             onClick={() => {
+              setTransferMethod("card");
               setSheet(null);
               setScreen("transfer");
             }}
           />
         </BottomSheet>
       )}
+
       {sheet === "actions" && (
         <BottomSheet title="Действия" onClose={() => setSheet(null)}>
           <SheetItem

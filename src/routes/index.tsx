@@ -1950,19 +1950,22 @@ function BankTransfer({
 
 function WebviewChrome({
   onClose,
+  onBack,
   children,
 }: {
   onClose?: () => void;
+  onBack?: () => void;
   children: React.ReactNode;
 }) {
   return (
     <div className="bg-background min-h-full">
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button
-          onClick={onClose}
+          onClick={onBack ?? onClose}
           className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1"
         >
-          <Lock className="h-3.5 w-3.5" /> Закрыть
+          {onBack ? <ArrowLeft className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+          {onBack ? "Назад" : "Закрыть"}
         </button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
           <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -1978,6 +1981,7 @@ function WebviewChrome({
     </div>
   );
 }
+
 
 type BankStep =
   | "welcome"

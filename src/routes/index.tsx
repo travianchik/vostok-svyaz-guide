@@ -1482,11 +1482,19 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   };
 
   if (screen === "topup") {
-    return <BankTopup onClose={() => setScreen("main")} onSubmit={handleTopup} />;
+    return <BankTopup method={topupMethod} onClose={() => setScreen("main")} onSubmit={handleTopup} />;
   }
   if (screen === "transfer") {
-    return <BankTransfer onClose={() => setScreen("main")} onSubmit={handleTransfer} balance={balance} />;
+    return (
+      <BankTransfer
+        method={transferMethod}
+        onClose={() => setScreen("main")}
+        onSubmit={handleTransfer}
+        balance={balance}
+      />
+    );
   }
+
   if (screen === "history") {
     return <BankHistory onClose={() => setScreen("main")} onLock={onLock} history={history} />;
   }

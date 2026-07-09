@@ -694,7 +694,7 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
               <br />сим-карту
             </div>
             <p className="mt-3 text-white/80 text-sm leading-relaxed">
-              Пошаговая инструкция — от подготовки документов до настройки приложения.
+              От подготовки документов до настройки приложения.
             </p>
           </div>
         </div>
@@ -732,24 +732,6 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
             title="Приходи в офис Билайн"
             subtitle="С готовыми документами и смартфоном"
           />
-          <div className="mt-4 space-y-2">
-            {offices.map((o) => (
-              <div
-                key={o.id}
-                className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border"
-              >
-                <div className="w-11 h-11 rounded-2xl bg-brand text-brand-foreground grid place-items-center shrink-0">
-                  <MapPin className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="font-bold text-sm leading-tight">{o.name}</div>
-                  <div className="text-[11px] text-muted-foreground mt-1">
-                    {o.hours} · {o.dist}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Step 3 */}

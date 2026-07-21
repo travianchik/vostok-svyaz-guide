@@ -1174,20 +1174,8 @@ function TabSvyaz({
       {isBeeline ? (
         <>
           {/* Balance card */}
-          <div className="rounded-2xl bg-card border border-border p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
-                <div className="text-xs text-muted-foreground mt-1">на балансе</div>
-              </div>
-              <button
-                onClick={() => showDev("Пополнение — раздел в разработке")}
-                className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
-              >
-                Пополнить
-              </button>
-            </div>
-          </div>
+          <BalanceCard showDev={showDev} />
+
 
           {/* Tariff */}
           <div className="flex items-center gap-2 px-1">

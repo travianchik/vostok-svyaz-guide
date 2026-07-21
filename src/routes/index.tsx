@@ -565,6 +565,23 @@ function Welcome({
       </div>
 
       <div className="p-6 pt-4 space-y-3 mt-auto">
+        {step === "phone" && (
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
+              className="mt-0.5 h-5 w-5 accent-brand shrink-0"
+            />
+            <span className="text-[12px] leading-snug text-muted-foreground">
+              Я принимаю условия{" "}
+              <span className="font-bold text-foreground underline underline-offset-2">
+                оферты приложения aloQa
+              </span>{" "}
+              и согласен на обработку персональных данных.
+            </span>
+          </label>
+        )}
         {step === "phone" ? (
           <button
             disabled={!valid}
@@ -573,6 +590,7 @@ function Welcome({
           >
             Получить смс-код
           </button>
+
         ) : (
           <button
             disabled={otp.length !== 4}

@@ -1138,6 +1138,61 @@ function NavBtn({
   );
 }
 
+const BALANCE_CONSENT_KEY = "aloqa_balance_consent";
+
+function BalanceCard({ showDev }: { showDev: (m?: string) => void }) {
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(BALANCE_CONSENT_KEY) === "1") setRevealed(true);
+    } catch {}
+  }, []);
+  const consent = () => {
+    try { localStorage.setItem(BALANCE_CONSENT_KEY, "1"); } catch {}
+    setRevealed(true);
+  };
+  return (
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {revealed ? (
+            <>
+              <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
+              <div className="text-xs text-muted-foreground mt-1">на балансе</div>
+            </>
+          ) : (
+            <>
+              <div className="text-3xl font-black tracking-tight tracking-widest text-muted-foreground select-none">
+                •••• ₽
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-1 leading-snug max-w-[210px]">
+                Для отображения баланса нужно согласие на передачу данных оператора.
+              </div>
+            </>
+          )}
+        </div>
+        {revealed ? (
+          <button
+            onClick={() => showDev("Пополнение — раздел в разработке")}
+            className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
+          >
+            Пополнить
+          </button>
+        ) : (
+          <button
+            onClick={consent}
+            className="h-11 px-4 rounded-full bg-foreground text-background font-bold text-xs shrink-0 active:scale-[0.98] transition"
+          >
+            Показывать баланс
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+
 function TabSvyaz({
   primary,
   additional,

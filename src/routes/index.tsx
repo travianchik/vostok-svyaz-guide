@@ -458,13 +458,14 @@ function Welcome({
 }) {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [i, setI] = useState(0);
+  const [agree, setAgree] = useState(false);
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % slides.length), 3000);
     return () => clearInterval(t);
   }, []);
   const S = slides[i].icon;
   const formatted = useMemo(() => formatPhoneInput(phone), [phone]);
-  const valid = phone.length === 10;
+  const valid = phone.length === 10 && agree;
 
   return (
     <div className="flex flex-col h-[calc(100vh-44px)] overflow-auto">

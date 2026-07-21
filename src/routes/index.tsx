@@ -458,13 +458,14 @@ function Welcome({
 }) {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [i, setI] = useState(0);
+  const [agree, setAgree] = useState(false);
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % slides.length), 3000);
     return () => clearInterval(t);
   }, []);
   const S = slides[i].icon;
   const formatted = useMemo(() => formatPhoneInput(phone), [phone]);
-  const valid = phone.length === 10;
+  const valid = phone.length === 10 && agree;
 
   return (
     <div className="flex flex-col h-[calc(100vh-44px)] overflow-auto">
@@ -564,6 +565,23 @@ function Welcome({
       </div>
 
       <div className="p-6 pt-4 space-y-3 mt-auto">
+        {step === "phone" && (
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={agree}
+              onChange={(e) => setAgree(e.target.checked)}
+              className="mt-0.5 h-5 w-5 accent-brand shrink-0"
+            />
+            <span className="text-[12px] leading-snug text-muted-foreground">
+              Я принимаю условия{" "}
+              <span className="font-bold text-foreground underline underline-offset-2">
+                оферты приложения aloQa
+              </span>{" "}
+              и согласен на обработку персональных данных.
+            </span>
+          </label>
+        )}
         {step === "phone" ? (
           <button
             disabled={!valid}
@@ -572,6 +590,7 @@ function Welcome({
           >
             Получить смс-код
           </button>
+
         ) : (
           <button
             disabled={otp.length !== 4}
@@ -1119,6 +1138,61 @@ function NavBtn({
   );
 }
 
+const BALANCE_CONSENT_KEY = "aloqa_balance_consent";
+
+function BalanceCard({ showDev }: { showDev: (m?: string) => void }) {
+  const [revealed, setRevealed] = useState(false);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(BALANCE_CONSENT_KEY) === "1") setRevealed(true);
+    } catch {}
+  }, []);
+  const consent = () => {
+    try { localStorage.setItem(BALANCE_CONSENT_KEY, "1"); } catch {}
+    setRevealed(true);
+  };
+  return (
+    <div className="rounded-2xl bg-card border border-border p-5">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {revealed ? (
+            <>
+              <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
+              <div className="text-xs text-muted-foreground mt-1">на балансе</div>
+            </>
+          ) : (
+            <>
+              <div className="text-3xl font-black tracking-tight tracking-widest text-muted-foreground select-none">
+                •••• ₽
+              </div>
+              <div className="text-[11px] text-muted-foreground mt-1 leading-snug max-w-[210px]">
+                Для отображения баланса нужно согласие на передачу данных оператора.
+              </div>
+            </>
+          )}
+        </div>
+        {revealed ? (
+          <button
+            onClick={() => showDev("Пополнение — раздел в разработке")}
+            className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
+          >
+            Пополнить
+          </button>
+        ) : (
+          <button
+            onClick={consent}
+            className="h-11 px-4 rounded-full bg-foreground text-background font-bold text-xs shrink-0 active:scale-[0.98] transition"
+          >
+            Показывать баланс
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+
 function TabSvyaz({
   primary,
   additional,
@@ -1155,20 +1229,8 @@ function TabSvyaz({
       {isBeeline ? (
         <>
           {/* Balance card */}
-          <div className="rounded-2xl bg-card border border-border p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
-                <div className="text-xs text-muted-foreground mt-1">на балансе</div>
-              </div>
-              <button
-                onClick={() => showDev("Пополнение — раздел в разработке")}
-                className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
-              >
-                Пополнить
-              </button>
-            </div>
-          </div>
+          <BalanceCard showDev={showDev} />
+
 
           {/* Tariff */}
           <div className="flex items-center gap-2 px-1">

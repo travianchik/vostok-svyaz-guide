@@ -3348,9 +3348,16 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
           >
             Войти
           </button>
+          <button
+            onClick={() => setRecover(true)}
+            className="w-full text-sm font-semibold text-brand underline"
+          >
+            Забыли логин или пароль?
+          </button>
           <p className="text-[11px] text-center text-muted-foreground">
             Вход в защищённый раздел АО «Альфа-Банк»
           </p>
+
         </div>
       </WebviewChrome>
     );

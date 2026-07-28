@@ -1265,9 +1265,9 @@ function TabSvyaz({
           {/* Round actions */}
           <div className="grid grid-cols-3 gap-2 pt-2">
             {[
-              { icon: Settings, label: "Настроить\nтариф" },
-              { icon: Layers, label: "Услуги\nи сервисы" },
-              { icon: PieChart, label: "Мои\nрасходы" },
+              { icon: Settings, label: t("Настроить тариф") },
+              { icon: Layers, label: t("Услуги и сервисы") },
+              { icon: PieChart, label: t("Мои расходы") },
             ].map(({ icon: Icon, label }) => (
               <button
                 key={label}

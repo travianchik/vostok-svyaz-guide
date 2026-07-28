@@ -3393,10 +3393,197 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
         >
           Забыли код-пароль? Войти по логину
         </button>
+        <button
+          onClick={() => setRecover(true)}
+          className="text-xs font-semibold text-brand underline"
+        >
+          Восстановить доступ
+        </button>
       </div>
     </WebviewChrome>
   );
 }
+
+function BankRecover({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+  const [step, setStep] = useState<"phone" | "sms" | "password" | "done">("phone");
+  const [phone, setPhone] = useState("");
+  const [sms, setSms] = useState("");
+  const [timer, setTimer] = useState(30);
+  const [pass, setPass] = useState("");
+  const [pass2, setPass2] = useState("");
+
+  useEffect(() => {
+    if (step !== "sms") return;
+    setTimer(30);
+    const id = setInterval(() => setTimer((t) => (t > 0 ? t - 1 : 0)), 1000);
+    return () => clearInterval(id);
+  }, [step]);
+
+  const back = () => {
+    if (step === "phone") return onBack();
+    if (step === "sms") return setStep("phone");
+    if (step === "password") return setStep("sms");
+    onBack();
+  };
+
+  return (
+    <WebviewChrome onBack={back}>
+      <div className="px-5 pt-6 pb-8 space-y-6">
+        <div className="w-16 h-16 rounded-3xl bg-brand grid place-items-center shadow-lg">
+          <ShieldCheck className="h-7 w-7 text-brand-foreground" />
+        </div>
+
+        {step === "phone" && (
+          <>
+            <div>
+              <h1 className="text-xl font-black tracking-tight">Восстановление доступа</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Укажите номер телефона, привязанный к карте aloQa — мы отправим смс-код.
+              </p>
+            </div>
+            <BankField
+              label="Номер телефона"
+              placeholder="+7 900 000-00-00"
+              value={phone}
+              onChange={(v) => setPhone(v.replace(/[^\d+ -]/g, ""))}
+              inputMode="numeric"
+            />
+            <button
+              disabled={phone.replace(/\D/g, "").length < 11}
+              onClick={() => setStep("sms")}
+              className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+            >
+              Получить смс-код
+            </button>
+          </>
+        )}
+
+        {step === "sms" && (
+          <>
+            <div>
+              <h1 className="text-xl font-black tracking-tight">Подтвердите номер</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Код отправлен на {phone || "ваш номер"}
+              </p>
+            </div>
+            <div className="flex gap-3 justify-center">
+              {[0, 1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "w-14 h-16 rounded-2xl border-2 grid place-items-center text-2xl font-black",
+                    sms.length === i ? "border-brand" : "border-foreground/10",
+                  )}
+                >
+                  {sms[i] ?? ""}
+                </div>
+              ))}
+            </div>
+            <input
+              autoFocus
+              inputMode="numeric"
+              value={sms}
+              onChange={(e) => setSms(e.target.value.replace(/\D/g, "").slice(0, 4))}
+              className="w-full h-12 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
+              placeholder="Введите код из смс"
+            />
+            <button
+              disabled={sms.length !== 4}
+              onClick={() => setStep("password")}
+              className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+            >
+              Продолжить
+            </button>
+            <button
+              disabled={timer > 0}
+              onClick={() => setTimer(30)}
+              className="w-full text-xs font-semibold text-muted-foreground underline disabled:no-underline disabled:opacity-60"
+            >
+              {timer > 0 ? `Отправить код повторно через ${timer} с` : "Отправить код повторно"}
+            </button>
+          </>
+        )}
+
+        {step === "password" && (
+          <>
+            <div>
+              <h1 className="text-xl font-black tracking-tight">Новый пароль</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Минимум 6 символов. Логин остаётся прежним — номер телефона.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <label className="block">
+                <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+                  Новый пароль
+                </div>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={pass}
+                  onChange={(e) => setPass(e.target.value)}
+                  className="w-full h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
+                />
+              </label>
+              <label className="block">
+                <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+                  Повторите пароль
+                </div>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={pass2}
+                  onChange={(e) => setPass2(e.target.value)}
+                  className="w-full h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
+                />
+              </label>
+              {pass2.length > 0 && pass !== pass2 && (
+                <div className="text-xs font-semibold text-destructive px-1">Пароли не совпадают</div>
+              )}
+            </div>
+            <button
+              disabled={pass.length < 6 || pass !== pass2}
+              onClick={() => setStep("done")}
+              className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+            >
+              Сохранить пароль
+            </button>
+          </>
+        )}
+
+        {step === "done" && (
+          <>
+            <div>
+              <h1 className="text-xl font-black tracking-tight">Доступ восстановлен</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Пароль обновлён. Можно войти в банковский раздел.
+              </p>
+            </div>
+            <div className="flex items-start gap-2 p-3 rounded-2xl bg-brand/10">
+              <Check className="h-4 w-4 text-brand shrink-0 mt-0.5" />
+              <p className="text-[11px] leading-snug text-foreground/70">
+                После входа задайте новый код-пароль для быстрого доступа.
+              </p>
+            </div>
+            <button
+              onClick={onDone}
+              className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold active:scale-[0.98] transition inline-flex items-center justify-center gap-2"
+            >
+              Войти
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          </>
+        )}
+
+        <p className="text-[11px] text-center text-muted-foreground">
+          Восстановление доступа в защищённом разделе АО «Альфа-Банк»
+        </p>
+      </div>
+    </WebviewChrome>
+  );
+}
+
+
 
 
 function BankPasscode({ onDone }: { onDone: () => void }) {

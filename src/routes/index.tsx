@@ -432,7 +432,7 @@ function Splash({
 }
 
 /* ---------- WELCOME ---------- */
-const slides = [
+const slides = () => [
   {
     title: t("aloQa — связь, которая ведёт к цели"),
     text: t("Управляйте номером и балансом в одном приложении."),
@@ -469,10 +469,10 @@ function Welcome({
   const [i, setI] = useState(0);
   const [agree, setAgree] = useState(false);
   useEffect(() => {
-    const t = setInterval(() => setI((v) => (v + 1) % slides.length), 3000);
+    const t = setInterval(() => setI((v) => (v + 1) % slides().length), 3000);
     return () => clearInterval(t);
   }, []);
-  const S = slides[i].icon;
+  const S = slides()[i].icon;
   const formatted = useMemo(() => formatPhoneInput(phone), [phone]);
   const valid = phone.length === 10 && agree;
 
@@ -491,13 +491,13 @@ function Welcome({
               <S className="h-5 w-5" />
             </div>
             <h2 key={i} className="text-2xl font-black leading-tight tracking-tight animate-in fade-in duration-500">
-              {slides[i].title}
+              {slides()[i].title}
             </h2>
-            <p className="mt-2 text-white/80 text-[14px] leading-relaxed">{slides[i].text}</p>
+            <p className="mt-2 text-white/80 text-[14px] leading-relaxed">{slides()[i].text}</p>
           </div>
           <div className="relative flex items-center justify-between">
             <div className="flex gap-1.5">
-              {slides.map((_, idx) => (
+              {slides().map((_, idx) => (
                 <span
                   key={idx}
                   className={`h-1.5 rounded-full transition-all ${
@@ -649,7 +649,7 @@ function TopBar({ title, onBack }: { title: string; onBack: () => void }) {
 }
 
 /* ---------- SIM NOTICE (Beeline /dobro/notice/ flow) ---------- */
-const noticeDocs = [
+const noticeDocs = () => [
   {
     icon: FileText,
     t: t("Оригинал паспорта"),
@@ -677,7 +677,7 @@ const noticeDocs = [
   },
 ];
 
-const appSteps = [
+const appSteps = () => [
   { icon: Smartphone, t: t("Установи сим в смартфон") },
   { icon: Download, t: t("Установи приложение «aloQa»") },
   { icon: LogIn, t: t("Нажми «Войти»") },
@@ -705,7 +705,7 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
         <div className="px-5 pt-6">
           <StepHeader n="1" title={t(t("Подготовь документы"))} subtitle={t(t("Если чего-то не хватает — обратись в МФЦ"))} />
           <div className="mt-4 space-y-2.5">
-            {noticeDocs.map((d) => {
+            {noticeDocs().map((d) => {
               const Icon = d.icon;
               return (
                 <div
@@ -744,7 +744,7 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
             subtitle={t(t("Через приложение «aloQa»"))}
           />
           <div className="mt-4 space-y-2.5">
-            {appSteps.map((s) => {
+            {appSteps().map((s) => {
               const Icon = s.icon;
               return (
                 <div
@@ -790,7 +790,7 @@ function StepHeader({ n, title, subtitle }: { n: string; title: string; subtitle
 }
 
 /* ---------- SIM MAP ---------- */
-const offices = [
+const offices = () => [
   { id: 1, name: t("Билайн — Ленина 24"), dist: t("320 м"), hours: "09:00 – 21:00", x: 38, y: 42 },
   { id: 2, name: t("Билайн — ТЦ Восток"), dist: t("1.2 км"), hours: "10:00 – 22:00", x: 65, y: 30 },
   { id: 3, name: t("Билайн — Гагарина 7"), dist: t("2.4 км"), hours: "09:00 – 20:00", x: 22, y: 70 },
@@ -799,7 +799,7 @@ const offices = [
 
 function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) {
   const [geo, setGeo] = useState(false);
-  const [selected, setSelected] = useState(offices[0]);
+  const [selected, setSelected] = useState(offices()[0]);
   const [routing, setRouting] = useState(false);
 
   return (
@@ -836,7 +836,7 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
           </div>
         )}
 
-        {offices.map((o) => (
+        {offices().map((o) => (
           <button
             key={o.id}
             onClick={() => {
@@ -931,7 +931,7 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
 }
 
 /* ---------- DOCS ---------- */
-const docs = [
+const docs = () => [
   { t: t("Паспорт гражданина РФ"), d: t("Оригинал документа") },
   { t: t("СНИЛС"), d: t("При наличии") },
   { t: t("Заявление"), d: t("Заполняется в офисе") },
@@ -947,7 +947,7 @@ function SimDocs({ onBack }: { onBack: () => void }) {
           <div className="text-sm text-white/70">{t("Для оформления сим-карты")}</div>
           <div className="text-xl font-black mt-1">{t("Возьмите с собой")}</div>
         </div>
-        {docs.map((d) => (
+        {docs().map((d) => (
           <div key={d.t} className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border">
             <div className="w-10 h-10 rounded-xl bg-brand grid place-items-center shrink-0">
               <Check className="h-5 w-5 text-brand-foreground" />

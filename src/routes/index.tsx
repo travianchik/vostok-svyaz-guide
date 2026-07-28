@@ -168,7 +168,7 @@ function operatorLabel(op: ReturnType<typeof detectOperator>) {
 
 function App() {
   const [screen, setScreen] = useState<Screen>("splash");
-  const [lang, setLang] = useState<Lang>("ru");
+  const [lang, setLangState] = useState<Lang>("ru");
   const [showLangPopup, setShowLangPopup] = useState(false);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -182,12 +182,25 @@ function App() {
   // bank auth: 'login' = first-time data entry, 'passcode' = subsequent, 'in' = unlocked
   const [bankAuth, setBankAuth] = useState<"login" | "passcode" | "in">("login");
 
+  // restore saved language on mount
+  useEffect(() => {
+    const saved = loadLang();
+    if (saved !== "ru") setLangState(saved);
+  }, []);
+
+  const setLang = (l: Lang) => {
+    setI18nLang(l);
+    setLangState(l);
+  };
+
   const operator = useMemo(() => detectOperator(primary || phone), [primary, phone]);
   const showDev = (m = t("Раздел в разработке")) => setDevMsg(m);
 
   return (
-    <div className="min-h-screen bg-neutral-200 flex items-start justify-center">
-      <div className="relative w-full max-w-[440px] min-h-screen bg-background overflow-hidden shadow-2xl">
+    <div className="min-h-screen bg-neutral-200 flex items-start justify-center" lang={lang}>
+      {/* key on lang remounts the tree so every translated string re-renders */}
+      <div key={lang} className="relative w-full max-w-[440px] min-h-screen bg-background overflow-hidden shadow-2xl">
+
         {/* Status bar */}
         <div className="h-11 px-6 flex items-center justify-between text-[13px] font-semibold bg-background text-foreground">
           <span>9:41</span>

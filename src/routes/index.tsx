@@ -1391,13 +1391,72 @@ function TabBank({
   operator: ReturnType<typeof detectOperator>;
   onOrderSim: () => void;
 }) {
+  const [entered, setEntered] = useState(false);
+
   if (operator !== "beeline") {
     return <BankDisabledNotice onOrderSim={onOrderSim} />;
   }
+  if (!entered) return <BankIntro onGo={() => setEntered(true)} />;
   if (auth === "login") return <BankLogin onDone={() => setAuth("in")} />;
   if (auth === "passcode") return <BankPasscode onDone={() => setAuth("in")} />;
   return <BankWebview onLock={onLock} />;
 }
+
+function BankIntro({ onGo }: { onGo: () => void }) {
+  const perks = [
+    { icon: CreditCard, title: "Карта «МИР» aloQa", text: "Бесплатный выпуск и обслуживание, работает по всей России" },
+    { icon: Sparkles, title: "Кэшбэк до 10%", text: "Возврат за переводы, связь, продукты и покупки онлайн" },
+    { icon: Globe, title: "Переводы на родину", text: "Отправляйте деньги родным по номеру телефона или карты" },
+    { icon: ShieldCheck, title: "Безопасно", text: "Средства защищены, вход по код-паролю" },
+  ];
+  return (
+    <div className="px-5 pt-6 pb-10">
+      <div className="rounded-3xl bg-brand p-6 relative overflow-hidden">
+        <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-brand-foreground/10" />
+        <div className="text-brand-foreground/80 text-xs font-bold uppercase tracking-wide">
+          Банковский сервис
+        </div>
+        <div className="text-brand-foreground font-black text-2xl leading-tight mt-2">
+          Своя банковская карта
+          <br />в приложении aloQa
+        </div>
+        <p className="text-brand-foreground/85 text-sm mt-2 leading-relaxed">
+          Оформление онлайн за пару минут — без похода в банк.
+        </p>
+        <div className="mt-5">
+          <MirCard />
+        </div>
+      </div>
+
+      <div className="mt-5 space-y-3">
+        {perks.map((p) => (
+          <div key={p.title} className="flex gap-3 items-start rounded-2xl bg-surface border border-border p-4">
+            <div className="w-10 h-10 shrink-0 rounded-xl bg-brand/10 text-brand grid place-items-center">
+              <p.icon className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="font-bold text-sm">{p.title}</div>
+              <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{p.text}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={onGo}
+        className="mt-6 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-black text-base inline-flex items-center justify-center gap-2 active:scale-[0.99] transition"
+      >
+        Перейти
+        <ArrowRight className="h-5 w-5" />
+      </button>
+      <p className="text-[11px] text-muted-foreground text-center mt-3 leading-relaxed">
+        Банковские услуги предоставляет АО «Альфа-Банк». Продолжая, вы перейдёте
+        в защищённый раздел партнёра внутри приложения.
+      </p>
+    </div>
+  );
+}
+
 
 function BankDisabledNotice({ onOrderSim }: { onOrderSim: () => void }) {
   return (

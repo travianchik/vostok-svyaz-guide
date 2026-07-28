@@ -529,9 +529,7 @@ function Welcome({
           />
         </div>
         {valid && step === "phone" && (
-          <div className="mt-2 text-[11px] text-muted-foreground">
-            Оператор определяется автоматически через ЦНИИС:&nbsp;
-            <span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
+          <div className="mt-2 text-[11px] text-muted-foreground">{t("Оператор определяется автоматически через ЦНИИС:&nbsp;")}<span className="font-bold text-foreground">{operatorLabel(detectOperator(phone))}</span>
           </div>
         )}
         <button

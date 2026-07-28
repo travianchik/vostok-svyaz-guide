@@ -3259,6 +3259,9 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
   const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
   const [err, setErr] = useState(false);
+  const [recover, setRecover] = useState(false);
+
+
 
   useEffect(() => {
     try {

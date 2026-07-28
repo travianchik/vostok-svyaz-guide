@@ -74,9 +74,9 @@ type Tab = "svyaz" | "bank" | "uslugi";
 const LANGS: { code: Lang; label: string; hello: string; native: string; flag: React.ReactNode }[] = [
   {
     code: "ru",
-    label: t("Русский"),
-    hello: t("Добро пожаловать"),
-    native: t("Русский"),
+    label: "Русский",
+    hello: "Добро пожаловать",
+    native: "Русский",
     flag: (
       <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
         <rect width="36" height="8" fill="#FFFFFF" />
@@ -87,9 +87,9 @@ const LANGS: { code: Lang; label: string; hello: string; native: string; flag: R
   },
   {
     code: "tg",
-    label: t("Тоҷикӣ"),
-    hello: t("Хуш омадед"),
-    native: t("Тоҷикӣ"),
+    label: "Тоҷикӣ",
+    hello: "Хуш омадед",
+    native: "Тоҷикӣ",
     flag: (
       <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
         <rect width="36" height="7" fill="#CC0000" />
@@ -110,9 +110,9 @@ const LANGS: { code: Lang; label: string; hello: string; native: string; flag: R
   },
   {
     code: "ky",
-    label: t("Кыргызча"),
-    hello: t("Кош келиңиз"),
-    native: t("Кыргызча"),
+    label: "Кыргызча",
+    hello: "Кош келиңиз",
+    native: "Кыргызча",
     flag: (
       <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
         <rect width="36" height="24" fill="#E4002B" />

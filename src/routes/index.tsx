@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { t, setLang as setI18nLang, loadLang, type Lang } from "@/lib/i18n";
 import {
   ArrowLeft,
   ArrowRight,
@@ -52,8 +53,8 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "aloQa — мобильное приложение" },
-      { name: "description", content: "CJM прототип мобильного приложения aloQa" },
+      { title: t("aloQa — мобильное приложение") },
+      { name: "description", content: t("CJM прототип мобильного приложения aloQa") },
     ],
   }),
   component: App,
@@ -68,15 +69,14 @@ type Screen =
   | "sim-docs"
   | "home";
 
-type Lang = "ru" | "tg" | "ky" | "uz";
 type Tab = "svyaz" | "bank" | "uslugi";
 
 const LANGS: { code: Lang; label: string; hello: string; native: string; flag: React.ReactNode }[] = [
   {
     code: "ru",
-    label: "Русский",
-    hello: "Добро пожаловать",
-    native: "Русский",
+    label: t("Русский"),
+    hello: t("Добро пожаловать"),
+    native: t("Русский"),
     flag: (
       <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
         <rect width="36" height="8" fill="#FFFFFF" />
@@ -87,9 +87,9 @@ const LANGS: { code: Lang; label: string; hello: string; native: string; flag: R
   },
   {
     code: "tg",
-    label: "Тоҷикӣ",
-    hello: "Хуш омадед",
-    native: "Тоҷикӣ",
+    label: t("Тоҷикӣ"),
+    hello: t("Хуш омадед"),
+    native: t("Тоҷикӣ"),
     flag: (
       <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
         <rect width="36" height="7" fill="#CC0000" />
@@ -110,9 +110,9 @@ const LANGS: { code: Lang; label: string; hello: string; native: string; flag: R
   },
   {
     code: "ky",
-    label: "Кыргызча",
-    hello: "Кош келиңиз",
-    native: "Кыргызча",
+    label: t("Кыргызча"),
+    hello: t("Кош келиңиз"),
+    native: t("Кыргызча"),
     flag: (
       <svg viewBox="0 0 36 24" className="w-8 h-5 rounded shadow-sm">
         <rect width="36" height="24" fill="#E4002B" />
@@ -163,7 +163,7 @@ function detectOperator(phone: string): "beeline" | "mts" | "megafon" | "tele2" 
   return "other";
 }
 function operatorLabel(op: ReturnType<typeof detectOperator>) {
-  return { beeline: "Билайн", mts: "МТС", megafon: "МегаФон", tele2: "Tele2", other: "Другой оператор" }[op];
+  return { beeline: t("Билайн"), mts: t("МТС"), megafon: t("МегаФон"), tele2: "Tele2", other: t("Другой оператор") }[op];
 }
 
 function App() {
@@ -183,7 +183,7 @@ function App() {
   const [bankAuth, setBankAuth] = useState<"login" | "passcode" | "in">("login");
 
   const operator = useMemo(() => detectOperator(primary || phone), [primary, phone]);
-  const showDev = (m = "Раздел в разработке") => setDevMsg(m);
+  const showDev = (m = t("Раздел в разработке")) => setDevMsg(m);
 
   return (
     <div className="min-h-screen bg-neutral-200 flex items-start justify-center">
@@ -353,18 +353,13 @@ function Splash({
         </div>
         {!showLangPopup && (
           <>
-            <div className="mt-6 text-sm text-muted-foreground">
-              Язык: <span className="font-semibold text-foreground">{active.native}</span>
-              <button onClick={() => setShowLangPopup(true)} className="ml-2 underline">
-                сменить
-              </button>
+            <div className="mt-6 text-sm text-muted-foreground">{t("Язык:")}<span className="font-semibold text-foreground">{active.native}</span>
+              <button onClick={() => setShowLangPopup(true)} className="ml-2 underline">{t("сменить")}</button>
             </div>
             <button
               onClick={() => setShowLangPopup(true)}
               className="mt-10 h-14 px-10 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center gap-2"
-            >
-              Продолжить
-              <ChevronRight className="h-5 w-5" />
+            >{t("Продолжить")}<ChevronRight className="h-5 w-5" />
             </button>
           </>
         )}
@@ -379,8 +374,8 @@ function Splash({
                 <Globe className="h-5 w-5 text-brand-foreground" />
               </div>
               <div>
-                <div className="font-black text-lg leading-tight">Выберите язык</div>
-                <div className="text-xs text-muted-foreground">Забан · Тил · Til · Язык</div>
+                <div className="font-black text-lg leading-tight">{t("Выберите язык")}</div>
+                <div className="text-xs text-muted-foreground">{t("Забан · Тил · Til · Язык")}</div>
               </div>
             </div>
             <div className="mt-5 space-y-2">
@@ -412,9 +407,7 @@ function Splash({
             <button
               onClick={() => { setShowLangPopup(false); onContinue(); }}
               className="mt-5 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold"
-            >
-              Продолжить
-            </button>
+            >{t("Продолжить")}</button>
           </div>
         </div>
       )}
@@ -425,18 +418,18 @@ function Splash({
 /* ---------- WELCOME ---------- */
 const slides = [
   {
-    title: "aloQa — связь, которая ведёт к цели",
-    text: "Управляйте номером и балансом в одном приложении.",
+    title: t("aloQa — связь, которая ведёт к цели"),
+    text: t("Управляйте номером и балансом в одном приложении."),
     icon: Sparkles,
   },
   {
-    title: "Выгодные тарифы рядом",
-    text: "Звонки, интернет и роуминг без переплат.",
+    title: t("Выгодные тарифы рядом"),
+    text: t("Звонки, интернет и роуминг без переплат."),
     icon: Wallet,
   },
   {
-    title: "Поддержка 24/7",
-    text: "Чат, звонок и ближайший офис — всегда под рукой.",
+    title: t("Поддержка 24/7"),
+    text: t("Чат, звонок и ближайший офис — всегда под рукой."),
     icon: ShieldCheck,
   },
 ];
@@ -497,16 +490,14 @@ function Welcome({
                 />
               ))}
             </div>
-            <span className="text-[10px] uppercase tracking-widest text-white/50">авто</span>
+            <span className="text-[10px] uppercase tracking-widest text-white/50">{t("авто")}</span>
           </div>
         </div>
       </div>
 
       {/* Auth form */}
       <div className="px-6 mt-5">
-        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">
-          Войти по номеру телефона
-        </div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2 font-bold">{t("Войти по номеру телефона")}</div>
         <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
           <Phone className="h-5 w-5" />
           <span className="font-bold text-base tracking-wider">+7</span>
@@ -531,20 +522,17 @@ function Welcome({
           type="button"
           onClick={() => setPhone("9035551234")}
           className="mt-3 w-full text-[12px] font-bold text-brand underline underline-offset-4"
-        >
-          Демо: войти как абонент Билайн
-        </button>
+        >{t("Демо: войти как абонент Билайн")}</button>
 
         {step === "otp" && (
           <div className="mt-4">
-            <div className="text-sm text-muted-foreground mb-2">
-              Код отправлен на <span className="font-black text-foreground">{formatPhone(phone)}</span>
+            <div className="text-sm text-muted-foreground mb-2">{t("Код отправлен на")}<span className="font-black text-foreground">{formatPhone(phone)}</span>
             </div>
             <div className="flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
               <ShieldCheck className="h-5 w-5" />
               <input
                 inputMode="numeric"
-                placeholder="Смс-код"
+                placeholder={t(t("Смс-код"))}
                 maxLength={4}
                 value={otp}
                 onChange={(e) => {
@@ -557,9 +545,7 @@ function Welcome({
             <button
               onClick={() => { setOtp(""); setStep("phone"); }}
               className="mt-2 text-[12px] font-bold text-brand"
-            >
-              Изменить номер
-            </button>
+            >{t("Изменить номер")}</button>
           </div>
         )}
       </div>
@@ -575,9 +561,7 @@ function Welcome({
             />
             <span className="text-[12px] leading-snug text-muted-foreground">
               Я принимаю условия{" "}
-              <span className="font-bold text-foreground underline underline-offset-2">
-                оферты приложения aloQa
-              </span>{" "}
+              <span className="font-bold text-foreground underline underline-offset-2">{t("оферты приложения aloQa")}</span>{" "}
               и согласен на обработку персональных данных.
             </span>
           </label>
@@ -587,25 +571,19 @@ function Welcome({
             disabled={!valid}
             onClick={() => { setOtp(""); setStep("otp"); }}
             className="w-full h-14 rounded-2xl bg-foreground text-background font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
-          >
-            Получить смс-код
-          </button>
+          >{t("Получить смс-код")}</button>
 
         ) : (
           <button
             disabled={otp.length !== 4}
             onClick={onLogin}
             className="w-full h-14 rounded-2xl bg-foreground text-background font-bold text-base active:scale-[0.98] transition disabled:opacity-40"
-          >
-            Войти
-          </button>
+          >{t("Войти")}</button>
         )}
         <button
           onClick={onOrder}
           className="w-full h-14 rounded-2xl border-2 border-foreground bg-background text-foreground font-bold text-base flex items-center justify-center gap-2 active:scale-[0.98] transition"
-        >
-          Заказать сим-карту
-          <ChevronRight className="h-5 w-5" />
+        >{t("Заказать сим-карту")}<ChevronRight className="h-5 w-5" />
         </button>
       </div>
     </div>
@@ -635,9 +613,7 @@ function Logo() {
       <AloqaLogo className="w-9 h-9 rounded-xl" />
       <div className="leading-tight">
         <div className="text-[15px] font-black tracking-tight">aloQa</div>
-        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-          связь с целью
-        </div>
+        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{t("связь с целью")}</div>
       </div>
     </div>
   );
@@ -662,65 +638,58 @@ function TopBar({ title, onBack }: { title: string; onBack: () => void }) {
 const noticeDocs = [
   {
     icon: FileText,
-    t: "Оригинал паспорта",
-    d: "И заверенный перевод паспорта — его можно получить в бюро переводов.",
+    t: t("Оригинал паспорта"),
+    d: t("И заверенный перевод паспорта — его можно получить в бюро переводов."),
   },
   {
     icon: CreditCard,
-    t: "СНИЛС",
-    d: "Оформи в МФЦ, Социальном фонде России или у работодателя. Понадобится паспорт и нотариально заверенный перевод.",
+    t: t("СНИЛС"),
+    d: t("Оформи в МФЦ, Социальном фонде России или у работодателя. Понадобится паспорт и нотариально заверенный перевод."),
   },
   {
     icon: Mail,
-    t: "Адрес электронной почты",
-    d: "Создай его заранее — пригодится для регистрации на госуслугах.",
+    t: t("Адрес электронной почты"),
+    d: t("Создай его заранее — пригодится для регистрации на госуслугах."),
   },
   {
     icon: ShieldCheck,
-    t: "Учётная запись на Госуслугах",
-    d: "Создай и подтверди её в МФЦ.",
+    t: t("Учётная запись на Госуслугах"),
+    d: t("Создай и подтверди её в МФЦ."),
   },
   {
     icon: ScanFace,
-    t: "Биометрические данные",
-    d: "Голос и лицо — сдай в любом банке, который участвует в ЕБС.",
+    t: t("Биометрические данные"),
+    d: t("Голос и лицо — сдай в любом банке, который участвует в ЕБС."),
   },
 ];
 
 const appSteps = [
-  { icon: Smartphone, t: "Установи сим в смартфон" },
-  { icon: Download, t: "Установи приложение «aloQa»" },
-  { icon: LogIn, t: "Нажми «Войти»" },
-  { icon: Phone, t: "Зайди по номеру, который дали в офисе" },
-  { icon: Sliders, t: "Управляй сим в приложении" },
+  { icon: Smartphone, t: t("Установи сим в смартфон") },
+  { icon: Download, t: t("Установи приложение «aloQa»") },
+  { icon: LogIn, t: t("Нажми «Войти»") },
+  { icon: Phone, t: t("Зайди по номеру, который дали в офисе") },
+  { icon: Sliders, t: t("Управляй сим в приложении") },
 ];
 
 function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => void }) {
   return (
     <div className="flex flex-col h-[calc(100vh-44px)]">
-      <TopBar title="Заказ сим-карты" onBack={onBack} />
+      <TopBar title={t(t("Заказ сим-карты"))} onBack={onBack} />
       <div className="flex-1 overflow-auto">
         {/* Hero */}
         <div className="relative rounded-b-3xl bg-surface text-white p-6 overflow-hidden">
           <div className="absolute -right-12 -top-12 w-44 h-44 rounded-full bg-brand/90" />
           <div className="absolute -left-16 -bottom-20 w-44 h-44 rounded-full bg-brand/20" />
           <div className="relative">
-            <div className="text-[11px] uppercase tracking-widest text-white/60">
-              Памятка для иностранных граждан
-            </div>
-            <div className="text-2xl font-black mt-2 leading-tight">
-              Как оформить
-              <br />сим-карту
-            </div>
-            <p className="mt-3 text-white/80 text-sm leading-relaxed">
-              От подготовки документов до настройки приложения.
-            </p>
+            <div className="text-[11px] uppercase tracking-widest text-white/60">{t("Памятка для иностранных граждан")}</div>
+            <div className="text-2xl font-black mt-2 leading-tight">{t("Как оформить")}<br />{t("сим-карту")}</div>
+            <p className="mt-3 text-white/80 text-sm leading-relaxed">{t("От подготовки документов до настройки приложения.")}</p>
           </div>
         </div>
 
         {/* Step 1 */}
         <div className="px-5 pt-6">
-          <StepHeader n="1" title="Подготовь документы" subtitle="Если чего-то не хватает — обратись в МФЦ" />
+          <StepHeader n="1" title={t(t("Подготовь документы"))} subtitle={t(t("Если чего-то не хватает — обратись в МФЦ"))} />
           <div className="mt-4 space-y-2.5">
             {noticeDocs.map((d) => {
               const Icon = d.icon;
@@ -748,8 +717,8 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
         <div className="px-5 pt-6 pb-6">
           <StepHeader
             n="2"
-            title="Приходи в офис Билайн"
-            subtitle="С готовыми документами и смартфоном"
+            title={t(t("Приходи в офис Билайн"))}
+            subtitle={t(t("С готовыми документами и смартфоном"))}
           />
         </div>
 
@@ -757,8 +726,8 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
         <div className="px-5 pb-6">
           <StepHeader
             n="3"
-            title="Настрой сим и управляй тарифом"
-            subtitle="Через приложение «aloQa»"
+            title={t(t("Настрой сим и управляй тарифом"))}
+            subtitle={t(t("Через приложение «aloQa»"))}
           />
           <div className="mt-4 space-y-2.5">
             {appSteps.map((s) => {
@@ -783,9 +752,7 @@ function SimNotice({ onBack, onToMap }: { onBack: () => void; onToMap: () => voi
         <button
           onClick={onBack}
           className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold text-base flex items-center justify-center gap-2"
-        >
-          Понятно
-        </button>
+        >{t("Понятно")}</button>
       </div>
     </div>
   );
@@ -810,10 +777,10 @@ function StepHeader({ n, title, subtitle }: { n: string; title: string; subtitle
 
 /* ---------- SIM MAP ---------- */
 const offices = [
-  { id: 1, name: "Билайн — Ленина 24", dist: "320 м", hours: "09:00 – 21:00", x: 38, y: 42 },
-  { id: 2, name: "Билайн — ТЦ Восток", dist: "1.2 км", hours: "10:00 – 22:00", x: 65, y: 30 },
-  { id: 3, name: "Билайн — Гагарина 7", dist: "2.4 км", hours: "09:00 – 20:00", x: 22, y: 70 },
-  { id: 4, name: "Билайн — Мира 101", dist: "3.1 км", hours: "10:00 – 21:00", x: 78, y: 65 },
+  { id: 1, name: t("Билайн — Ленина 24"), dist: t("320 м"), hours: "09:00 – 21:00", x: 38, y: 42 },
+  { id: 2, name: t("Билайн — ТЦ Восток"), dist: t("1.2 км"), hours: "10:00 – 22:00", x: 65, y: 30 },
+  { id: 3, name: t("Билайн — Гагарина 7"), dist: t("2.4 км"), hours: "09:00 – 20:00", x: 22, y: 70 },
+  { id: 4, name: t("Билайн — Мира 101"), dist: t("3.1 км"), hours: "10:00 – 21:00", x: 78, y: 65 },
 ];
 
 function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) {
@@ -823,7 +790,7 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
 
   return (
     <div className="flex flex-col h-[calc(100vh-44px)]">
-      <TopBar title="Офисы Билайн" onBack={onBack} />
+      <TopBar title={t(t("Офисы Билайн"))} onBack={onBack} />
 
       <div className="relative flex-1 bg-[#e6eef3] overflow-hidden">
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -878,7 +845,7 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
           <div className="flex items-center gap-2 h-11 px-4 rounded-2xl bg-white shadow-md">
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
-              placeholder="Поиск ближайшего офиса"
+              placeholder={t(t("Поиск ближайшего офиса"))}
               className="flex-1 bg-transparent text-sm outline-none"
             />
           </div>
@@ -902,25 +869,19 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
               <Navigation className="h-5 w-5 text-brand-foreground" />
             </div>
             <div className="min-w-0">
-              <div className="font-bold">Разрешить геолокацию?</div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Чтобы показать ближайший офис и построить маршрут.
-              </p>
+              <div className="font-bold">{t("Разрешить геолокацию?")}</div>
+              <p className="text-sm text-muted-foreground mt-1">{t("Чтобы показать ближайший офис и построить маршрут.")}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-4">
             <button
               onClick={() => setGeo(false)}
               className="h-12 rounded-2xl bg-muted font-semibold text-sm"
-            >
-              Не сейчас
-            </button>
+            >{t("Не сейчас")}</button>
             <button
               onClick={() => setGeo(true)}
               className="h-12 rounded-2xl bg-brand text-brand-foreground font-bold text-sm"
-            >
-              Разрешить
-            </button>
+            >{t("Разрешить")}</button>
           </div>
         </div>
       )}
@@ -935,25 +896,19 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
                 {selected.hours} · {selected.dist} от вас
               </div>
             </div>
-            <span className="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full bg-brand text-brand-foreground">
-              Открыто
-            </span>
+            <span className="shrink-0 text-[11px] font-bold px-2.5 py-1 rounded-full bg-brand text-brand-foreground">{t("Открыто")}</span>
           </div>
           <div className="grid grid-cols-2 gap-2 mt-4">
             <button
               onClick={() => setRouting(true)}
               className="h-12 rounded-2xl bg-brand text-brand-foreground font-bold text-sm flex items-center justify-center gap-2"
             >
-              <Navigation className="h-4 w-4" />
-              Маршрут
-            </button>
+              <Navigation className="h-4 w-4" />{t("Маршрут")}</button>
             <button
               onClick={onDocs}
               className="h-12 rounded-2xl border-2 border-foreground font-bold text-sm flex items-center justify-center gap-2"
             >
-              <FileText className="h-4 w-4" />
-              Документы
-            </button>
+              <FileText className="h-4 w-4" />{t("Документы")}</button>
           </div>
         </div>
       )}
@@ -963,20 +918,20 @@ function SimMap({ onBack, onDocs }: { onBack: () => void; onDocs: () => void }) 
 
 /* ---------- DOCS ---------- */
 const docs = [
-  { t: "Паспорт гражданина РФ", d: "Оригинал документа" },
-  { t: "СНИЛС", d: "При наличии" },
-  { t: "Заявление", d: "Заполняется в офисе" },
-  { t: "Для иностранных граждан", d: "Паспорт + миграционная карта" },
+  { t: t("Паспорт гражданина РФ"), d: t("Оригинал документа") },
+  { t: t("СНИЛС"), d: t("При наличии") },
+  { t: t("Заявление"), d: t("Заполняется в офисе") },
+  { t: t("Для иностранных граждан"), d: t("Паспорт + миграционная карта") },
 ];
 
 function SimDocs({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex flex-col h-[calc(100vh-44px)]">
-      <TopBar title="Документы" onBack={onBack} />
+      <TopBar title={t(t("Документы"))} onBack={onBack} />
       <div className="flex-1 overflow-auto p-5 space-y-3">
         <div className="rounded-3xl bg-surface text-white p-5">
-          <div className="text-sm text-white/70">Для оформления сим-карты</div>
-          <div className="text-xl font-black mt-1">Возьмите с собой</div>
+          <div className="text-sm text-white/70">{t("Для оформления сим-карты")}</div>
+          <div className="text-xl font-black mt-1">{t("Возьмите с собой")}</div>
         </div>
         {docs.map((d) => (
           <div key={d.t} className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border">
@@ -989,9 +944,7 @@ function SimDocs({ onBack }: { onBack: () => void }) {
             </div>
           </div>
         ))}
-        <div className="p-4 rounded-2xl bg-brand/20 text-sm">
-          После оформления номер автоматически появится в приложении.
-        </div>
+        <div className="p-4 rounded-2xl bg-brand/20 text-sm">{t("После оформления номер автоматически появится в приложении.")}</div>
       </div>
     </div>
   );
@@ -1068,9 +1021,7 @@ function Home({
         <button
           onClick={onLogout}
           className="text-xs font-semibold text-muted-foreground px-3 py-2 rounded-full hover:bg-muted"
-        >
-          Выйти
-        </button>
+        >{t("Выйти")}</button>
       </div>
 
       <div className="flex-1 overflow-auto pb-24">
@@ -1101,9 +1052,9 @@ function Home({
       {/* Bottom Nav */}
       <div className="absolute bottom-0 left-0 right-0 bg-background border-t border-border">
         <div className="grid grid-cols-3 px-2 py-2 pb-3">
-          <NavBtn icon={Wifi} label="Связь" active={tab === "svyaz"} onClick={() => setTab("svyaz")} />
-          <NavBtn icon={CreditCard} label="Банк" active={tab === "bank"} onClick={() => setTab("bank")} />
-          <NavBtn icon={Grid3x3} label="Услуги" active={tab === "uslugi"} onClick={() => setTab("uslugi")} />
+          <NavBtn icon={Wifi} label={t(t("Связь"))} active={tab === "svyaz"} onClick={() => setTab("svyaz")} />
+          <NavBtn icon={CreditCard} label={t(t("Банк"))} active={tab === "bank"} onClick={() => setTab("bank")} />
+          <NavBtn icon={Grid3x3} label={t(t("Услуги"))} active={tab === "uslugi"} onClick={() => setTab("uslugi")} />
         </div>
       </div>
 
@@ -1158,33 +1109,27 @@ function BalanceCard({ showDev }: { showDev: (m?: string) => void }) {
           {revealed ? (
             <>
               <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
-              <div className="text-xs text-muted-foreground mt-1">на балансе</div>
+              <div className="text-xs text-muted-foreground mt-1">{t("на балансе")}</div>
             </>
           ) : (
             <>
               <div className="text-3xl font-black tracking-tight tracking-widest text-muted-foreground select-none">
                 •••• ₽
               </div>
-              <div className="text-[11px] text-muted-foreground mt-1 leading-snug max-w-[210px]">
-                Для отображения баланса нужно согласие на передачу данных оператора.
-              </div>
+              <div className="text-[11px] text-muted-foreground mt-1 leading-snug max-w-[210px]">{t("Для отображения баланса нужно согласие на передачу данных оператора.")}</div>
             </>
           )}
         </div>
         {revealed ? (
           <button
-            onClick={() => showDev("Пополнение — раздел в разработке")}
+            onClick={() => showDev(t("Пополнение — раздел в разработке"))}
             className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
-          >
-            Пополнить
-          </button>
+          >{t("Пополнить")}</button>
         ) : (
           <button
             onClick={consent}
             className="h-11 px-4 rounded-full bg-foreground text-background font-bold text-xs shrink-0 active:scale-[0.98] transition"
-          >
-            Показывать баланс
-          </button>
+          >{t("Показывать баланс")}</button>
         )}
       </div>
     </div>
@@ -1222,7 +1167,7 @@ function TabSvyaz({
         </div>
         <div className="min-w-0">
           <div className="font-black text-base tracking-tight">{formatPhone(primary)}</div>
-          <div className="text-xs text-muted-foreground">Алина Петрова</div>
+          <div className="text-xs text-muted-foreground">{t("Алина Петрова")}</div>
         </div>
       </div>
 
@@ -1234,27 +1179,23 @@ function TabSvyaz({
 
           {/* Tariff */}
           <div className="flex items-center gap-2 px-1">
-            <h2 className="text-base font-black">Тариф</h2>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand text-brand-foreground">
-              твой тариф
-            </span>
+            <h2 className="text-base font-black">{t("Тариф")}</h2>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand text-brand-foreground">{t("твой тариф")}</span>
           </div>
           <div className="relative">
             <div className="grid grid-cols-2 gap-3 blur-md select-none pointer-events-none">
               <div className="p-4 rounded-2xl bg-card border border-border">
                 <div className="text-2xl font-black">25<span className="text-muted-foreground">/35</span></div>
-                <div className="text-xs text-muted-foreground mt-1">Гигабайты</div>
+                <div className="text-xs text-muted-foreground mt-1">{t("Гигабайты")}</div>
               </div>
               <div className="p-4 rounded-2xl bg-card border border-border">
                 <div className="text-2xl font-black">200<span className="text-muted-foreground">/250</span></div>
-                <div className="text-xs text-muted-foreground mt-1">Минуты</div>
+                <div className="text-xs text-muted-foreground mt-1">{t("Минуты")}</div>
               </div>
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/90 text-background text-xs font-bold shadow-lg">
-                <Wrench className="h-3.5 w-3.5" />
-                Раздел в разработке
-              </div>
+                <Wrench className="h-3.5 w-3.5" />{t("Раздел в разработке")}</div>
             </div>
           </div>
 
@@ -1282,11 +1223,9 @@ function TabSvyaz({
 
           {/* Special offers */}
           <div className="pt-2">
-            <h2 className="text-base font-black px-1 mb-2">Специальные предложения</h2>
+            <h2 className="text-base font-black px-1 mb-2">{t("Специальные предложения")}</h2>
             <div className="rounded-2xl bg-surface text-white p-5">
-              <div className="font-bold text-sm leading-snug">
-                Следите за вашим балансом<br />и управляйте связью
-              </div>
+              <div className="font-bold text-sm leading-snug">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
             </div>
           </div>
         </>
@@ -1313,10 +1252,8 @@ function TabSvyaz({
               <Plus className="h-5 w-5 text-brand-foreground" />
             </div>
             <div className="text-left min-w-0">
-              <div className="font-bold text-sm">Привязать новый номер</div>
-              <div className="text-xs text-muted-foreground">
-                Текущий номер сохранится в профиле как дополнительный
-              </div>
+              <div className="font-bold text-sm">{t("Привязать новый номер")}</div>
+              <div className="text-xs text-muted-foreground">{t("Текущий номер сохранится в профиле как дополнительный")}</div>
             </div>
           </button>
 
@@ -1332,18 +1269,12 @@ function TabSvyaz({
               <div className="w-11 h-11 rounded-2xl bg-surface text-brand grid place-items-center mb-3">
                 <Sparkles className="h-5 w-5" />
               </div>
-              <div className="text-surface font-black text-lg leading-tight">
-                Закажите номер Билайн
-              </div>
-              <p className="text-surface/80 text-sm mt-1">
-                Полный доступ к сервисам «aloQa» — только с сим-картой Билайн.
-              </p>
+              <div className="text-surface font-black text-lg leading-tight">{t("Закажите номер Билайн")}</div>
+              <p className="text-surface/80 text-sm mt-1">{t("Полный доступ к сервисам «aloQa» — только с сим-картой Билайн.")}</p>
               <button
                 onClick={onOrderSim}
                 className="mt-4 h-12 px-5 rounded-2xl bg-brand text-brand-foreground font-bold text-sm inline-flex items-center gap-2 active:scale-[0.98] transition"
-              >
-                Заказать сим-карту
-                <ChevronRight className="h-4 w-4" />
+              >{t("Заказать сим-карту")}<ChevronRight className="h-4 w-4" />
               </button>
             </div>
           )}
@@ -1353,9 +1284,7 @@ function TabSvyaz({
       {/* Additional numbers */}
       {additional.length > 0 && (
         <div className="space-y-2 pt-2">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground font-bold px-1">
-            Дополнительные номера в профиле
-          </div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-bold px-1">{t("Дополнительные номера в профиле")}</div>
           {additional.map((p) => (
             <div
               key={p}
@@ -1404,25 +1333,18 @@ function TabBank({
 
 function BankIntro({ onGo }: { onGo: () => void }) {
   const perks = [
-    { icon: CreditCard, title: "Карта «МИР» aloQa", text: "Бесплатный выпуск и обслуживание, работает по всей России" },
-    { icon: Sparkles, title: "Кэшбэк до 10%", text: "Возврат за переводы, связь, продукты и покупки онлайн" },
-    { icon: Globe, title: "Переводы на родину", text: "Отправляйте деньги родным по номеру телефона или карты" },
-    { icon: ShieldCheck, title: "Безопасно", text: "Средства защищены, вход по код-паролю" },
+    { icon: CreditCard, title: t("Карта «МИР» aloQa"), text: t("Бесплатный выпуск и обслуживание, работает по всей России") },
+    { icon: Sparkles, title: t("Кэшбэк до 10%"), text: t("Возврат за переводы, связь, продукты и покупки онлайн") },
+    { icon: Globe, title: t("Переводы на родину"), text: t("Отправляйте деньги родным по номеру телефона или карты") },
+    { icon: ShieldCheck, title: t("Безопасно"), text: t("Средства защищены, вход по код-паролю") },
   ];
   return (
     <div className="px-5 pt-6 pb-10">
       <div className="rounded-3xl bg-brand p-6 relative overflow-hidden">
         <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-brand-foreground/10" />
-        <div className="text-brand-foreground/80 text-xs font-bold uppercase tracking-wide">
-          Банковский сервис
-        </div>
-        <div className="text-brand-foreground font-black text-2xl leading-tight mt-2">
-          Своя банковская карта
-          <br />в приложении aloQa
-        </div>
-        <p className="text-brand-foreground/85 text-sm mt-2 leading-relaxed">
-          Оформление онлайн за пару минут — без похода в банк.
-        </p>
+        <div className="text-brand-foreground/80 text-xs font-bold uppercase tracking-wide">{t("Банковский сервис")}</div>
+        <div className="text-brand-foreground font-black text-2xl leading-tight mt-2">{t("Своя банковская карта")}<br />{t("в приложении aloQa")}</div>
+        <p className="text-brand-foreground/85 text-sm mt-2 leading-relaxed">{t("Оформление онлайн за пару минут — без похода в банк.")}</p>
         <div className="mt-5">
           <MirCard />
         </div>
@@ -1445,14 +1367,9 @@ function BankIntro({ onGo }: { onGo: () => void }) {
       <button
         onClick={onGo}
         className="mt-6 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-black text-base inline-flex items-center justify-center gap-2 active:scale-[0.99] transition"
-      >
-        Перейти
-        <ArrowRight className="h-5 w-5" />
+      >{t("Перейти")}<ArrowRight className="h-5 w-5" />
       </button>
-      <p className="text-[11px] text-muted-foreground text-center mt-3 leading-relaxed">
-        Банковские услуги предоставляет АО «Альфа-Банк». Продолжая, вы перейдёте
-        в защищённый раздел партнёра внутри приложения.
-      </p>
+      <p className="text-[11px] text-muted-foreground text-center mt-3 leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк». Продолжая, вы перейдёте\n        в защищённый раздел партнёра внутри приложения.")}</p>
     </div>
   );
 }
@@ -1465,18 +1382,12 @@ function BankDisabledNotice({ onOrderSim }: { onOrderSim: () => void }) {
         <div className="w-12 h-12 rounded-2xl bg-surface text-brand grid place-items-center mb-4">
           <CreditCard className="h-6 w-6" />
         </div>
-        <div className="text-surface font-black text-xl leading-tight">
-          Банковский сервис недоступен
-        </div>
-        <p className="text-surface/80 text-sm mt-2 leading-relaxed">
-          Чтобы пользоваться картой и переводами, оформите сим-карту Билайн.
-        </p>
+        <div className="text-surface font-black text-xl leading-tight">{t("Банковский сервис недоступен")}</div>
+        <p className="text-surface/80 text-sm mt-2 leading-relaxed">{t("Чтобы пользоваться картой и переводами, оформите сим-карту Билайн.")}</p>
         <button
           onClick={onOrderSim}
           className="mt-5 h-12 px-5 rounded-2xl bg-brand text-brand-foreground font-bold text-sm inline-flex items-center gap-2 active:scale-[0.98] transition"
-        >
-          Оформить сим-карту
-          <ChevronRight className="h-4 w-4" />
+        >{t("Оформить сим-карту")}<ChevronRight className="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -1529,9 +1440,7 @@ function MirCard({ last4 = "4821" }: { last4?: string }) {
         •••• •••• •••• {last4}
       </div>
       {/* МИР logo */}
-      <div className="absolute right-4 bottom-4 text-white font-black italic text-xl tracking-tight">
-        мир
-      </div>
+      <div className="absolute right-4 bottom-4 text-white font-black italic text-xl tracking-tight">{t("мир")}</div>
     </div>
   );
 }
@@ -1560,16 +1469,16 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   const [balance, setBalance] = useState(12480);
   const [cashback, setCashback] = useState(1200);
   const [history, setHistory] = useState<TxItem[]>([
-    { day: "Сегодня", who: "Коргоо Маркет", cat: "Финансовые операции", sum: -1656.94, sign: "-", icon: "K", color: "#22c55e" },
-    { day: "Вчера", who: "Иван Х.", cat: "Перевод от друга", sum: 3656.74, sign: "+", icon: "И", color: "#ef4444" },
-    { day: "Вчера", who: "Иван Х.", cat: "Перевод от друга", sum: 3656.74, sign: "+", icon: "И", color: "#ef4444" },
-    { day: "Вчера", who: "Lamoda", cat: "Покупки онлайн", sum: -3656.74, sign: "-", icon: "la", color: "#111827" },
+    { day: t("Сегодня"), who: t("Коргоо Маркет"), cat: t("Финансовые операции"), sum: -1656.94, sign: "-", icon: "K", color: "#22c55e" },
+    { day: t("Вчера"), who: t("Иван Х."), cat: t("Перевод от друга"), sum: 3656.74, sign: "+", icon: t("И"), color: "#ef4444" },
+    { day: t("Вчера"), who: t("Иван Х."), cat: t("Перевод от друга"), sum: 3656.74, sign: "+", icon: t("И"), color: "#ef4444" },
+    { day: t("Вчера"), who: "Lamoda", cat: t("Покупки онлайн"), sum: -3656.74, sign: "-", icon: "la", color: "#111827" },
   ]);
 
   const handleTopup = (amount: number, fromLast4: string) => {
     setBalance((b) => b + amount);
     setHistory((h) => [
-      { day: "Сегодня", who: `Пополнение с •• ${fromLast4}`, cat: "Пополнение карты", sum: amount, sign: "+", icon: "₽", color: "#16a34a" },
+      { day: t("Сегодня"), who: `Пополнение с •• ${fromLast4}`, cat: t("Пополнение карты"), sum: amount, sign: "+", icon: "₽", color: "#16a34a" },
       ...h,
     ]);
     setScreen("main");
@@ -1578,7 +1487,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
   const handleTransfer = (amount: number, toLast4: string, recipient: string) => {
     setBalance((b) => b - amount);
     setHistory((h) => [
-      { day: "Сегодня", who: recipient || `Перевод на •• ${toLast4}`, cat: "Перевод на карту РФ", sum: -amount, sign: "-", icon: "→", color: "#0ea5e9" },
+      { day: t("Сегодня"), who: recipient || `Перевод на •• ${toLast4}`, cat: t("Перевод на карту РФ"), sum: -amount, sign: "-", icon: "→", color: "#0ea5e9" },
       ...h,
     ]);
     setScreen("main");
@@ -1624,12 +1533,9 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       {/* Webview browser bar */}
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button onClick={onLock} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
-          <Lock className="h-3.5 w-3.5" /> Закрыть
-        </button>
+          <Lock className="h-3.5 w-3.5" />{t("Закрыть")}</button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          Webview · Альфа-Банк
-        </div>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />{t("Webview · Альфа-Банк")}</div>
         <div className="w-6" />
       </div>
 
@@ -1637,7 +1543,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       <div className="px-5 pt-4 pb-2 flex items-center justify-between">
         <div className="w-6" />
         <div className="text-center">
-          <div className="text-base font-bold">Карта aloQa</div>
+          <div className="text-base font-bold">{t("Карта aloQa")}</div>
           <CardTypeSwitcher value={cardType} onChange={setCardType} />
         </div>
         <button onClick={onLock} className="w-8 h-8 grid place-items-center rounded-full bg-muted">
@@ -1653,15 +1559,15 @@ function BankWebview({ onLock }: { onLock: () => void }) {
           <div className="text-4xl font-black tracking-tight">
             {displayBalance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
           </div>
-          <div className="text-xs text-muted-foreground mt-1">Доступно на карте</div>
+          <div className="text-xs text-muted-foreground mt-1">{t("Доступно на карте")}</div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-around">
           {[
-            { icon: Plus, label: "Пополнить", onClick: () => setSheet("topup") },
-            { icon: ArrowLeftRight, label: "Перевести", onClick: () => setSheet("transfer") },
-            { icon: Sliders, label: "Действия", onClick: () => setSheet("actions") },
+            { icon: Plus, label: t("Пополнить"), onClick: () => setSheet("topup") },
+            { icon: ArrowLeftRight, label: t("Перевести"), onClick: () => setSheet("transfer") },
+            { icon: Sliders, label: t("Действия"), onClick: () => setSheet("actions") },
           ].map((a) => (
             <button key={a.label} onClick={a.onClick} className="flex flex-col items-center gap-2">
               <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center shadow-sm">
@@ -1676,7 +1582,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         {showTerms && (
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-2xl bg-card border border-border">
             <Info className="h-4 w-4 text-brand shrink-0" />
-            <div className="flex-1 text-xs font-semibold">Обновили условия переводов</div>
+            <div className="flex-1 text-xs font-semibold">{t("Обновили условия переводов")}</div>
             <button onClick={() => setShowTerms(false)} className="w-6 h-6 grid place-items-center rounded-full hover:bg-muted">
               <X className="h-3.5 w-3.5" />
             </button>
@@ -1690,7 +1596,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             className="text-left rounded-2xl p-4 h-28 relative overflow-hidden shadow-sm"
             style={{ background: "linear-gradient(135deg, hsl(160 100% 33%), hsl(165 100% 22%))" }}
           >
-            <div className="text-[11px] font-bold text-white/80">Кэшбэк</div>
+            <div className="text-[11px] font-bold text-white/80">{t("Кэшбэк")}</div>
             <div className="absolute inset-x-4 bottom-3 text-white text-lg font-black">
               {cashback.toLocaleString("ru-RU")} ₽
             </div>
@@ -1700,7 +1606,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             onClick={() => setScreen("cashback")}
             className="text-left rounded-2xl p-4 h-28 relative overflow-hidden shadow-sm bg-card border border-border"
           >
-            <div className="text-[11px] font-bold text-muted-foreground">Ваши категории</div>
+            <div className="text-[11px] font-bold text-muted-foreground">{t("Ваши категории")}</div>
             <div className="absolute bottom-3 left-3 flex -space-x-2">
               <span className="w-8 h-8 rounded-full bg-orange-100 grid place-items-center ring-2 ring-card">
                 <Utensils className="h-4 w-4 text-orange-600" />
@@ -1718,8 +1624,8 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         {/* History */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <div className="text-lg font-black">История</div>
-            <button onClick={() => setScreen("history")} className="text-xs font-semibold text-brand hover:underline">Все</button>
+            <div className="text-lg font-black">{t("История")}</div>
+            <button onClick={() => setScreen("history")} className="text-xs font-semibold text-brand hover:underline">{t("Все")}</button>
           </div>
           <div className="space-y-3">
             {history.map((h, i) => {
@@ -1754,24 +1660,21 @@ function BankWebview({ onLock }: { onLock: () => void }) {
             <div className="w-8 h-8 rounded-full bg-muted grid place-items-center">
               <FileText className="h-4 w-4" />
             </div>
-            <div className="text-sm font-bold">Ответы на вопросы</div>
+            <div className="text-sm font-bold">{t("Ответы на вопросы")}</div>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </button>
 
         {/* Footer note */}
-        <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
-          Банковские услуги предоставляет АО «Альфа-Банк».<br />
-          Экран открыт во встроенном веб-браузере приложения.
-        </div>
+        <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк».")}<br />{t("Экран открыт во встроенном веб-браузере приложения.")}</div>
       </div>
 
       {/* Bottom sheets */}
       {sheet === "topup" && (
-        <BottomSheet title="Пополнить" onClose={() => setSheet(null)}>
+        <BottomSheet title={t(t("Пополнить"))} onClose={() => setSheet(null)}>
           <SheetItem
             icon={Building2}
-            label="С моего счёта в другом банке"
+            label={t(t("С моего счёта в другом банке"))}
             onClick={() => {
               setTopupMethod("account");
               setSheet(null);
@@ -1780,7 +1683,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
           />
           <SheetItem
             icon={Smartphone}
-            label="По номеру телефона"
+            label={t(t("По номеру телефона"))}
             onClick={() => {
               setTopupMethod("phone");
               setSheet(null);
@@ -1789,7 +1692,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
           />
           <SheetItem
             icon={CreditCard}
-            label="С карты другого банка"
+            label={t(t("С карты другого банка"))}
             onClick={() => {
               setTopupMethod("card");
               setSheet(null);
@@ -1799,10 +1702,10 @@ function BankWebview({ onLock }: { onLock: () => void }) {
         </BottomSheet>
       )}
       {sheet === "transfer" && (
-        <BottomSheet title="Перевести" onClose={() => setSheet(null)}>
+        <BottomSheet title={t(t("Перевести"))} onClose={() => setSheet(null)}>
           <SheetItem
             icon={Smartphone}
-            label="По номеру телефона"
+            label={t(t("По номеру телефона"))}
             onClick={() => {
               setTransferMethod("phone");
               setSheet(null);
@@ -1811,7 +1714,7 @@ function BankWebview({ onLock }: { onLock: () => void }) {
           />
           <SheetItem
             icon={CreditCard}
-            label="По номеру карты"
+            label={t(t("По номеру карты"))}
             onClick={() => {
               setTransferMethod("card");
               setSheet(null);
@@ -1822,17 +1725,17 @@ function BankWebview({ onLock }: { onLock: () => void }) {
       )}
 
       {sheet === "actions" && (
-        <BottomSheet title="Действия" onClose={() => setSheet(null)}>
+        <BottomSheet title={t(t("Действия"))} onClose={() => setSheet(null)}>
           <SheetItem
             icon={FileText}
-            label="Реквизиты карты"
+            label={t(t("Реквизиты карты"))}
             onClick={() => {
               setSheet(null);
               setScreen("requisites");
             }}
           />
-          <SheetItem icon={CreditCard} label="Заказать пластик" onClick={() => setSheet(null)} />
-          <SheetItem icon={Snowflake} label="Заморозить карту" onClick={() => setSheet(null)} />
+          <SheetItem icon={CreditCard} label={t(t("Заказать пластик"))} onClick={() => setSheet(null)} />
+          <SheetItem icon={Snowflake} label={t(t("Заморозить карту"))} onClick={() => setSheet(null)} />
         </BottomSheet>
       )}
     </div>
@@ -1846,7 +1749,7 @@ function CardTypeSwitcher({
   value: "plastic" | "virtual" | "digital";
   onChange: (v: "plastic" | "virtual" | "digital") => void;
 }) {
-  const label = { plastic: "Пластиковая карта", virtual: "Виртуальная карта", digital: "Цифровой тариф" }[value];
+  const label = { plastic: t("Пластиковая карта"), virtual: t("Виртуальная карта"), digital: t("Цифровой тариф") }[value];
   const order: Array<"plastic" | "virtual" | "digital"> = ["plastic", "virtual", "digital"];
   return (
     <button
@@ -1870,9 +1773,7 @@ function BankCard({ type }: { type: "plastic" | "virtual" | "digital" }) {
         <div className="absolute left-5 bottom-5 text-white text-3xl font-black tracking-tight">
           10 652<span className="text-lg">,00 ₽</span>
         </div>
-        <div className="absolute right-4 top-4 px-2 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold">
-          Виртуальная
-        </div>
+        <div className="absolute right-4 top-4 px-2 py-1 rounded-full bg-white/10 text-white text-[10px] font-bold">{t("Виртуальная")}</div>
         <div className="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-brand/20" />
       </div>
     );
@@ -1898,9 +1799,7 @@ function BottomSheet({
         <button
           onClick={onClose}
           className="mt-4 w-full h-12 rounded-2xl bg-foreground text-background font-bold"
-        >
-          Закрыть
-        </button>
+        >{t("Закрыть")}</button>
       </div>
     </div>
   );
@@ -1937,22 +1836,18 @@ function BankRequisites({ onBack, onLock }: { onBack: () => void; onLock: () => 
     <div className="bg-background min-h-full">
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button onClick={onBack} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
-          <ArrowLeft className="h-3.5 w-3.5" /> Назад
-        </button>
+          <ArrowLeft className="h-3.5 w-3.5" />{t("Назад")}</button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Webview · Альфа-Банк
-        </div>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />{t("Webview · Альфа-Банк")}</div>
         <button onClick={onLock} className="w-6 h-6 grid place-items-center">
           <X className="h-4 w-4" />
         </button>
       </div>
       <div className="px-5 pt-5 pb-6">
-        <h1 className="text-xl font-black text-center mb-6">Реквизиты карты</h1>
+        <h1 className="text-xl font-black text-center mb-6">{t("Реквизиты карты")}</h1>
         <div className="space-y-5">
           <div>
-            <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
-              Номер карты
-            </div>
+            <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">{t("Номер карты")}</div>
             <div className="flex items-center gap-2 h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-mono font-bold text-base">
               <span className="flex-1">{showNum ? num : "4664 •••• •••• 4333"}</span>
               <button onClick={() => setShowNum((v) => !v)} className="text-muted-foreground">
@@ -1962,9 +1857,7 @@ function BankRequisites({ onBack, onLock }: { onBack: () => void; onLock: () => 
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
-                ММ/ГГ
-              </div>
+              <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">{t("ММ/ГГ")}</div>
               <div className="h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-bold text-base flex items-center">
                 07/34
               </div>
@@ -1981,16 +1874,10 @@ function BankRequisites({ onBack, onLock }: { onBack: () => void; onLock: () => 
               </div>
             </div>
           </div>
-          <div className="p-3 rounded-2xl bg-brand/10 text-[11px] leading-snug text-foreground/80">
-            Никому не сообщайте CVC и код из СМС. Сотрудники банка их не спрашивают.
-          </div>
-          <button className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold">
-            Скопировать реквизиты
-          </button>
+          <div className="p-3 rounded-2xl bg-brand/10 text-[11px] leading-snug text-foreground/80">{t("Никому не сообщайте CVC и код из СМС. Сотрудники банка их не спрашивают.")}</div>
+          <button className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold">{t("Скопировать реквизиты")}</button>
         </div>
-        <div className="pt-6 text-center text-[10px] text-muted-foreground">
-          Банковские услуги предоставляет АО «Альфа-Банк».
-        </div>
+        <div className="pt-6 text-center text-[10px] text-muted-foreground">{t("Банковские услуги предоставляет АО «Альфа-Банк».")}</div>
       </div>
     </div>
   );
@@ -2006,12 +1893,12 @@ function BankCashback({
   onDone: (cashback: number) => void;
 }) {
   const cats = [
-    { id: "all", pct: 1, label: "За все покупки", icon: Sparkles, color: "bg-emerald-100 text-emerald-700", locked: true },
-    { id: "food", pct: 10, label: "Фастфуд", icon: Utensils, color: "bg-orange-100 text-orange-700" },
-    { id: "fuel", pct: 5, label: "АЗС", icon: Fuel, color: "bg-red-100 text-red-700" },
-    { id: "home", pct: 5, label: "Дом и ремонт", icon: HomeIcon, color: "bg-amber-100 text-amber-700" },
-    { id: "health", pct: 5, label: "Здоровье", icon: Heart, color: "bg-rose-100 text-rose-700" },
-    { id: "tech", pct: 5, label: "Техника", icon: Headphones, color: "bg-sky-100 text-sky-700" },
+    { id: "all", pct: 1, label: t("За все покупки"), icon: Sparkles, color: "bg-emerald-100 text-emerald-700", locked: true },
+    { id: "food", pct: 10, label: t("Фастфуд"), icon: Utensils, color: "bg-orange-100 text-orange-700" },
+    { id: "fuel", pct: 5, label: t("АЗС"), icon: Fuel, color: "bg-red-100 text-red-700" },
+    { id: "home", pct: 5, label: t("Дом и ремонт"), icon: HomeIcon, color: "bg-amber-100 text-amber-700" },
+    { id: "health", pct: 5, label: t("Здоровье"), icon: Heart, color: "bg-rose-100 text-rose-700" },
+    { id: "tech", pct: 5, label: t("Техника"), icon: Headphones, color: "bg-sky-100 text-sky-700" },
   ];
   const [sel, setSel] = useState<Set<string>>(new Set(["all"]));
   const toggle = (id: string, locked?: boolean) => {
@@ -2028,19 +1915,15 @@ function BankCashback({
     <div className="bg-background min-h-full">
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button onClick={onBack} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
-          <ArrowLeft className="h-3.5 w-3.5" /> Назад
-        </button>
+          <ArrowLeft className="h-3.5 w-3.5" />{t("Назад")}</button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Webview · Альфа-Банк
-        </div>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />{t("Webview · Альфа-Банк")}</div>
         <button onClick={onLock} className="w-6 h-6 grid place-items-center">
           <X className="h-4 w-4" />
         </button>
       </div>
       <div className="px-5 pt-4 pb-6">
-        <h1 className="text-xl font-black leading-snug mb-4">
-          Выберите категории<br />кэшбэка на сентябрь
-        </h1>
+        <h1 className="text-xl font-black leading-snug mb-4">{t("Выберите категории")}<br />{t("кэшбэка на сентябрь")}</h1>
         <div className="space-y-2">
           {cats.map((c) => {
             const active = sel.has(c.id);
@@ -2060,9 +1943,7 @@ function BankCashback({
                   {c.pct}% {c.label}
                 </div>
                 {c.locked ? (
-                  <span className="text-[10px] font-bold text-muted-foreground px-2 py-1 rounded-full bg-muted">
-                    Всегда
-                  </span>
+                  <span className="text-[10px] font-bold text-muted-foreground px-2 py-1 rounded-full bg-muted">{t("Всегда")}</span>
                 ) : (
                   <span
                     className={cn(
@@ -2077,23 +1958,17 @@ function BankCashback({
             );
           })}
         </div>
-        <div className="mt-4 text-[11px] text-muted-foreground text-center">
-          Можно выбрать до 3 категорий, минимум 2
-        </div>
+        <div className="mt-4 text-[11px] text-muted-foreground text-center">{t("Можно выбрать до 3 категорий, минимум 2")}</div>
         <div className="mt-5 space-y-2">
           <button
             disabled={!canPick}
             onClick={() => onDone(1500)}
             className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40"
-          >
-            Выбрать
-          </button>
+          >{t("Выбрать")}</button>
           <button
             onClick={() => onDone(1200)}
             className="w-full h-12 rounded-2xl bg-muted text-foreground font-bold"
-          >
-            Пропустить
-          </button>
+          >{t("Пропустить")}</button>
         </div>
       </div>
     </div>
@@ -2113,12 +1988,9 @@ function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
 
         <button onClick={onLock} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
-          <Lock className="h-3.5 w-3.5" /> Закрыть
-        </button>
+          <Lock className="h-3.5 w-3.5" />{t("Закрыть")}</button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          Webview · Альфа-Банк
-        </div>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />{t("Webview · Альфа-Банк")}</div>
         <div className="w-6" />
       </div>
 
@@ -2127,7 +1999,7 @@ function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock
         <button onClick={onClose} className="w-8 h-8 grid place-items-center rounded-full bg-muted">
           <ChevronRight className="h-4 w-4 rotate-180" />
         </button>
-        <div className="text-base font-bold">История операций</div>
+        <div className="text-base font-bold">{t("История операций")}</div>
         <div className="w-8" />
       </div>
 
@@ -2135,13 +2007,13 @@ function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock
         {/* Summary */}
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-2xl bg-card border border-border p-4">
-            <div className="text-[11px] text-muted-foreground">Поступления</div>
+            <div className="text-[11px] text-muted-foreground">{t("Поступления")}</div>
             <div className="text-lg font-black text-green-600 mt-1">
               +{income.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
             </div>
           </div>
           <div className="rounded-2xl bg-card border border-border p-4">
-            <div className="text-[11px] text-muted-foreground">Списания</div>
+            <div className="text-[11px] text-muted-foreground">{t("Списания")}</div>
             <div className="text-lg font-black mt-1">
               −{outcome.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
             </div>
@@ -2151,9 +2023,9 @@ function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock
         {/* Filter tabs */}
         <div className="inline-flex w-full rounded-full bg-muted p-1">
           {([
-            { k: "all", l: "Все" },
-            { k: "in", l: "Пополнения" },
-            { k: "out", l: "Списания" },
+            { k: "all", l: t("Все") },
+            { k: "in", l: t("Пополнения") },
+            { k: "out", l: t("Списания") },
           ] as const).map((t) => (
             <button
               key={t.k}
@@ -2170,7 +2042,7 @@ function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock
         {/* List */}
         <div className="space-y-3">
           {filtered.length === 0 && (
-            <div className="text-center text-sm text-muted-foreground py-10">Операций нет</div>
+            <div className="text-center text-sm text-muted-foreground py-10">{t("Операций нет")}</div>
           )}
           {filtered.map((h, i) => {
             const showDay = i === 0 || filtered[i - 1].day !== h.day;
@@ -2197,10 +2069,7 @@ function BankHistory({ onClose, onLock, history }: { onClose: () => void; onLock
           })}
         </div>
 
-        <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
-          Банковские услуги предоставляет АО «Альфа-Банк».<br />
-          Экран открыт во встроенном веб-браузере приложения.
-        </div>
+        <div className="pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк».")}<br />{t("Экран открыт во встроенном веб-браузере приложения.")}</div>
       </div>
     </div>
   );
@@ -2261,15 +2130,15 @@ function BankTopup({
     if (!sourceValid) {
       setError(
         method === "card"
-          ? "Пополнение доступно только с карт российских банков"
+          ? t("Пополнение доступно только с карт российских банков")
           : method === "phone"
-            ? "Введите корректный номер телефона плательщика"
-            : "Номер счёта должен содержать 20 цифр",
+            ? t("Введите корректный номер телефона плательщика")
+            : t("Номер счёта должен содержать 20 цифр"),
       );
       return;
     }
     if (!(amt > 0)) {
-      setError("Введите сумму");
+      setError(t("Введите сумму"));
       return;
     }
     setProcessing(true);
@@ -2287,34 +2156,31 @@ function BankTopup({
 
   const title =
     method === "card"
-      ? "С карты другого банка РФ"
+      ? t("С карты другого банка РФ")
       : method === "phone"
-        ? "По номеру телефона через СБП"
-        : "С моего счёта в другом банке";
+        ? t("По номеру телефона через СБП")
+        : t("С моего счёта в другом банке");
 
   return (
     <div className="bg-background min-h-full">
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button onClick={onClose} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
-          <ArrowLeft className="h-3.5 w-3.5" /> Назад
-        </button>
+          <ArrowLeft className="h-3.5 w-3.5" />{t("Назад")}</button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          Webview · Альфа-Банк
-        </div>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />{t("Webview · Альфа-Банк")}</div>
         <div className="w-6" />
       </div>
 
       <div className="px-5 pt-5 space-y-5">
         <div>
-          <div className="text-2xl font-black">Пополнить карту</div>
+          <div className="text-2xl font-black">{t("Пополнить карту")}</div>
           <div className="text-xs text-muted-foreground mt-1">{title}</div>
         </div>
 
         <div className="rounded-2xl bg-card border border-border p-4 space-y-4">
           {method === "card" && (
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">С карты</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("С карты")}</div>
               <input
                 inputMode="numeric"
                 placeholder="0000 0000 0000 0000"
@@ -2322,18 +2188,14 @@ function BankTopup({
                 onChange={(e) => setCard(formatCardNumber(e.target.value))}
                 className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
               />
-              <div className="text-[10px] text-muted-foreground mt-1">
-                Принимаются только карты российских банков (МИР, Visa/Mastercard РФ)
-              </div>
+              <div className="text-[10px] text-muted-foreground mt-1">{t("Принимаются только карты российских банков (МИР, Visa/Mastercard РФ)")}</div>
             </div>
           )}
 
           {method === "phone" && (
             <>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
-                  Номер телефона плательщика
-                </div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("Номер телефона плательщика")}</div>
                 <div className="flex items-center gap-2 h-11 px-3 rounded-xl bg-muted border border-border focus-within:border-brand">
                   <span className="text-sm font-semibold text-muted-foreground">+7</span>
                   <input
@@ -2344,22 +2206,20 @@ function BankTopup({
                     className="flex-1 bg-transparent outline-none text-base font-semibold"
                   />
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-1">
-                  СБП: деньги придут за секунды, комиссия 0 ₽ до 100 000 ₽ / мес
-                </div>
+                <div className="text-[10px] text-muted-foreground mt-1">{t("СБП: деньги придут за секунды, комиссия 0 ₽ до 100 000 ₽ / мес")}</div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Банк отправителя</div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("Банк отправителя")}</div>
                 <select
                   value={bank}
                   onChange={(e) => setBank(e.target.value)}
                   className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-sm font-semibold outline-none focus:border-brand"
                 >
-                  <option value="sber">Сбербанк</option>
-                  <option value="tinkoff">Т-Банк</option>
-                  <option value="vtb">ВТБ</option>
-                  <option value="alfa">Альфа-Банк</option>
-                  <option value="other">Другой банк СБП</option>
+                  <option value="sber">{t("Сбербанк")}</option>
+                  <option value="tinkoff">{t("Т-Банк")}</option>
+                  <option value="vtb">{t("ВТБ")}</option>
+                  <option value="alfa">{t("Альфа-Банк")}</option>
+                  <option value="other">{t("Другой банк СБП")}</option>
                 </select>
               </div>
             </>
@@ -2367,7 +2227,7 @@ function BankTopup({
 
           {method === "account" && (
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Номер счёта (20 цифр)</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("Номер счёта (20 цифр)")}</div>
               <input
                 inputMode="numeric"
                 placeholder="40817 810 0 0000 0000000"
@@ -2375,14 +2235,12 @@ function BankTopup({
                 onChange={(e) => setAccount(e.target.value.replace(/[^\d\s]/g, "").slice(0, 24))}
                 className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
               />
-              <div className="text-[10px] text-muted-foreground mt-1">
-                Счёт в стороннем банке РФ. Зачисление 1–2 рабочих дня.
-              </div>
+              <div className="text-[10px] text-muted-foreground mt-1">{t("Счёт в стороннем банке РФ. Зачисление 1–2 рабочих дня.")}</div>
             </div>
           )}
 
           <div>
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Сумма</div>
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("Сумма")}</div>
             <div className="relative">
               <input
                 inputMode="decimal"
@@ -2405,8 +2263,8 @@ function BankTopup({
 
           <div className="text-[11px] text-muted-foreground">
             {method === "account"
-              ? "Комиссия: 0 ₽ · Зачисление: 1–2 рабочих дня"
-              : "Комиссия: 0 ₽ · Зачисление: мгновенно"}
+              ? t("Комиссия: 0 ₽ · Зачисление: 1–2 рабочих дня")
+              : t("Комиссия: 0 ₽ · Зачисление: мгновенно")}
           </div>
         </div>
 
@@ -2419,12 +2277,10 @@ function BankTopup({
           onClick={submit}
           className="w-full h-12 rounded-full bg-brand text-white font-bold disabled:opacity-40 inline-flex items-center justify-center gap-2"
         >
-          {processing ? (<><Loader2 className="h-4 w-4 animate-spin" /> Обработка…</>) : "Пополнить"}
+          {processing ? (<><Loader2 className="h-4 w-4 animate-spin" />{t("Обработка…")}</>) : "Пополнить"}
         </button>
 
-        <div className="pb-8 text-center text-[10px] text-muted-foreground leading-relaxed">
-          Банковские услуги предоставляет АО «Альфа-Банк».
-        </div>
+        <div className="pb-8 text-center text-[10px] text-muted-foreground leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк».")}</div>
       </div>
     </div>
   );
@@ -2460,17 +2316,17 @@ function BankTransfer({
     if (!destValid) {
       setError(
         method === "card"
-          ? "Переводы возможны только на карты российских банков (РФ → РФ)"
-          : "Введите корректный номер телефона получателя",
+          ? t("Переводы возможны только на карты российских банков (РФ → РФ)")
+          : t("Введите корректный номер телефона получателя"),
       );
       return;
     }
     if (!(amt > 0)) {
-      setError("Введите сумму");
+      setError(t("Введите сумму"));
       return;
     }
     if (amt > balance) {
-      setError("Недостаточно средств на карте");
+      setError(t("Недостаточно средств на карте"));
       return;
     }
     setProcessing(true);
@@ -2483,26 +2339,23 @@ function BankTransfer({
 
   const subtitle =
     method === "card"
-      ? "Только с карты РФ на карту РФ"
-      : "По номеру телефона через СБП";
+      ? t("Только с карты РФ на карту РФ")
+      : t("По номеру телефона через СБП");
 
   return (
     <div className="bg-background min-h-full">
       <div className="px-4 pt-3 pb-2 flex items-center justify-between bg-card border-b border-border">
         <button onClick={onClose} className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1">
-          <ArrowLeft className="h-3.5 w-3.5" /> Назад
-        </button>
+          <ArrowLeft className="h-3.5 w-3.5" />{t("Назад")}</button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          Webview · Альфа-Банк
-        </div>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />{t("Webview · Альфа-Банк")}</div>
         <div className="w-6" />
       </div>
 
       <div className="px-5 pt-5 space-y-5">
         <div>
           <div className="text-2xl font-black">
-            {method === "card" ? "Перевод на карту" : "Перевод по телефону"}
+            {method === "card" ? t("Перевод на карту") : t("Перевод по телефону")}
           </div>
           <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>
         </div>
@@ -2510,7 +2363,7 @@ function BankTransfer({
         <div className="rounded-2xl bg-card border border-border p-4 space-y-4">
           {method === "card" ? (
             <div>
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Номер карты получателя</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("Номер карты получателя")}</div>
               <input
                 inputMode="numeric"
                 placeholder="0000 0000 0000 0000"
@@ -2518,16 +2371,12 @@ function BankTransfer({
                 onChange={(e) => setCard(formatCardNumber(e.target.value))}
                 className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-base font-semibold tracking-wider outline-none focus:border-brand"
               />
-              <div className="text-[10px] text-muted-foreground mt-1">
-                Только карты российских банков. Переводы за рубеж недоступны.
-              </div>
+              <div className="text-[10px] text-muted-foreground mt-1">{t("Только карты российских банков. Переводы за рубеж недоступны.")}</div>
             </div>
           ) : (
             <>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
-                  Номер телефона получателя
-                </div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("Номер телефона получателя")}</div>
                 <div className="flex items-center gap-2 h-11 px-3 rounded-xl bg-muted border border-border focus-within:border-brand">
                   <span className="text-sm font-semibold text-muted-foreground">+7</span>
                   <input
@@ -2538,22 +2387,20 @@ function BankTransfer({
                     className="flex-1 bg-transparent outline-none text-base font-semibold"
                   />
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-1">
-                  СБП РФ — комиссия 0 ₽ до 100 000 ₽ / мес
-                </div>
+                <div className="text-[10px] text-muted-foreground mt-1">{t("СБП РФ — комиссия 0 ₽ до 100 000 ₽ / мес")}</div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">Банк получателя</div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">{t("Банк получателя")}</div>
                 <select
                   value={bank}
                   onChange={(e) => setBank(e.target.value)}
                   className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-sm font-semibold outline-none focus:border-brand"
                 >
-                  <option value="sber">Сбербанк</option>
-                  <option value="tinkoff">Т-Банк</option>
-                  <option value="vtb">ВТБ</option>
-                  <option value="alfa">Альфа-Банк</option>
-                  <option value="other">Другой банк СБП</option>
+                  <option value="sber">{t("Сбербанк")}</option>
+                  <option value="tinkoff">{t("Т-Банк")}</option>
+                  <option value="vtb">{t("ВТБ")}</option>
+                  <option value="alfa">{t("Альфа-Банк")}</option>
+                  <option value="other">{t("Другой банк СБП")}</option>
                 </select>
               </div>
             </>
@@ -2561,10 +2408,10 @@ function BankTransfer({
 
           <div>
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
-              {method === "card" ? "Получатель (необязательно)" : "Имя получателя"}
+              {method === "card" ? t("Получатель (необязательно)") : t("Имя получателя")}
             </div>
             <input
-              placeholder="Иван И."
+              placeholder={t(t("Иван И."))}
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full h-11 px-3 rounded-xl bg-muted border border-border text-sm outline-none focus:border-brand"
@@ -2573,7 +2420,7 @@ function BankTransfer({
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Сумма</div>
+              <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Сумма")}</div>
               <div className="text-[11px] text-muted-foreground">
                 Доступно: {balance.toLocaleString("ru-RU", { minimumFractionDigits: 2 })} ₽
               </div>
@@ -2590,7 +2437,7 @@ function BankTransfer({
             </div>
           </div>
 
-          <div className="text-[11px] text-muted-foreground">Комиссия: 0 ₽ · Лимит: 150 000 ₽ / сутки</div>
+          <div className="text-[11px] text-muted-foreground">{t("Комиссия: 0 ₽ · Лимит: 150 000 ₽ / сутки")}</div>
         </div>
 
         {error && (
@@ -2602,12 +2449,10 @@ function BankTransfer({
           onClick={submit}
           className="w-full h-12 rounded-full bg-brand text-white font-bold disabled:opacity-40 inline-flex items-center justify-center gap-2"
         >
-          {processing ? (<><Loader2 className="h-4 w-4 animate-spin" /> Перевод…</>) : "Перевести"}
+          {processing ? (<><Loader2 className="h-4 w-4 animate-spin" />{t("Перевод…")}</>) : "Перевести"}
         </button>
 
-        <div className="pb-8 text-center text-[10px] text-muted-foreground leading-relaxed">
-          Банковские услуги предоставляет АО «Альфа-Банк».
-        </div>
+        <div className="pb-8 text-center text-[10px] text-muted-foreground leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк».")}</div>
       </div>
     </div>
   );
@@ -2632,19 +2477,14 @@ function WebviewChrome({
           className="text-xs font-semibold text-muted-foreground inline-flex items-center gap-1"
         >
           {onBack ? <ArrowLeft className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-          {onBack ? "Назад" : "Закрыть"}
+          {onBack ? t("Назад") : t("Закрыть")}
         </button>
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 text-[10px] font-bold uppercase tracking-wider">
-          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-          Webview · Альфа-Банк
-        </div>
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />{t("Webview · Альфа-Банк")}</div>
         <div className="w-6" />
       </div>
       {children}
-      <div className="px-5 pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">
-        Банковские услуги предоставляет АО «Альфа-Банк».<br />
-        Экран открыт во встроенном веб-браузере приложения.
-      </div>
+      <div className="px-5 pb-6 pt-2 text-center text-[10px] text-muted-foreground leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк».")}<br />{t("Экран открыт во встроенном веб-браузере приложения.")}</div>
     </div>
   );
 }
@@ -2717,36 +2557,25 @@ function BankLogin({ onDone }: { onDone: () => void }) {
             <Sparkles className="absolute bottom-4 -left-4 h-6 w-6 text-brand/70" />
           </div>
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-black tracking-tight">Дебетовая карта для мигрантов</h1>
-            <p className="text-sm text-muted-foreground">
-              Бесплатное обслуживание. Переводы на родину, оплата покупок и снятие наличных.
-            </p>
+            <h1 className="text-2xl font-black tracking-tight">{t("Дебетовая карта для мигрантов")}</h1>
+            <p className="text-sm text-muted-foreground">{t("Бесплатное обслуживание. Переводы на родину, оплата покупок и снятие наличных.")}</p>
           </div>
           <div className="w-full space-y-2 pt-2">
             <button
               onClick={() => setStep("form")}
               className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold active:scale-[0.98] transition"
-            >
-              Оформить карту
-            </button>
+            >{t("Оформить карту")}</button>
             <button
               onClick={() => setStep("signin")}
 
               className="w-full h-12 text-sm font-semibold text-muted-foreground hover:text-foreground transition"
-            >
-              Уже есть карта? Войти
-            </button>
+            >{t("Уже есть карта? Войти")}</button>
           </div>
           <div className="w-full flex items-start gap-2 p-3 rounded-2xl bg-brand/10">
             <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-            <p className="text-[11px] leading-snug text-foreground/70">
-              Мы гарантируем безопасность и сохранность ваших данных
-            </p>
+            <p className="text-[11px] leading-snug text-foreground/70">{t("Мы гарантируем безопасность и сохранность ваших данных")}</p>
           </div>
-          <p className="text-[10px] leading-snug text-center text-muted-foreground">
-            Нажимая «Оформить карту», я подтверждаю, что ознакомлен с условиями обработки
-            персональных данных
-          </p>
+          <p className="text-[10px] leading-snug text-center text-muted-foreground">{t("Нажимая «Оформить карту», я подтверждаю, что ознакомлен с условиями обработки\n            персональных данных")}</p>
         </div>
       </WebviewChrome>
     );
@@ -2771,16 +2600,12 @@ function BankLogin({ onDone }: { onDone: () => void }) {
       <WebviewChrome onBack={() => setStep("welcome")}>
         <div className="px-5 pt-4 pb-6 space-y-4">
           <div>
-            <h1 className="text-xl font-black tracking-tight leading-snug">
-              Заполните заявку<br />и зелёная карта ваша
-            </h1>
+            <h1 className="text-xl font-black tracking-tight leading-snug">{t("Заполните заявку")}<br />{t("и зелёная карта ваша")}</h1>
             <StepProgress step={2} total={4} percent={30} />
           </div>
-          <div className="text-sm font-bold">Заполните ваши данные:</div>
+          <div className="text-sm font-bold">{t("Заполните ваши данные:")}</div>
           <div>
-            <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
-              Пол
-            </div>
+            <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">{t("Пол")}</div>
             <div className="flex gap-2">
               {(["m", "f"] as const).map((g) => (
                 <button
@@ -2793,41 +2618,41 @@ function BankLogin({ onDone }: { onDone: () => void }) {
                       : "bg-muted text-foreground",
                   )}
                 >
-                  {g === "m" ? "Муж" : "Жен"}
+                  {g === "m" ? t("Муж") : t("Жен")}
                 </button>
               ))}
             </div>
           </div>
           <BankSelect
-            label="Гражданство"
+            label={t(t("Гражданство"))}
             value={citizenship}
             onChange={setCitizenship}
-            options={["Узбекистан", "Таджикистан", "Кыргызстан", "Казахстан", "Армения"]}
+            options={[t("Узбекистан"), t("Таджикистан"), t("Кыргызстан"), t("Казахстан"), t("Армения")]}
           />
           <BankField
-            label="Фамилия Имя Отчество"
-            placeholder="Как в паспорте"
+            label={t(t("Фамилия Имя Отчество"))}
+            placeholder={t(t("Как в паспорте"))}
             value={fio}
             onChange={setFio}
-            hint="Укажите точно как в паспорте"
+            hint={t(t("Укажите точно как в паспорте"))}
           />
           <BankField
-            label="Дата рождения"
-            placeholder="ДД.ММ.ГГГГ"
+            label={t(t("Дата рождения"))}
+            placeholder={t(t("ДД.ММ.ГГГГ"))}
             value={birth}
             onChange={(v) => setBirth(maskDate(v))}
             inputMode="numeric"
-            hint="Заказать карту можно только с 18 лет"
+            hint={t(t("Заказать карту можно только с 18 лет"))}
           />
           <BankField
-            label="Мобильный телефон"
+            label={t(t("Мобильный телефон"))}
             placeholder="+7 (___) ___-__-__"
             value={phone}
             onChange={setPhone}
             inputMode="numeric"
           />
           <BankField
-            label="Электронная почта"
+            label={t(t("Электронная почта"))}
             placeholder="you@example.com"
             value={email}
             onChange={setEmail}
@@ -2836,20 +2661,12 @@ function BankLogin({ onDone }: { onDone: () => void }) {
             disabled={!valid}
             onClick={() => setStep("sms")}
             className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-          >
-            Продолжить
-          </button>
+          >{t("Продолжить")}</button>
           <div className="flex items-start gap-2 p-3 rounded-2xl bg-brand/10">
             <ShieldCheck className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-            <p className="text-[11px] leading-snug text-foreground/70">
-              Мы гарантируем безопасность и сохранность ваших данных
-            </p>
+            <p className="text-[11px] leading-snug text-foreground/70">{t("Мы гарантируем безопасность и сохранность ваших данных")}</p>
           </div>
-          <p className="text-[10px] leading-snug text-center text-muted-foreground">
-            Нажимая «Продолжить», я подтверждаю, что ознакомлен с Памяткой об ЭДС, соглашаюсь
-            на выпуск предоплаченной карты и заказ расчётной карты, соглашаюсь с условиями,
-            договором, даю согласие
-          </p>
+          <p className="text-[10px] leading-snug text-center text-muted-foreground">{t("Нажимая «Продолжить», я подтверждаю, что ознакомлен с Памяткой об ЭДС, соглашаюсь\n            на выпуск предоплаченной карты и заказ расчётной карты, соглашаюсь с условиями,\n            договором, даю согласие")}</p>
         </div>
       </WebviewChrome>
     );
@@ -2863,7 +2680,7 @@ function BankLogin({ onDone }: { onDone: () => void }) {
         <div className="px-5 pt-4 pb-6 space-y-5">
           <StepProgress step={3} total={4} percent={55} />
           <div className="text-center space-y-1 pt-4">
-            <h1 className="text-lg font-black tracking-tight">Введите код из смс</h1>
+            <h1 className="text-lg font-black tracking-tight">{t("Введите код из смс")}</h1>
             <p className="text-sm text-muted-foreground">
               Код отправлен на {masked || "+7 ••• ••••••"}
             </p>
@@ -2887,17 +2704,13 @@ function BankLogin({ onDone }: { onDone: () => void }) {
             {smsTimer > 0 ? (
               <>Запросить повторно можно через 00:{smsTimer.toString().padStart(2, "0")}</>
             ) : (
-              <button onClick={() => setSmsTimer(25)} className="font-bold text-brand">
-                Отправить код повторно
-              </button>
+              <button onClick={() => setSmsTimer(25)} className="font-bold text-brand">{t("Отправить код повторно")}</button>
             )}
           </div>
           <button
             onClick={() => setStep("form")}
             className="w-full text-center text-sm font-bold text-foreground"
-          >
-            Изменить номер телефона
-          </button>
+          >{t("Изменить номер телефона")}</button>
           <div className="flex-1" />
           <PinKeypad
             onDigit={(d) => {
@@ -2916,11 +2729,11 @@ function BankLogin({ onDone }: { onDone: () => void }) {
 
   // --- DELIVERY ---
   if (step === "delivery") {
-    const noZone = address.toLowerCase().includes("ленин");
+    const noZone = address.toLowerCase().includes(t("ленин"));
     const dates = [
-      { d: "15", m: "апр.", w: "Сегодня" },
-      { d: "16", m: "", w: "Вт" },
-      { d: "17", m: "", w: "Ср" },
+      { d: "15", m: t("апр."), w: t("Сегодня") },
+      { d: "16", m: "", w: t("Вт") },
+      { d: "17", m: "", w: t("Ср") },
     ];
     const times = ["9:15–9:35", "10:00–11:00", "11:00–12:00", "12:00–13:00", "13:00–15:00", "15:00–17:00"];
     const valid = address.trim().length > 5 && deliveryTime.length > 0 && !noZone;
@@ -2928,16 +2741,14 @@ function BankLogin({ onDone }: { onDone: () => void }) {
       <WebviewChrome onBack={() => setStep("sms")}>
         <div className="px-5 pt-4 pb-6 space-y-5">
           <div>
-            <h1 className="text-xl font-black tracking-tight">Осталось заказать доставку</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Введите адрес — предложим варианты доставки
-            </p>
+            <h1 className="text-xl font-black tracking-tight">{t("Осталось заказать доставку")}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t("Введите адрес — предложим варианты доставки")}</p>
             <StepProgress step={4} total={4} percent={80} />
           </div>
           <div className="relative">
             <BankField
-              label="Адрес"
-              placeholder="г Москва, ул Арбат, д 40"
+              label={t(t("Адрес"))}
+              placeholder={t(t("г Москва, ул Арбат, д 40"))}
               value={address}
               onChange={setAddress}
             />
@@ -2955,25 +2766,21 @@ function BankLogin({ onDone }: { onDone: () => void }) {
               </div>
             )}
             {noZone && (
-              <p className="text-xs font-semibold text-destructive mt-1 px-1">
-                В эту зону нет доставки
-              </p>
+              <p className="text-xs font-semibold text-destructive mt-1 px-1">{t("В эту зону нет доставки")}</p>
             )}
             {!noZone && address.length > 3 && (
-              <p className="text-[11px] text-muted-foreground mt-1 px-1">
-                Например: г Москва, ул Арбат, д 1
-              </p>
+              <p className="text-[11px] text-muted-foreground mt-1 px-1">{t("Например: г Москва, ул Арбат, д 1")}</p>
             )}
           </div>
           {!noZone && (
             <>
               <div>
-                <div className="text-sm font-bold mb-2">Куда доставить</div>
+                <div className="text-sm font-bold mb-2">{t("Куда доставить")}</div>
                 <div className="flex gap-2">
                   {(
                     [
-                      { k: "courier", l: "По адресу" },
-                      { k: "office", l: "В офис банка" },
+                      { k: "courier", l: t("По адресу") },
+                      { k: "office", l: t("В офис банка") },
                     ] as const
                   ).map((o) => (
                     <button
@@ -2992,7 +2799,7 @@ function BankLogin({ onDone }: { onDone: () => void }) {
                 </div>
               </div>
               <div>
-                <div className="text-sm font-bold mb-2">Дата и время</div>
+                <div className="text-sm font-bold mb-2">{t("Дата и время")}</div>
                 <div className="flex gap-2 mb-3">
                   {dates.map((d) => (
                     <button
@@ -3034,9 +2841,7 @@ function BankLogin({ onDone }: { onDone: () => void }) {
             disabled={!valid}
             onClick={() => setStep("waiting")}
             className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-          >
-            Заказать доставку
-          </button>
+          >{t("Заказать доставку")}</button>
         </div>
       </WebviewChrome>
     );
@@ -3044,10 +2849,10 @@ function BankLogin({ onDone }: { onDone: () => void }) {
 
   if (step === "waiting") {
     const stages = [
-      { at: 15, label: "Заявка отправлена в банк" },
-      { at: 45, label: "Проверка паспортных данных" },
-      { at: 75, label: "Скоринг и решение по счёту" },
-      { at: 95, label: "Формирование карты" },
+      { at: 15, label: t("Заявка отправлена в банк") },
+      { at: 45, label: t("Проверка паспортных данных") },
+      { at: 75, label: t("Скоринг и решение по счёту") },
+      { at: 95, label: t("Формирование карты") },
     ];
     return (
       <WebviewChrome>
@@ -3056,10 +2861,8 @@ function BankLogin({ onDone }: { onDone: () => void }) {
             <Loader2 className="h-9 w-9 text-brand animate-spin" />
           </div>
           <div className="text-center">
-            <h1 className="text-xl font-black tracking-tight">Ждём ответ банка</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Обычно занимает до одной минуты. Не закрывайте окно.
-            </p>
+            <h1 className="text-xl font-black tracking-tight">{t("Ждём ответ банка")}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t("Обычно занимает до одной минуты. Не закрывайте окно.")}</p>
           </div>
           <div className="w-full max-w-xs">
             <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -3120,7 +2923,7 @@ function BankLogin({ onDone }: { onDone: () => void }) {
             <Check className="h-7 w-7 text-brand-foreground" />
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight">Дождитесь курьера</h1>
+            <h1 className="text-2xl font-black tracking-tight">{t("Дождитесь курьера")}</h1>
             <div className="mt-3 space-y-1 text-sm">
               <div className="flex items-center gap-2 text-foreground/80">
                 <span className="w-4 h-4 rounded-full border-2 border-brand grid place-items-center">
@@ -3130,28 +2933,26 @@ function BankLogin({ onDone }: { onDone: () => void }) {
               </div>
               <div className="flex items-center gap-2 text-foreground/80">
                 <MapPin className="h-4 w-4 text-brand" />
-                {address || "г. Москва, ул Арбат, д 40"}
+                {address || t("г. Москва, ул Арбат, д 40")}
               </div>
             </div>
           </div>
           <div>
-            <h2 className="text-lg font-black tracking-tight mb-3">Возьмите документы</h2>
+            <h2 className="text-lg font-black tracking-tight mb-3">{t("Возьмите документы")}</h2>
             <ul className="space-y-2.5 text-sm">
-              <DocRow>Паспорт иностранного гражданина (с заверенным переводом)</DocRow>
-              <DocRow>Миграционная карта (можно с истёкшим сроком)</DocRow>
-              <li className="pt-1 font-bold">И один из документов:</li>
-              <li className="pl-4 text-foreground/80">• Отрывная часть уведомления о прибытии</li>
-              <li className="pl-4 text-foreground/80">• Разрешение на временное проживание</li>
-              <li className="pl-4 text-foreground/80">• Заявление участника ЭПР</li>
-              <li className="pl-4 text-foreground/80">• Вид на жительство РФ</li>
+              <DocRow>{t("Паспорт иностранного гражданина (с заверенным переводом)")}</DocRow>
+              <DocRow>{t("Миграционная карта (можно с истёкшим сроком)")}</DocRow>
+              <li className="pt-1 font-bold">{t("И один из документов:")}</li>
+              <li className="pl-4 text-foreground/80">{t("• Отрывная часть уведомления о прибытии")}</li>
+              <li className="pl-4 text-foreground/80">{t("• Разрешение на временное проживание")}</li>
+              <li className="pl-4 text-foreground/80">{t("• Заявление участника ЭПР")}</li>
+              <li className="pl-4 text-foreground/80">{t("• Вид на жительство РФ")}</li>
             </ul>
           </div>
           <button
             onClick={() => setStep("create-passcode")}
             className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold active:scale-[0.98] transition"
-          >
-            Хорошо
-          </button>
+          >{t("Хорошо")}</button>
         </div>
       </WebviewChrome>
     );
@@ -3162,13 +2963,11 @@ function BankLogin({ onDone }: { onDone: () => void }) {
     <WebviewChrome>
       <div className="px-5 pt-4 pb-4 space-y-5">
         <div>
-          <h1 className="text-xl font-black tracking-tight">Придумайте код-пароль</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Код потребуется для входа в банк в следующий раз.
-          </p>
+          <h1 className="text-xl font-black tracking-tight">{t("Придумайте код-пароль")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("Код потребуется для входа в банк в следующий раз.")}</p>
         </div>
-        <PinDisplay value={pin} label="Новый код" />
-        <PinDisplay value={pin2} label="Повторите код" />
+        <PinDisplay value={pin} label={t(t("Новый код"))} />
+        <PinDisplay value={pin2} label={t(t("Повторите код"))} />
         <PinKeypad
           onDigit={(d) => {
             if (pin.length < 4) setPin(pin + d);
@@ -3183,9 +2982,7 @@ function BankLogin({ onDone }: { onDone: () => void }) {
           disabled={!ok}
           onClick={onDone}
           className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-        >
-          Сохранить и войти
-        </button>
+        >{t("Сохранить и войти")}</button>
       </div>
     </WebviewChrome>
   );
@@ -3229,7 +3026,7 @@ function BankSelect({
             !value && "text-muted-foreground",
           )}
         >
-          <option value="">Выберите</option>
+          <option value="">{t("Выберите")}</option>
           {options.map((o) => (
             <option key={o} value={o}>
               {o}
@@ -3309,22 +3106,18 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
             <Lock className="h-7 w-7 text-brand-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-black tracking-tight">Первый вход</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Введите логин и пароль от банка aloQa. В следующий раз вход будет по код-паролю.
-            </p>
+            <h1 className="text-xl font-black tracking-tight">{t("Первый вход")}</h1>
+            <p className="text-sm text-muted-foreground mt-1">{t("Введите логин и пароль от банка aloQa. В следующий раз вход будет по код-паролю.")}</p>
           </div>
           <div className="space-y-4">
             <BankField
-              label="Логин"
-              placeholder="Номер телефона или логин"
+              label={t(t("Логин"))}
+              placeholder={t(t("Номер телефона или логин"))}
               value={login}
               onChange={setLogin}
             />
             <label className="block">
-              <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
-                Пароль
-              </div>
+              <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">{t("Пароль")}</div>
               <input
                 type="password"
                 placeholder="••••••••"
@@ -3345,18 +3138,12 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
               onDone();
             }}
             className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-          >
-            Войти
-          </button>
+          >{t("Войти")}</button>
           <button
             onClick={() => setRecover(true)}
             className="w-full text-sm font-semibold text-brand underline"
-          >
-            Забыли логин или пароль?
-          </button>
-          <p className="text-[11px] text-center text-muted-foreground">
-            Вход в защищённый раздел АО «Альфа-Банк»
-          </p>
+          >{t("Забыли логин или пароль?")}</button>
+          <p className="text-[11px] text-center text-muted-foreground">{t("Вход в защищённый раздел АО «Альфа-Банк»")}</p>
 
         </div>
       </WebviewChrome>
@@ -3371,8 +3158,8 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
           <Lock className="h-7 w-7 text-brand-foreground" />
         </div>
         <div className="text-center">
-          <h1 className="text-xl font-black tracking-tight">Введите код-пароль</h1>
-          <p className="text-sm text-muted-foreground mt-1">Для входа в банк aloQa</p>
+          <h1 className="text-xl font-black tracking-tight">{t("Введите код-пароль")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("Для входа в банк aloQa")}</p>
         </div>
         <PinDisplay value={pin} label="" error={err} />
         <PinKeypad
@@ -3390,15 +3177,11 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
             setPin("");
           }}
           className="text-xs font-semibold text-muted-foreground underline"
-        >
-          Забыли код-пароль? Войти по логину
-        </button>
+        >{t("Забыли код-пароль? Войти по логину")}</button>
         <button
           onClick={() => setRecover(true)}
           className="text-xs font-semibold text-brand underline"
-        >
-          Восстановить доступ
-        </button>
+        >{t("Восстановить доступ")}</button>
       </div>
     </WebviewChrome>
   );
@@ -3436,13 +3219,11 @@ function BankRecover({ onBack, onDone }: { onBack: () => void; onDone: () => voi
         {step === "phone" && (
           <>
             <div>
-              <h1 className="text-xl font-black tracking-tight">Восстановление доступа</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Укажите номер телефона, привязанный к карте aloQa — мы отправим смс-код.
-              </p>
+              <h1 className="text-xl font-black tracking-tight">{t("Восстановление доступа")}</h1>
+              <p className="text-sm text-muted-foreground mt-1">{t("Укажите номер телефона, привязанный к карте aloQa — мы отправим смс-код.")}</p>
             </div>
             <BankField
-              label="Номер телефона"
+              label={t(t("Номер телефона"))}
               placeholder="+7 900 000-00-00"
               value={phone}
               onChange={(v) => setPhone(v.replace(/[^\d+ -]/g, ""))}
@@ -3452,18 +3233,16 @@ function BankRecover({ onBack, onDone }: { onBack: () => void; onDone: () => voi
               disabled={phone.replace(/\D/g, "").length < 11}
               onClick={() => setStep("sms")}
               className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-            >
-              Получить смс-код
-            </button>
+            >{t("Получить смс-код")}</button>
           </>
         )}
 
         {step === "sms" && (
           <>
             <div>
-              <h1 className="text-xl font-black tracking-tight">Подтвердите номер</h1>
+              <h1 className="text-xl font-black tracking-tight">{t("Подтвердите номер")}</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Код отправлен на {phone || "ваш номер"}
+                Код отправлен на {phone || t("ваш номер")}
               </p>
             </div>
             <div className="flex gap-3 justify-center">
@@ -3485,21 +3264,19 @@ function BankRecover({ onBack, onDone }: { onBack: () => void; onDone: () => voi
               value={sms}
               onChange={(e) => setSms(e.target.value.replace(/\D/g, "").slice(0, 4))}
               className="w-full h-12 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
-              placeholder="Введите код из смс"
+              placeholder={t(t("Введите код из смс"))}
             />
             <button
               disabled={sms.length !== 4}
               onClick={() => setStep("password")}
               className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-            >
-              Продолжить
-            </button>
+            >{t("Продолжить")}</button>
             <button
               disabled={timer > 0}
               onClick={() => setTimer(30)}
               className="w-full text-xs font-semibold text-muted-foreground underline disabled:no-underline disabled:opacity-60"
             >
-              {timer > 0 ? `Отправить код повторно через ${timer} с` : "Отправить код повторно"}
+              {timer > 0 ? `Отправить код повторно через ${timer} с` : t("Отправить код повторно")}
             </button>
           </>
         )}
@@ -3507,16 +3284,12 @@ function BankRecover({ onBack, onDone }: { onBack: () => void; onDone: () => voi
         {step === "password" && (
           <>
             <div>
-              <h1 className="text-xl font-black tracking-tight">Новый пароль</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Минимум 6 символов. Логин остаётся прежним — номер телефона.
-              </p>
+              <h1 className="text-xl font-black tracking-tight">{t("Новый пароль")}</h1>
+              <p className="text-sm text-muted-foreground mt-1">{t("Минимум 6 символов. Логин остаётся прежним — номер телефона.")}</p>
             </div>
             <div className="space-y-4">
               <label className="block">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
-                  Новый пароль
-                </div>
+                <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">{t("Новый пароль")}</div>
                 <input
                   type="password"
                   placeholder="••••••••"
@@ -3526,9 +3299,7 @@ function BankRecover({ onBack, onDone }: { onBack: () => void; onDone: () => voi
                 />
               </label>
               <label className="block">
-                <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
-                  Повторите пароль
-                </div>
+                <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">{t("Повторите пароль")}</div>
                 <input
                   type="password"
                   placeholder="••••••••"
@@ -3538,46 +3309,36 @@ function BankRecover({ onBack, onDone }: { onBack: () => void; onDone: () => voi
                 />
               </label>
               {pass2.length > 0 && pass !== pass2 && (
-                <div className="text-xs font-semibold text-destructive px-1">Пароли не совпадают</div>
+                <div className="text-xs font-semibold text-destructive px-1">{t("Пароли не совпадают")}</div>
               )}
             </div>
             <button
               disabled={pass.length < 6 || pass !== pass2}
               onClick={() => setStep("done")}
               className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
-            >
-              Сохранить пароль
-            </button>
+            >{t("Сохранить пароль")}</button>
           </>
         )}
 
         {step === "done" && (
           <>
             <div>
-              <h1 className="text-xl font-black tracking-tight">Доступ восстановлен</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Пароль обновлён. Можно войти в банковский раздел.
-              </p>
+              <h1 className="text-xl font-black tracking-tight">{t("Доступ восстановлен")}</h1>
+              <p className="text-sm text-muted-foreground mt-1">{t("Пароль обновлён. Можно войти в банковский раздел.")}</p>
             </div>
             <div className="flex items-start gap-2 p-3 rounded-2xl bg-brand/10">
               <Check className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-              <p className="text-[11px] leading-snug text-foreground/70">
-                После входа задайте новый код-пароль для быстрого доступа.
-              </p>
+              <p className="text-[11px] leading-snug text-foreground/70">{t("После входа задайте новый код-пароль для быстрого доступа.")}</p>
             </div>
             <button
               onClick={onDone}
               className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold active:scale-[0.98] transition inline-flex items-center justify-center gap-2"
-            >
-              Войти
-              <ArrowRight className="h-5 w-5" />
+            >{t("Войти")}<ArrowRight className="h-5 w-5" />
             </button>
           </>
         )}
 
-        <p className="text-[11px] text-center text-muted-foreground">
-          Восстановление доступа в защищённом разделе АО «Альфа-Банк»
-        </p>
+        <p className="text-[11px] text-center text-muted-foreground">{t("Восстановление доступа в защищённом разделе АО «Альфа-Банк»")}</p>
       </div>
     </WebviewChrome>
   );
@@ -3603,8 +3364,8 @@ function BankPasscode({ onDone }: { onDone: () => void }) {
           <Lock className="h-7 w-7 text-brand-foreground" />
         </div>
         <div className="text-center">
-          <h1 className="text-xl font-black tracking-tight">Введите код-пароль</h1>
-          <p className="text-sm text-muted-foreground mt-1">Для входа в банк aloQa</p>
+          <h1 className="text-xl font-black tracking-tight">{t("Введите код-пароль")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("Для входа в банк aloQa")}</p>
         </div>
         <PinDisplay value={pin} label="" error={err} />
         <PinKeypad
@@ -3614,9 +3375,7 @@ function BankPasscode({ onDone }: { onDone: () => void }) {
         <button
           onClick={() => setPin("")}
           className="text-xs font-semibold text-muted-foreground underline"
-        >
-          Забыли код-пароль?
-        </button>
+        >{t("Забыли код-пароль?")}</button>
       </div>
     </WebviewChrome>
   );
@@ -3727,10 +3486,8 @@ function TabUslugi() {
       <div className="w-20 h-20 rounded-3xl bg-brand grid place-items-center shadow-lg">
         <Wrench className="h-9 w-9 text-brand-foreground" />
       </div>
-      <h1 className="text-2xl font-black tracking-tight">Услуги</h1>
-      <p className="text-sm text-muted-foreground max-w-[280px]">
-        Раздел в разработке. Скоро здесь появятся домашний интернет, ТВ, роуминг, подписки и поддержка.
-      </p>
+      <h1 className="text-2xl font-black tracking-tight">{t("Услуги")}</h1>
+      <p className="text-sm text-muted-foreground max-w-[280px]">{t("Раздел в разработке. Скоро здесь появятся домашний интернет, ТВ, роуминг, подписки и поддержка.")}</p>
     </div>
   );
 }
@@ -3760,10 +3517,8 @@ function BindNumberSheet({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <h3 className="mt-5 text-2xl font-black leading-tight">Привязать новый номер</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Текущий номер останется в профиле как дополнительный.
-        </p>
+        <h3 className="mt-5 text-2xl font-black leading-tight">{t("Привязать новый номер")}</h3>
+        <p className="mt-2 text-sm text-muted-foreground">{t("Текущий номер останется в профиле как дополнительный.")}</p>
 
         <div className="mt-5 flex items-center gap-3 h-14 px-4 rounded-2xl border-2 border-foreground bg-card">
           <Phone className="h-5 w-5" />
@@ -3780,8 +3535,7 @@ function BindNumberSheet({
           />
         </div>
         {valid && (
-          <div className="mt-2 text-[11px] text-muted-foreground">
-            Оператор по ЦНИИС: <span className="font-bold text-foreground">{operatorLabel(op)}</span>
+          <div className="mt-2 text-[11px] text-muted-foreground">{t("Оператор по ЦНИИС:")}<span className="font-bold text-foreground">{operatorLabel(op)}</span>
           </div>
         )}
 
@@ -3789,9 +3543,7 @@ function BindNumberSheet({
           disabled={!valid}
           onClick={() => onBind(v)}
           className="mt-5 w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40"
-        >
-          Привязать номер
-        </button>
+        >{t("Привязать номер")}</button>
       </div>
     </div>
   );

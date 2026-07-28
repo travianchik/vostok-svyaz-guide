@@ -3282,6 +3282,23 @@ function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void
 
   if (known === null) return <WebviewChrome onBack={onBack}><div className="h-40" /></WebviewChrome>;
 
+  if (recover)
+    return (
+      <BankRecover
+        onBack={() => setRecover(false)}
+        onDone={() => {
+          try {
+            localStorage.setItem(BANK_CREDS_KEY, "1");
+          } catch {
+            /* ignore */
+          }
+          setRecover(false);
+          onDone();
+        }}
+      />
+    );
+
+
   // Первый вход — логин и пароль
   if (!known) {
     const valid = login.trim().length >= 4 && password.length >= 4;

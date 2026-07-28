@@ -459,6 +459,8 @@ function Welcome({
   setOtp,
   onOrder,
   onLogin,
+  lang,
+  setLang,
 }: {
   phone: string;
   setPhone: (v: string) => void;
@@ -466,10 +468,14 @@ function Welcome({
   setOtp: (v: string) => void;
   onOrder: () => void;
   onLogin: () => void;
+  lang: Lang;
+  setLang: (l: Lang) => void;
 }) {
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [i, setI] = useState(0);
   const [agree, setAgree] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const activeLang = LANGS.find((l) => l.code === lang) ?? LANGS[0];
   useEffect(() => {
     const t = setInterval(() => setI((v) => (v + 1) % slides().length), 3000);
     return () => clearInterval(t);
@@ -479,12 +485,52 @@ function Welcome({
   const valid = phone.length === 10 && agree;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-44px)] overflow-auto">
+    <div className="relative flex flex-col h-[calc(100vh-44px)] overflow-auto">
       <div className="px-6 pt-4 flex items-center justify-between">
         <Logo />
+        <button
+          onClick={() => setLangOpen(true)}
+          aria-label={t("Выберите язык")}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full hover:bg-muted"
+        >
+          {activeLang.flag}
+          <span className="text-[11px] font-bold uppercase">{activeLang.code}</span>
+        </button>
       </div>
 
-      <div className="px-6 pt-5">
+      {langOpen && (
+        <div className="absolute inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-end" onClick={() => setLangOpen(false)}>
+          <div className="w-full bg-background text-foreground rounded-t-3xl p-5 pb-8" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="font-black text-lg text-foreground">{t("Выберите язык")}</div>
+              <button onClick={() => setLangOpen(false)} className="p-2 rounded-full hover:bg-muted text-foreground">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => {
+                    setLang(l.code);
+                    setLangOpen(false);
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-3 rounded-2xl border-2 transition text-foreground",
+                    lang === l.code ? "border-brand bg-brand/10" : "border-border bg-card",
+                  )}
+                >
+                  {l.flag}
+                  <span className="font-bold text-sm text-foreground">{l.native}</span>
+                  {lang === l.code && <Check className="h-4 w-4 text-brand ml-auto" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+
         <div className="rounded-3xl bg-surface text-white p-6 h-[300px] flex flex-col justify-between relative overflow-hidden">
           <div className="absolute -right-12 -top-12 w-56 h-56 rounded-full bg-brand/90" />
           <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-brand/20" />

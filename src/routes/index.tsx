@@ -2752,6 +2752,13 @@ function BankLogin({ onDone }: { onDone: () => void }) {
     );
   }
 
+  // --- SIGN IN (passcode or first-time login/password) ---
+  if (step === "signin") {
+    return <BankSignIn onBack={() => setStep("welcome")} onDone={onDone} />;
+  }
+
+
+
   // --- FORM (step 2 of 4) ---
   if (step === "form") {
     const valid =

@@ -2652,6 +2652,7 @@ function WebviewChrome({
 
 type BankStep =
   | "welcome"
+  | "signin"
   | "form"
   | "sms"
   | "delivery"

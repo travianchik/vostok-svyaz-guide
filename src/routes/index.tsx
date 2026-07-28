@@ -1009,6 +1009,8 @@ function Home({
   showDev,
   bankAuth,
   setBankAuth,
+  lang,
+  setLang,
 }: {
   primary: string;
   additional: string[];
@@ -1026,16 +1028,63 @@ function Home({
   showDev: (m?: string) => void;
   bankAuth: "login" | "passcode" | "in";
   setBankAuth: (s: "login" | "passcode" | "in") => void;
+  lang: Lang;
+  setLang: (l: Lang) => void;
 }) {
+  const [langOpen, setLangOpen] = useState(false);
+  const activeLang = LANGS.find((l) => l.code === lang) ?? LANGS[0];
   return (
     <div className="relative flex flex-col h-[calc(100vh-44px)] bg-background">
       <div className="px-5 pt-4 pb-2 flex items-center justify-between">
         <Logo />
-        <button
-          onClick={onLogout}
-          className="text-xs font-semibold text-muted-foreground px-3 py-2 rounded-full hover:bg-muted"
-        >{t("Выйти")}</button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setLangOpen(true)}
+            aria-label={t("Выберите язык")}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full hover:bg-muted"
+          >
+            {activeLang.flag}
+            <span className="text-[11px] font-bold uppercase">{activeLang.code}</span>
+          </button>
+          <button
+            onClick={onLogout}
+            className="text-xs font-semibold text-muted-foreground px-3 py-2 rounded-full hover:bg-muted"
+          >{t("Выйти")}</button>
+        </div>
       </div>
+
+      {langOpen && (
+        <div className="absolute inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-end" onClick={() => setLangOpen(false)}>
+          <div className="w-full bg-surface rounded-t-3xl p-5 pb-8" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="font-black text-lg">{t("Выберите язык")}</div>
+              <button onClick={() => setLangOpen(false)} className="p-2 rounded-full hover:bg-muted">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => {
+                    setLang(l.code);
+                    setLangOpen(false);
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 p-3 rounded-2xl border-2 transition",
+                    lang === l.code ? "border-brand bg-brand/5" : "border-border",
+                  )}
+                >
+                  {l.flag}
+                  <span className="font-bold text-sm">{l.native}</span>
+                  {lang === l.code && <Check className="h-4 w-4 text-brand ml-auto" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
 
       <div className="flex-1 overflow-auto pb-24">
         {tab === "svyaz" && (

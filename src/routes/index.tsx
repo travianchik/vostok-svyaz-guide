@@ -2730,7 +2730,8 @@ function BankLogin({ onDone }: { onDone: () => void }) {
               Оформить карту
             </button>
             <button
-              onClick={onDone}
+              onClick={() => setStep("signin")}
+
               className="w-full h-12 text-sm font-semibold text-muted-foreground hover:text-foreground transition"
             >
               Уже есть карта? Войти

@@ -293,6 +293,9 @@ function App() {
             showDev={showDev}
             bankAuth={bankAuth}
             setBankAuth={setBankAuth}
+            lang={lang}
+            setLang={setLang}
+
           />
         )}
 

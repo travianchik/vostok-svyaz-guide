@@ -530,7 +530,7 @@ function Welcome({
         </div>
       )}
 
-
+      <div className="px-6 pt-5">
         <div className="rounded-3xl bg-surface text-white p-6 h-[300px] flex flex-col justify-between relative overflow-hidden">
           <div className="absolute -right-12 -top-12 w-56 h-56 rounded-full bg-brand/90" />
           <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-brand/20" />

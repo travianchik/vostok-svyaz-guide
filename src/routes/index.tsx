@@ -574,9 +574,9 @@ function Welcome({
               className="mt-0.5 h-5 w-5 accent-brand shrink-0"
             />
             <span className="text-[12px] leading-snug text-muted-foreground">
-              {t("Я принимаю условия")}{" "}
-              <span className="font-bold text-foreground underline underline-offset-2">{t("оферты приложения aloQa")}</span>{" "}
-              {t("и согласен на обработку персональных данных.")}
+              <span className="font-bold text-foreground underline underline-offset-2">
+                {t("Я принимаю условия оферты приложения aloQa и согласен на обработку персональных данных.")}
+              </span>
             </span>
           </label>
         )}

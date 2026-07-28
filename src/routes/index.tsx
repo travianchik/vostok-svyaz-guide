@@ -1056,10 +1056,10 @@ function Home({
 
       {langOpen && (
         <div className="absolute inset-0 z-50 bg-foreground/40 backdrop-blur-sm flex items-end" onClick={() => setLangOpen(false)}>
-          <div className="w-full bg-surface rounded-t-3xl p-5 pb-8" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full bg-background text-foreground rounded-t-3xl p-5 pb-8" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <div className="font-black text-lg">{t("Выберите язык")}</div>
-              <button onClick={() => setLangOpen(false)} className="p-2 rounded-full hover:bg-muted">
+              <div className="font-black text-lg text-foreground">{t("Выберите язык")}</div>
+              <button onClick={() => setLangOpen(false)} className="p-2 rounded-full hover:bg-muted text-foreground">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -1072,17 +1072,18 @@ function Home({
                     setLangOpen(false);
                   }}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-2xl border-2 transition",
-                    lang === l.code ? "border-brand bg-brand/5" : "border-border",
+                    "w-full flex items-center gap-3 p-3 rounded-2xl border-2 transition text-foreground",
+                    lang === l.code ? "border-brand bg-brand/10" : "border-border bg-card",
                   )}
                 >
                   {l.flag}
-                  <span className="font-bold text-sm">{l.native}</span>
+                  <span className="font-bold text-sm text-foreground">{l.native}</span>
                   {lang === l.code && <Check className="h-4 w-4 text-brand ml-auto" />}
                 </button>
               ))}
             </div>
           </div>
+
         </div>
       )}
 

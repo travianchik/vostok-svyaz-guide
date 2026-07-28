@@ -391,7 +391,7 @@ function Splash({
               </div>
               <div>
                 <div className="font-black text-lg leading-tight">{t("Выберите язык")}</div>
-                <div className="text-xs text-muted-foreground">{t("Забан · Тил · Til · Язык")}</div>
+                <div className="text-xs text-muted-foreground">Забан · Тил · Til · Язык</div>
               </div>
             </div>
             <div className="mt-5 space-y-2">
@@ -574,9 +574,9 @@ function Welcome({
               className="mt-0.5 h-5 w-5 accent-brand shrink-0"
             />
             <span className="text-[12px] leading-snug text-muted-foreground">
-              Я принимаю условия{" "}
+              {t("Я принимаю условия")}{" "}
               <span className="font-bold text-foreground underline underline-offset-2">{t("оферты приложения aloQa")}</span>{" "}
-              и согласен на обработку персональных данных.
+              {t("и согласен на обработку персональных данных.")}
             </span>
           </label>
         )}

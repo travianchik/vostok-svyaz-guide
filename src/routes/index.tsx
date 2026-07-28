@@ -238,6 +238,8 @@ function App() {
               if (op !== "beeline") setShowAdNotice(true);
               setOtp("");
             }}
+            lang={lang}
+            setLang={setLang}
           />
         )}
 

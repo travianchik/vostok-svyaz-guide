@@ -3251,6 +3251,127 @@ function DocRow({ children }: { children: React.ReactNode }) {
   );
 }
 
+const BANK_CREDS_KEY = "aloqa_bank_creds";
+
+function BankSignIn({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+  const [known, setKnown] = useState<boolean | null>(null);
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [pin, setPin] = useState("");
+  const [err, setErr] = useState(false);
+
+  useEffect(() => {
+    try {
+      setKnown(!!localStorage.getItem(BANK_CREDS_KEY));
+    } catch {
+      setKnown(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (known !== true) return;
+    if (pin.length === 4) {
+      const t = setTimeout(onDone, 250);
+      return () => clearTimeout(t);
+    }
+    setErr(false);
+  }, [pin, known, onDone]);
+
+  if (known === null) return <WebviewChrome onBack={onBack}><div className="h-40" /></WebviewChrome>;
+
+  // Первый вход — логин и пароль
+  if (!known) {
+    const valid = login.trim().length >= 4 && password.length >= 4;
+    return (
+      <WebviewChrome onBack={onBack}>
+        <div className="px-5 pt-6 pb-8 space-y-6">
+          <div className="w-16 h-16 rounded-3xl bg-brand grid place-items-center shadow-lg">
+            <Lock className="h-7 w-7 text-brand-foreground" />
+          </div>
+          <div>
+            <h1 className="text-xl font-black tracking-tight">Первый вход</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Введите логин и пароль от банка aloQa. В следующий раз вход будет по код-паролю.
+            </p>
+          </div>
+          <div className="space-y-4">
+            <BankField
+              label="Логин"
+              placeholder="Номер телефона или логин"
+              value={login}
+              onChange={setLogin}
+            />
+            <label className="block">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 px-1">
+                Пароль
+              </div>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full h-14 px-4 rounded-2xl border-2 border-foreground/10 bg-card font-semibold text-sm outline-none focus:border-foreground transition"
+              />
+            </label>
+          </div>
+          <button
+            disabled={!valid}
+            onClick={() => {
+              try {
+                localStorage.setItem(BANK_CREDS_KEY, "1");
+              } catch {
+                /* ignore */
+              }
+              onDone();
+            }}
+            className="w-full h-14 rounded-2xl bg-brand text-brand-foreground font-bold disabled:opacity-40 active:scale-[0.98] transition"
+          >
+            Войти
+          </button>
+          <p className="text-[11px] text-center text-muted-foreground">
+            Вход в защищённый раздел АО «Альфа-Банк»
+          </p>
+        </div>
+      </WebviewChrome>
+    );
+  }
+
+  // Последующие входы — код-пароль
+  return (
+    <WebviewChrome onBack={onBack}>
+      <div className="px-5 pt-6 pb-4 space-y-6 flex flex-col items-center">
+        <div className="w-16 h-16 rounded-3xl bg-brand grid place-items-center shadow-lg">
+          <Lock className="h-7 w-7 text-brand-foreground" />
+        </div>
+        <div className="text-center">
+          <h1 className="text-xl font-black tracking-tight">Введите код-пароль</h1>
+          <p className="text-sm text-muted-foreground mt-1">Для входа в банк aloQa</p>
+        </div>
+        <PinDisplay value={pin} label="" error={err} />
+        <PinKeypad
+          onDigit={(d) => pin.length < 4 && setPin(pin + d)}
+          onBack={() => setPin(pin.slice(0, -1))}
+        />
+        <button
+          onClick={() => {
+            try {
+              localStorage.removeItem(BANK_CREDS_KEY);
+            } catch {
+              /* ignore */
+            }
+            setKnown(false);
+            setPin("");
+          }}
+          className="text-xs font-semibold text-muted-foreground underline"
+        >
+          Забыли код-пароль? Войти по логину
+        </button>
+      </div>
+    </WebviewChrome>
+  );
+}
+
+
 function BankPasscode({ onDone }: { onDone: () => void }) {
   const [pin, setPin] = useState("");
   const [err, setErr] = useState(false);

@@ -1345,13 +1345,8 @@ function TabSvyaz({
         <>
           {/* Non-Beeline balance placeholder */}
           <div className="rounded-2xl bg-card border border-border p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-3xl font-black tracking-tight text-muted-foreground">—</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  баланс недоступен · {operatorLabel(operator)}
-                </div>
-              </div>
+            <div className="text-sm font-semibold leading-snug text-foreground">
+              {t("Баланс абонента доступен для номеров Билайн. Закажите нашу сим-карту, чтобы получить полный доступ к сервису aloQa")}
             </div>
           </div>
 

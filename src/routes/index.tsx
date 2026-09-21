@@ -1439,6 +1439,11 @@ function TabBank({
 }
 
 function BankIntro({ onGo }: { onGo: () => void }) {
+  const [showOffer, setShowOffer] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setShowOffer(true), 800);
+    return () => clearTimeout(id);
+  }, []);
   const perks = [
     { icon: CreditCard, title: t("Карта «МИР» aloQa"), text: t("Бесплатный выпуск и обслуживание, работает по всей России") },
     { icon: Sparkles, title: t("Кэшбэк до 10%"), text: t("Возврат за переводы, связь, продукты и покупки онлайн") },
@@ -1477,6 +1482,33 @@ function BankIntro({ onGo }: { onGo: () => void }) {
       >{t("Перейти")}<ArrowRight className="h-5 w-5" />
       </button>
       <p className="text-[11px] text-muted-foreground text-center mt-3 leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк». Продолжая, вы перейдёте\n        в защищённый раздел партнёра внутри приложения.")}</p>
+
+      {showOffer && (
+        <div className="absolute inset-x-0 bottom-0 z-30 px-4 pb-4 animate-in slide-in-from-bottom-6 fade-in duration-500">
+          <div className="relative rounded-3xl bg-brand p-5 overflow-hidden shadow-2xl">
+            <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-brand-foreground/10" />
+            <div className="absolute -left-6 -bottom-10 w-24 h-24 rounded-full bg-brand-foreground/10" />
+            <button
+              onClick={() => setShowOffer(false)}
+              aria-label={t("Закрыть")}
+              className="absolute right-3 top-3 w-8 h-8 rounded-full bg-brand-foreground/15 text-brand-foreground grid place-items-center active:scale-95 transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="w-11 h-11 rounded-2xl bg-brand-foreground/15 text-brand-foreground grid place-items-center">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div className="text-brand-foreground font-black text-lg mt-3">{t("Специальное предложение")}</div>
+            <p className="text-brand-foreground/90 text-sm mt-1.5 leading-relaxed pr-6">
+              {t("Благодаря приложению aloQa получи 1000 рублей на связь, оформив дебетовую карту нашего партнера Альфа Банка и совершив покупку.")}
+            </p>
+            <button
+              onClick={() => { setShowOffer(false); onGo(); }}
+              className="mt-4 w-full h-12 rounded-2xl bg-brand-foreground text-brand font-black text-sm inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
+            >{t("Оформить карту")}<ArrowRight className="h-4 w-4" /></button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

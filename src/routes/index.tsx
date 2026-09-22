@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import React, { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { t, setLang as setI18nLang, loadLang, type Lang } from "@/lib/i18n";
+import promoRules from "@/assets/pravila-akcii-s-keshbekom.docx.asset.json";
 import {
   ArrowLeft,
   ArrowRight,
@@ -1440,6 +1441,7 @@ function TabBank({
 
 function BankIntro({ onGo }: { onGo: () => void }) {
   const [showOffer, setShowOffer] = useState(false);
+  const [offerAccepted, setOfferAccepted] = useState(false);
   useEffect(() => {
     const id = setTimeout(() => setShowOffer(true), 800);
     return () => clearTimeout(id);
@@ -1502,9 +1504,30 @@ function BankIntro({ onGo }: { onGo: () => void }) {
             <p className="text-brand-foreground/90 text-sm mt-1.5 leading-relaxed pr-6">
               {t("Благодаря приложению aloQa получи 1000 рублей на связь, оформив дебетовую карту нашего партнера Альфа Банка и совершив покупку.")}
             </p>
+            <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-brand-foreground">
+              <input
+                type="checkbox"
+                checked={offerAccepted}
+                onChange={(event) => setOfferAccepted(event.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-current"
+              />
+              <span className="text-xs leading-relaxed">
+                {t("Я согласен с")} {" "}
+                <a
+                  href={promoRules.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-bold underline underline-offset-2"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  {t("условиями акции")}
+                </a>
+              </span>
+            </label>
             <button
+              disabled={!offerAccepted}
               onClick={() => { setShowOffer(false); onGo(); }}
-              className="mt-4 w-full h-12 rounded-2xl bg-brand-foreground text-brand font-black text-sm inline-flex items-center justify-center gap-2 active:scale-[0.98] transition"
+              className="mt-4 w-full h-12 rounded-2xl bg-brand-foreground text-brand font-black text-sm inline-flex items-center justify-center gap-2 active:scale-[0.98] transition disabled:cursor-not-allowed disabled:opacity-50"
             >{t("Оформить карту")}<ArrowRight className="h-4 w-4" /></button>
           </div>
         </div>

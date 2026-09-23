@@ -1492,7 +1492,7 @@ function BankIntro({ onGo }: { onGo: () => void }) {
       <p className="text-[11px] text-muted-foreground text-center mt-3 leading-relaxed">{t("Банковские услуги предоставляет АО «Альфа-Банк». Продолжая, вы перейдёте\n        в защищённый раздел партнёра внутри приложения.")}</p>
 
       {showOffer && (
-        <div className="absolute inset-x-0 bottom-0 z-30 px-4 pb-4 animate-in slide-in-from-bottom-6 fade-in duration-500">
+        <div className="absolute inset-x-0 bottom-0 z-30 px-5 pb-4 animate-in slide-in-from-bottom-6 fade-in duration-500">
           <div className="relative rounded-3xl bg-brand p-5 overflow-hidden shadow-2xl">
             <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-brand-foreground/10" />
             <div className="absolute -left-6 -bottom-10 w-24 h-24 rounded-full bg-brand-foreground/10" />

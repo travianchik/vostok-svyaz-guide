@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { t, setLang as setI18nLang, loadLang, type Lang } from "@/lib/i18n";
 import promoRules from "@/assets/pravila-akcii-s-keshbekom.docx.asset.json";
 import {
@@ -56,6 +57,10 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: t("aloQa — мобильное приложение") },
       { name: "description", content: t("CJM прототип мобильного приложения aloQa") },
+      { property: "og:title", content: t("aloQa — мобильное приложение") },
+      { property: "og:description", content: t("CJM прототип мобильного приложения aloQa") },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: App,
@@ -1216,33 +1221,33 @@ function BalanceCard({ showDev }: { showDev: (m?: string) => void }) {
     setRevealed(true);
   };
   return (
-    <div className="rounded-2xl bg-card border border-border p-5">
+    <div className="rounded-2xl bg-card border border-border px-4 py-3.5 shadow-sm shadow-foreground/5">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           {revealed ? (
             <>
-              <div className="text-3xl font-black tracking-tight">2 250 ₽</div>
-              <div className="text-xs text-muted-foreground mt-1">{t("на балансе")}</div>
+              <div className="text-lg font-extrabold leading-none">2 250 ₽</div>
+              <div className="text-[10px] text-muted-foreground mt-1">{t("на балансе")}</div>
             </>
           ) : (
             <>
-              <div className="text-3xl font-black tracking-tight tracking-widest text-muted-foreground select-none">
+              <div className="text-lg font-extrabold leading-none tracking-widest text-muted-foreground select-none">
                 •••• ₽
               </div>
-              <div className="text-[11px] text-muted-foreground mt-1 leading-snug max-w-[210px]">{t("Для отображения баланса нужно согласие на передачу данных оператора.")}</div>
+              <div className="text-[10px] text-muted-foreground mt-1 leading-snug max-w-[190px]">{t("Для отображения баланса нужно согласие на передачу данных оператора.")}</div>
             </>
           )}
         </div>
         {revealed ? (
-          <button
+          <Button
             onClick={() => showDev(t("Пополнение — раздел в разработке"))}
-            className="h-11 px-5 rounded-full bg-brand text-brand-foreground font-bold text-sm shrink-0 active:scale-[0.98] transition"
-          >{t("Пополнить")}</button>
+            className="h-9 min-w-28 rounded-xl bg-brand px-4 text-xs font-bold text-brand-foreground shadow-none active:scale-[0.98]"
+          >{t("Пополнить")}</Button>
         ) : (
-          <button
+          <Button
             onClick={consent}
-            className="h-11 px-4 rounded-full bg-foreground text-background font-bold text-xs shrink-0 active:scale-[0.98] transition"
-          >{t("Показывать баланс")}</button>
+            className="h-9 rounded-xl bg-foreground px-3 text-[10px] font-bold text-background shadow-none active:scale-[0.98]"
+          >{t("Показывать баланс")}</Button>
         )}
       </div>
     </div>
@@ -1272,15 +1277,15 @@ function TabSvyaz({
 }) {
   const isBeeline = operator === "beeline";
   return (
-    <div className="px-5 pt-2 space-y-4">
+    <div className="px-4 pt-1 space-y-3">
       {/* User header */}
-      <div className="flex items-center gap-3 p-4 rounded-2xl bg-card border border-border">
-        <div className="w-12 h-12 rounded-full bg-muted grid place-items-center shrink-0">
-          <User className="h-5 w-5 text-muted-foreground" />
+      <div className="flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
+        <div className="w-10 h-10 rounded-full bg-muted grid place-items-center shrink-0">
+          <User className="h-4 w-4 text-muted-foreground" />
         </div>
         <div className="min-w-0">
-          <div className="font-black text-base tracking-tight">{formatPhone(primary)}</div>
-          <div className="text-xs text-muted-foreground">{t("Алина Петрова")}</div>
+          <div className="font-bold text-sm">{formatPhone(primary)}</div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">{t("Алина Петрова")}</div>
         </div>
       </div>
 
@@ -1291,54 +1296,55 @@ function TabSvyaz({
 
 
           {/* Tariff */}
-          <div className="flex items-center gap-2 px-1">
-            <h2 className="text-base font-black">{t("Тариф")}</h2>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand text-brand-foreground">{t("твой тариф")}</span>
+          <div className="flex items-center gap-2 px-0.5 pt-1">
+            <h2 className="text-xs font-bold">{t("Тариф")}</h2>
+            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-brand text-brand-foreground">{t("твой тариф")}</span>
           </div>
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-3 blur-md select-none pointer-events-none">
-              <div className="p-4 rounded-2xl bg-card border border-border">
-                <div className="text-2xl font-black">25<span className="text-muted-foreground">/35</span></div>
-                <div className="text-xs text-muted-foreground mt-1">{t("Гигабайты")}</div>
+          <div className="relative -mt-1">
+            <div className="grid grid-cols-2 gap-2.5 blur-[3px] select-none pointer-events-none">
+              <div className="px-4 py-3.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
+                <div className="text-sm font-bold">25/35</div>
+                <div className="text-[9px] text-muted-foreground mt-3">{t("Гигабайты")}</div>
               </div>
-              <div className="p-4 rounded-2xl bg-card border border-border">
-                <div className="text-2xl font-black">200<span className="text-muted-foreground">/250</span></div>
-                <div className="text-xs text-muted-foreground mt-1">{t("Минуты")}</div>
+              <div className="px-4 py-3.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
+                <div className="text-sm font-bold">200/250</div>
+                <div className="text-[9px] text-muted-foreground mt-3">{t("Минуты")}</div>
               </div>
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/90 text-background text-xs font-bold shadow-lg">
-                <Wrench className="h-3.5 w-3.5" />{t("Раздел в разработке")}</div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground/90 text-background text-[9px] font-bold shadow-lg">
+                <Wrench className="h-3 w-3" />{t("Раздел в разработке")}</div>
             </div>
           </div>
 
           {/* Round actions */}
-          <div className="grid grid-cols-3 gap-2 pt-2">
+          <div className="grid grid-cols-3 gap-2 pt-0.5">
             {[
               { icon: Settings, label: t("Настроить тариф") },
               { icon: Layers, label: t("Услуги и сервисы") },
               { icon: PieChart, label: t("Мои расходы") },
             ].map(({ icon: Icon, label }) => (
-              <button
+              <Button
+                variant="ghost"
                 key={label}
                 onClick={() => showDev(`${label.replace("\n", " ")} — в разработке`)}
-                className="flex flex-col items-center gap-2 active:scale-[0.97] transition"
+                className="h-auto flex-col gap-2 whitespace-normal p-0 hover:bg-transparent active:scale-[0.97]"
               >
-                <div className="w-14 h-14 rounded-full bg-card border border-border grid place-items-center">
-                  <Icon className="h-5 w-5" />
+                <div className="w-11 h-11 rounded-full bg-card border border-border grid place-items-center shadow-sm shadow-foreground/5">
+                  <Icon className="h-4 w-4" />
                 </div>
-                <span className="text-[11px] text-center text-muted-foreground leading-tight whitespace-pre-line">
+                <span className="max-w-20 text-[9px] font-normal text-center text-muted-foreground leading-tight whitespace-pre-line">
                   {label}
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
 
           {/* Special offers */}
-          <div className="pt-2">
-            <h2 className="text-base font-black px-1 mb-2">{t("Специальные предложения")}</h2>
-            <div className="rounded-2xl bg-surface text-white p-5">
-              <div className="font-bold text-sm leading-snug">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
+          <div className="pt-1">
+            <h2 className="text-xs font-bold px-0.5 mb-2">{t("Специальные предложения")}</h2>
+            <div className="min-h-24 rounded-xl bg-surface p-4 text-primary-foreground">
+              <div className="text-[10px] font-medium leading-relaxed">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
             </div>
           </div>
         </>

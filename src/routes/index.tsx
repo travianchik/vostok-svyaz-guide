@@ -128,11 +128,11 @@ function Header() {
         <BrandMark />
         <div className="min-w-0 leading-none">
           <div className="text-[19px] font-extrabold text-ink">aloQa</div>
-          <div className="mt-1 whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.22em] text-muted">СВЯЗЬ С ЦЕЛЬЮ</div>
+          <div className="mt-1 whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.22em] text-muted-foreground">СВЯЗЬ С ЦЕЛЬЮ</div>
         </div>
       </div>
       <div className="flex min-w-0 items-center gap-3 text-[12px] font-semibold">
-        <div className="flex shrink-0 items-center gap-1.5 text-muted"><RussianFlag /><span>RU</span></div>
+        <div className="flex shrink-0 items-center gap-1.5 text-muted-foreground"><RussianFlag /><span>RU</span></div>
         <span className="max-w-[54px] truncate text-red">Удалить аккаунт</span>
         <span className="max-w-[38px] truncate text-ink">Выйти</span>
       </div>
@@ -142,10 +142,10 @@ function Header() {
 
 function PhoneCard() {
   return (
-    <section className="relative mx-4 mt-1 flex h-[92px] items-center gap-4 overflow-hidden rounded-[26px] bg-card p-4 shadow-soft">
+    <section className="relative mx-4 mt-1 flex h-[82px] items-center gap-4 overflow-hidden rounded-[26px] bg-card p-4 shadow-soft">
       <Ornament />
       <div className="z-[1] grid h-14 w-14 shrink-0 place-items-center rounded-full bg-avatar">
-        <User className="h-6 w-6 text-muted" strokeWidth={1.7} />
+        <User className="h-6 w-6 text-muted-foreground" strokeWidth={1.7} />
       </div>
       <div className="z-[1] whitespace-nowrap text-[20px] font-extrabold text-ink">+7 988 016 19 75</div>
     </section>
@@ -154,7 +154,7 @@ function PhoneCard() {
 
 function BalanceCard() {
   return (
-    <section className="mx-4 mt-3 flex min-h-[150px] items-start justify-between gap-3 rounded-[26px] bg-card p-5 shadow-soft">
+    <section className="mx-4 mt-3 flex min-h-[138px] items-start justify-between gap-3 rounded-[26px] bg-card p-5 shadow-soft">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <div className="flex gap-2">
@@ -162,11 +162,11 @@ function BalanceCard() {
           </div>
           <span className="ml-1 text-[30px] font-bold leading-none text-faint">₽</span>
         </div>
-        <p className="mt-5 max-w-[170px] text-[13px] leading-[1.35] text-muted">
+        <p className="mt-4 max-w-[170px] text-[13px] leading-[1.35] text-muted-foreground">
           Для отображения баланса нужно согласие на передачу данных оператора.
         </p>
       </div>
-      <button type="button" className="mt-11 shrink-0 rounded-full bg-dark px-5 py-3 text-[13px] font-semibold text-card">
+      <button type="button" className="mt-9 shrink-0 rounded-full bg-dark px-5 py-3 text-[13px] font-semibold text-card">
         Показывать баланс
       </button>
     </section>
@@ -175,12 +175,12 @@ function BalanceCard() {
 
 function TariffSection() {
   return (
-    <section className="mx-4 mt-5">
+    <section className="mx-4 mt-4">
       <div className="flex items-center gap-2">
         <h2 className="text-[20px] font-extrabold leading-none text-ink">Тариф</h2>
         <span className="rounded-full bg-green px-3 py-1 text-[10px] font-bold uppercase text-card">ТВОЙ ТАРИФ</span>
       </div>
-      <div className="relative mt-4">
+      <div className="relative mt-3">
         <div className="grid grid-cols-2 gap-3">
           <TariffCard value="25/35" label="Гигабайты" />
           <TariffCard value="200/250" label="Минуты" />
@@ -198,9 +198,9 @@ function TariffSection() {
 
 function TariffCard({ value, label }: { value: string; label: string }) {
   return (
-    <div className="h-[104px] rounded-[22px] border border-line bg-soft-card p-4">
+    <div className="h-[92px] rounded-[22px] border border-line bg-soft-card p-4">
       <div className="whitespace-nowrap text-[28px] font-extrabold leading-none text-faint blur-[1.5px]">{value}</div>
-      <div className="mt-4 text-[12px] text-muted blur-[1.5px]">{label}</div>
+      <div className="mt-3 text-[12px] text-muted-foreground blur-[1.5px]">{label}</div>
     </div>
   );
 }
@@ -213,13 +213,13 @@ const actions = [
 
 function ActionSection() {
   return (
-    <section className="mx-4 mt-5 grid grid-cols-3 gap-2">
+    <section className="mx-4 mt-4 grid grid-cols-3 gap-2">
       {actions.map(({ icon: Icon, first, second }) => (
         <div key={first} className="flex flex-col items-center text-center">
-          <div className="grid h-[68px] w-[68px] place-items-center rounded-full border border-line bg-card shadow-soft">
+          <div className="grid h-[60px] w-[60px] place-items-center rounded-full border border-line bg-card shadow-soft">
             <Icon className="h-6 w-6 text-ink" strokeWidth={1.8} />
           </div>
-          <div className="mt-2 text-[12px] leading-[1.3] text-muted">{first}<br />{second}</div>
+          <div className="mt-2 text-[12px] leading-[1.3] text-muted-foreground">{first}<br />{second}</div>
         </div>
       ))}
     </section>
@@ -228,9 +228,9 @@ function ActionSection() {
 
 function Offers() {
   return (
-    <section className="mx-4 mt-6">
+    <section className="mx-4 mt-5">
       <h2 className="text-[18px] font-extrabold text-ink">Специальные предложения</h2>
-      <div className="mt-3 min-h-[106px] rounded-[22px] bg-dark p-5 text-[16px] font-semibold leading-snug text-card">
+      <div className="mt-3 min-h-[96px] rounded-[22px] bg-dark p-5 text-[16px] font-semibold leading-snug text-card">
         Следите за вашим балансом<br />и управляйте связью
       </div>
     </section>
@@ -249,7 +249,7 @@ function BottomTabs() {
 
 function Tab({ icon: Icon, label, active = false }: { icon: typeof Phone; label: string; active?: boolean }) {
   return (
-    <div className={`flex flex-col items-center justify-center gap-1 text-[11px] ${active ? "text-green" : "text-muted"}`}>
+    <div className={`flex flex-col items-center justify-center gap-1 text-[11px] ${active ? "text-green" : "text-muted-foreground"}`}>
       <Icon className="h-5 w-5" strokeWidth={2.3} />
       <span className="font-medium">{label}</span>
     </div>

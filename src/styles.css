@@ -40,6 +40,7 @@
   --color-dark: var(--dark);
   --color-green: var(--green);
   --color-red: var(--red);
+  --color-line: var(--line);
   --color-avatar: var(--avatar);
   --color-soft-card: var(--soft-card);
   --color-stage: var(--stage);
@@ -84,6 +85,7 @@
   --dark: #1E222A;
   --green: #15A57A;
   --red: #E5484D;
+  --line: #ECEEF0;
   --avatar: #E7E9EC;
   --soft-card: #FAFAFB;
   --stage: #E6E7E9;

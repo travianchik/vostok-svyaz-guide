@@ -1365,7 +1365,7 @@ function TabSvyaz({
                   •••• ₽
                 </div>
                 <div className="mt-2 max-w-[235px] text-xs leading-snug text-muted-foreground">
-                  {t("Баланс абонента доступен для номеров Билайн. Закажите сим-карту Билайн, чтобы получить полный доступ к сервису aloQa")}
+                  {t("Баланс абонента доступен для номеров билайн. Закажите сим-карту билайн, чтобы получить полный доступ к сервису aloQa")}
                 </div>
               </div>
               <Button disabled className="h-12 min-w-32 rounded-full bg-brand px-5 text-base font-bold text-brand-foreground shadow-none">
@@ -1549,7 +1549,7 @@ function BankIntro({ onGo }: { onGo: () => void }) {
           </div>
           <div className="mt-4 flex items-baseline gap-1.5">
             <span className="text-4xl font-black leading-none tracking-tight">1000 ₽</span>
-            <span className="text-base font-extrabold text-primary-foreground/90">{t("на связь")}</span>
+            <span className="text-base font-extrabold text-primary-foreground/90">{t("на связь билайн")}</span>
           </div>
           <p className="mt-1.5 text-xs font-semibold leading-relaxed text-primary-foreground/80">{t("Бонус после первой покупки по карте партнёра")}</p>
         </div>
@@ -1564,7 +1564,7 @@ function BankIntro({ onGo }: { onGo: () => void }) {
           <div>
             <div className="text-base font-extrabold leading-tight">{t("Специальное предложение")}</div>
             <p className="mt-1.5 text-sm font-semibold leading-relaxed text-primary-foreground/85">
-              {t("Благодаря приложению aloQa получи 1000 рублей на связь, оформив дебетовую карту нашего партнера Альфа Банка и совершив покупку.")}
+              {t("Благодаря приложению aloQa получи 1000 рублей на связь билайн, оформив дебетовую карту нашего партнера Альфа-Банка и совершив покупку.")}
             </p>
           </div>
         </div>

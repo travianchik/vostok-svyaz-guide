@@ -1528,7 +1528,7 @@ function BankIntro({ onGo }: { onGo: () => void }) {
     { icon: ShieldCheck, title: t("Безопасно"), text: t("Средства защищены, вход по код-паролю") },
   ];
   return (
-    <div className="px-4 pt-2 pb-8 space-y-3">
+    <div className="relative isolate overflow-hidden px-4 pt-2 pb-8 space-y-3">
       <div className="px-0.5 pt-1">
         <div className="text-[10px] font-bold uppercase text-brand">{t("Банковский сервис")}</div>
         <h1 className="mt-1 text-2xl font-black leading-tight">{t("Своя банковская карта")}<br />{t("в приложении aloQa")}</h1>
@@ -1541,13 +1541,6 @@ function BankIntro({ onGo }: { onGo: () => void }) {
           alt=""
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-16 -right-14 h-56 w-56 select-none opacity-[0.16]"
-          style={{ filter: "brightness(0) invert(1)" }}
-        />
-        <img
-          src={balanceCardOrnament.url}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-28 -left-28 h-56 w-56 select-none opacity-[0.14]"
           style={{ filter: "brightness(0) invert(1)" }}
         />
         <div className="absolute right-5 top-5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground/90">

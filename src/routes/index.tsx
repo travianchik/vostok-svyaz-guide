@@ -1285,7 +1285,7 @@ function TabSvyaz({
           aria-hidden
           src={ornamentMedallion.url}
           alt=""
-          className="pointer-events-none absolute -top-8 -right-8 h-36 w-36 opacity-[0.12] select-none"
+          className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-12 h-28 w-28 opacity-[0.12] select-none"
         />
         <div className="w-10 h-10 rounded-full bg-muted grid place-items-center shrink-0">
           <User className="h-4 w-4 text-muted-foreground" />

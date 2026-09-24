@@ -1226,7 +1226,7 @@ function BalanceCard({ showDev }: { showDev: (m?: string) => void }) {
   };
   return (
     <div className="flex min-h-[106px] items-center rounded-[28px] bg-card border border-border px-6 py-5 shadow-sm shadow-foreground/5">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex w-full items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           {revealed ? (
             <>
@@ -1354,17 +1354,17 @@ function TabSvyaz({
       ) : (
         <>
           {/* Balance card — same visual as Beeline, phrase differs */}
-          <div className="rounded-2xl bg-card border border-border px-4 py-3.5 shadow-sm shadow-foreground/5">
+          <div className="flex min-h-[106px] items-center rounded-[28px] border border-border bg-card px-6 py-5 shadow-sm shadow-foreground/5">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="text-lg font-extrabold leading-none tracking-widest text-muted-foreground select-none">
+                <div className="text-[34px] font-black leading-none text-muted-foreground select-none">
                   •••• ₽
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-1 leading-snug max-w-[230px]">
+                <div className="mt-2 max-w-[235px] text-xs leading-snug text-muted-foreground">
                   {t("Баланс абонента доступен для номеров Билайн. Закажите сим-карту Билайн, чтобы получить полный доступ к сервису aloQa")}
                 </div>
               </div>
-              <Button disabled className="h-9 min-w-28 rounded-xl bg-brand px-4 text-xs font-bold text-brand-foreground shadow-none">
+              <Button disabled className="h-12 min-w-32 rounded-full bg-brand px-5 text-base font-bold text-brand-foreground shadow-none">
                 {t("Пополнить")}
               </Button>
             </div>
@@ -1372,29 +1372,29 @@ function TabSvyaz({
 
 
           {/* Tariff */}
-          <div className="flex items-center gap-2 px-0.5 pt-1">
-            <h2 className="text-xs font-bold">{t("Тариф")}</h2>
-            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-brand text-brand-foreground">{t("твой тариф")}</span>
+          <div className="flex items-center gap-2.5 px-1 pt-1">
+            <h2 className="text-lg font-black">{t("Тариф")}</h2>
+            <span className="rounded-full bg-brand px-3 py-1 text-[10px] font-extrabold uppercase text-brand-foreground">{t("твой тариф")}</span>
           </div>
-          <div className="relative -mt-1">
-            <div className="grid grid-cols-2 gap-2.5 blur-[3px] select-none pointer-events-none">
-              <div className="px-4 py-3.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
-                <div className="text-sm font-bold">25/35</div>
-                <div className="text-[9px] text-muted-foreground mt-3">{t("Гигабайты")}</div>
+          <div className="relative -mt-2">
+            <div className="grid grid-cols-2 gap-3 blur-[3px] select-none pointer-events-none">
+              <div className="min-h-[92px] rounded-[26px] border border-border bg-card px-5 py-5 shadow-sm shadow-foreground/5">
+                <div className="text-[27px] font-black leading-none">25/35</div>
+                <div className="mt-2 text-sm text-muted-foreground">{t("Гигабайты")}</div>
               </div>
-              <div className="px-4 py-3.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
-                <div className="text-sm font-bold">200/250</div>
-                <div className="text-[9px] text-muted-foreground mt-3">{t("Минуты")}</div>
+              <div className="min-h-[92px] rounded-[26px] border border-border bg-card px-5 py-5 shadow-sm shadow-foreground/5">
+                <div className="text-[27px] font-black leading-none">200/250</div>
+                <div className="mt-2 text-sm text-muted-foreground">{t("Минуты")}</div>
               </div>
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground/90 text-background text-[9px] font-bold shadow-lg">
-                <Wrench className="h-3 w-3" />{t("Раздел в разработке")}</div>
+              <div className="flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-xs font-bold text-background shadow-lg">
+                <Wrench className="h-4 w-4" />{t("Раздел в разработке")}</div>
             </div>
           </div>
 
           {/* Round actions */}
-          <div className="grid grid-cols-3 gap-2 pt-0.5">
+          <div className="grid grid-cols-3 gap-3 pt-1">
             {[
               { icon: Settings, label: t("Настроить тариф") },
               { icon: Layers, label: t("Услуги и сервисы") },
@@ -1404,12 +1404,12 @@ function TabSvyaz({
                 variant="ghost"
                 key={label}
                 onClick={() => showDev(`${label.replace("\n", " ")} — в разработке`)}
-                className="h-auto flex-col gap-2 whitespace-normal p-0 hover:bg-transparent active:scale-[0.97]"
+                className="h-auto flex-col gap-3 whitespace-normal p-0 hover:bg-transparent active:scale-[0.97]"
               >
-                <div className="w-11 h-11 rounded-full bg-card border border-border grid place-items-center shadow-sm shadow-foreground/5">
-                  <Icon className="h-4 w-4" />
+                <div className="grid h-16 w-16 place-items-center rounded-full border border-border bg-card shadow-sm shadow-foreground/5">
+                  <Icon className="h-6 w-6" />
                 </div>
-                <span className="max-w-20 text-[9px] font-normal text-center text-muted-foreground leading-tight whitespace-pre-line">
+                <span className="max-w-24 text-xs font-normal text-center text-muted-foreground leading-tight whitespace-pre-line">
                   {label}
                 </span>
               </Button>
@@ -1418,9 +1418,9 @@ function TabSvyaz({
 
           {/* Special offers */}
           <div className="pt-1">
-            <h2 className="text-sm font-extrabold px-0.5 mb-2">{t("Специальные предложения")}</h2>
-            <div className="min-h-20 rounded-2xl bg-surface p-4 text-primary-foreground flex items-center">
-              <div className="text-sm font-bold leading-snug">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
+            <h2 className="mb-2.5 px-0.5 text-lg font-black">{t("Специальные предложения")}</h2>
+            <div className="flex min-h-[92px] items-center rounded-[28px] bg-surface p-6 text-primary-foreground">
+              <div className="text-base font-bold leading-snug">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
             </div>
           </div>
 

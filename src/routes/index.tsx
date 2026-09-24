@@ -1282,19 +1282,43 @@ function TabSvyaz({
       <div className="relative flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5 overflow-hidden">
         <svg
           aria-hidden
-          className="pointer-events-none absolute -top-4 -right-4 h-24 w-24 text-foreground/[0.06]"
-          viewBox="0 0 100 100"
+          className="pointer-events-none absolute -top-7 -right-7 h-32 w-32 text-foreground/[0.07]"
+          viewBox="0 0 160 160"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.5"
+          strokeWidth="2.2"
+          strokeLinecap="round"
         >
-          <path d="M100 0 C60 10 50 40 70 55 C85 66 100 60 100 45" />
-          <path d="M100 20 C75 26 68 45 80 56 C90 64 100 58 100 48" />
-          <circle cx="86" cy="38" r="10" />
-          <path d="M70 55 C55 70 55 88 70 100" />
-          <path d="M58 60 C48 74 48 88 58 100" />
-          <path d="M86 28 l4 4 M90 24 l4 4 M94 20 l4 4" />
-          <path d="M30 100 C40 82 55 75 70 78 C60 86 55 95 55 100 Z" />
+          <defs>
+            <path id="orn-leaf" d="M0,0 C9,-7 22,-6 27,6 C17,14 6,11 0,0 Z" fill="currentColor" stroke="none" />
+          </defs>
+          {/* main vine from top edge, curling into a spiral */}
+          <path d="M162,8 C124,10 102,30 104,54 C106,76 126,88 142,80 C156,73 158,55 146,48 C136,42 124,48 125,59 C126,67 134,70 139,65" />
+          {/* second vine sweeping down the right edge */}
+          <path d="M162,44 C138,50 126,68 130,88 C134,108 150,116 162,110" />
+          {/* tendril reaching left */}
+          <path d="M104,54 C86,64 78,84 88,100 C96,113 114,115 122,104 C128,95 123,84 114,85 C107,86 105,94 110,98" />
+          {/* lower vine with bud curl */}
+          <path d="M162,86 C146,100 142,122 152,140 C155,146 159,150 162,152" />
+          <path d="M122,104 C116,120 120,138 134,148" />
+          {/* leaves along stems */}
+          <use href="#orn-leaf" transform="translate(118,18) rotate(-24) scale(0.9)" />
+          <use href="#orn-leaf" transform="translate(104,40) rotate(52) scale(0.75)" />
+          <use href="#orn-leaf" transform="translate(148,88) rotate(18) scale(0.85)" />
+          <use href="#orn-leaf" transform="translate(92,82) rotate(140) scale(0.7)" />
+          <use href="#orn-leaf" transform="translate(140,128) rotate(58) scale(0.8)" />
+          <use href="#orn-leaf" transform="translate(158,122) rotate(-14) scale(0.7)" />
+          {/* small palmette flower */}
+          <g transform="translate(126,138)">
+            <path d="M0,0 C-2,-12 2,-20 10,-24" />
+            <path d="M0,0 C-8,-8 -10,-16 -6,-24" />
+            <path d="M0,0 C4,-10 12,-14 20,-13" />
+            <circle cx="0" cy="0" r="2.6" fill="currentColor" stroke="none" />
+          </g>
+          {/* accent dots */}
+          <circle cx="151" cy="30" r="2.4" fill="currentColor" stroke="none" />
+          <circle cx="96" cy="62" r="2" fill="currentColor" stroke="none" />
+          <circle cx="143" cy="104" r="2.2" fill="currentColor" stroke="none" />
         </svg>
         <div className="w-10 h-10 rounded-full bg-muted grid place-items-center shrink-0">
           <User className="h-4 w-4 text-muted-foreground" />

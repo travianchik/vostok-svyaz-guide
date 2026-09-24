@@ -1528,7 +1528,7 @@ function BankIntro({ onGo }: { onGo: () => void }) {
     { icon: ShieldCheck, title: t("Безопасно"), text: t("Средства защищены, вход по код-паролю") },
   ];
   return (
-    <div className="relative isolate -mb-24 min-h-full overflow-hidden px-4 pt-2 pb-32 space-y-3">
+    <div className="relative isolate -mb-4 min-h-[calc(100%+1rem)] overflow-hidden px-4 pt-2 pb-32 space-y-3">
       <div className="px-0.5 pt-1">
         <div className="text-[10px] font-bold uppercase text-brand">{t("Банковский сервис")}</div>
         <h1 className="mt-1 text-2xl font-black leading-tight">{t("Своя банковская карта")}<br />{t("в приложении aloQa")}</h1>

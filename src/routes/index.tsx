@@ -1286,7 +1286,7 @@ function TabSvyaz({
           src={balanceCardOrnament.url}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute -right-44 -top-24 h-88 w-88 select-none opacity-[0.055]"
+          className="pointer-events-none absolute -right-[11.75rem] -top-24 h-88 w-88 select-none opacity-[0.055]"
         />
         <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted">
           <User className="h-6 w-6 text-muted-foreground" />

@@ -1620,6 +1620,10 @@ function BankIntro({ onGo }: { onGo: () => void }) {
         alt=""
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-36 -left-36 -z-10 h-72 w-72 select-none opacity-[0.07]"
+        style={{
+          WebkitMaskImage: "radial-gradient(circle at 50% 50%, black 55%, transparent 70%)",
+          maskImage: "radial-gradient(circle at 50% 50%, black 55%, transparent 70%)",
+        }}
       />
     </div>
   );

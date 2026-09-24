@@ -35,38 +35,62 @@
   --color-surface: var(--surface);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
-  --font-display: "Manrope", system-ui, sans-serif;
-  --font-sans: "Manrope", system-ui, sans-serif;
+  --color-ink: var(--ink);
+  --color-faint: var(--faint);
+  --color-dark: var(--dark);
+  --color-green: var(--green);
+  --color-red: var(--red);
+  --color-line: var(--line);
+  --color-avatar: var(--avatar);
+  --color-soft-card: var(--soft-card);
+  --color-stage: var(--stage);
+  --color-system: var(--system);
+  --color-system-icon: var(--system-icon);
+  --shadow-soft: 0 2px 14px rgb(17 19 21 / 0.05);
+  --shadow-phone: 0 20px 55px rgb(17 19 21 / 0.12);
+  --font-display: "Inter", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
 }
 
 :root {
   --radius: 1rem;
-  --background: hsl(0 0% 97%);
-  --foreground: hsl(0 0% 7%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(0 0% 7%);
+  --background: #F1F2F4;
+  --foreground: #111315;
+  --card: #FFFFFF;
+  --card-foreground: #111315;
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(0 0% 7%);
   --primary: hsl(160 100% 33%);
   --primary-foreground: hsl(0 0% 100%);
   --secondary: hsl(0 0% 93%);
   --secondary-foreground: hsl(0 0% 15%);
-  --muted: hsl(0 0% 93%);
-  --muted-foreground: hsl(0 0% 45%);
+  --muted: #ECEEF0;
+  --muted-foreground: #8B9099;
   --accent: hsl(160 100% 33%);
   --accent-foreground: hsl(0 0% 100%);
   --destructive: hsl(0 72% 51%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(0 0% 88%);
-  --input: hsl(0 0% 88%);
-  --ring: hsl(160 100% 33%);
+  --border: #ECEEF0;
+  --input: #ECEEF0;
+  --ring: #15A57A;
   --success: hsl(142 71% 45%);
   --success-foreground: hsl(0 0% 100%);
 
   /* aloQa brand */
-  --brand: hsl(160 100% 33%);
+  --brand: #15A57A;
   --brand-foreground: hsl(0 0% 100%);
-  --surface: hsl(0 0% 7%);
+  --surface: #1E222A;
+  --ink: #111315;
+  --faint: #BCC0C7;
+  --dark: #1E222A;
+  --green: #15A57A;
+  --red: #E5484D;
+  --line: #ECEEF0;
+  --avatar: #E7E9EC;
+  --soft-card: #FAFAFB;
+  --stage: #E6E7E9;
+  --system: #B4B7BC;
+  --system-icon: #92969D;
   --aloqa-green: 160 100% 33%;
   --aloqa-teal: 165 100% 40%;
   --beeline-black: 0 0% 7%;
@@ -79,7 +103,7 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "Manrope", system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 }

@@ -1282,7 +1282,8 @@ function TabSvyaz({
       <div className="relative flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5 overflow-hidden">
         <svg
           aria-hidden
-          className="pointer-events-none absolute -top-7 -right-7 h-32 w-32 text-foreground/[0.07]"
+          className="pointer-events-none absolute -top-3 -right-3 h-24 w-24 text-foreground/[0.08]"
+          preserveAspectRatio="xMaxYMax meet"
           viewBox="0 0 160 160"
           fill="none"
           stroke="currentColor"

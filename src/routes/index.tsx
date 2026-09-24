@@ -1528,8 +1528,22 @@ function BankIntro({ onGo }: { onGo: () => void }) {
         <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t("Оформление онлайн за пару минут — без похода в банк.")}</p>
       </div>
 
-      <div className="rounded-2xl bg-card border border-border p-3 shadow-sm shadow-foreground/5">
-        <MirCard />
+      <div className="relative overflow-hidden rounded-2xl p-5 text-primary-foreground shadow-sm" style={{ background: "linear-gradient(135deg, hsl(160 100% 33%) 0%, hsl(165 100% 28%) 60%, hsl(165 100% 22%) 100%)" }}>
+        <div className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/10" />
+        <div className="absolute -left-10 -bottom-14 h-28 w-28 rounded-full bg-white/5" />
+        <div className="absolute right-5 top-5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground/90">
+          {t("Альфа-Банк")}
+        </div>
+        <div className="relative">
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-white/15 ring-4 ring-white/10">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="mt-4 flex items-baseline gap-1.5">
+            <span className="text-4xl font-black leading-none tracking-tight">1000 ₽</span>
+            <span className="text-base font-extrabold text-primary-foreground/90">{t("на связь")}</span>
+          </div>
+          <p className="mt-1.5 text-xs font-semibold leading-relaxed text-primary-foreground/80">{t("Бонус после первой покупки по карте партнёра")}</p>
+        </div>
       </div>
 
       <div className="relative overflow-hidden rounded-2xl bg-surface p-4 text-primary-foreground">

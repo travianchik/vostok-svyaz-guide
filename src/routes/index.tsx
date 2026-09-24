@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { t, setLang as setI18nLang, loadLang, type Lang } from "@/lib/i18n";
 import promoRules from "@/assets/pravila-akcii-s-keshbekom.docx.asset.json";
-import ornamentMedallion from "@/assets/ornament-medallion.png.asset.json";
 import {
   ArrowLeft,
   ArrowRight,
@@ -1281,12 +1280,6 @@ function TabSvyaz({
     <div className="px-4 pt-1 space-y-3">
       {/* User header */}
       <div className="relative flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5 overflow-hidden">
-        <img
-          aria-hidden
-          src={ornamentMedallion.url}
-          alt=""
-          className="pointer-events-none absolute top-1/2 -translate-y-1/2 -right-10 h-36 w-36 opacity-[0.12] select-none"
-        />
         <div className="w-10 h-10 rounded-full bg-muted grid place-items-center shrink-0">
           <User className="h-4 w-4 text-muted-foreground" />
         </div>
@@ -1368,8 +1361,12 @@ function TabSvyaz({
                   {t("Баланс абонента доступен для номеров Билайн. Закажите сим-карту Билайн, чтобы получить полный доступ к сервису aloQa")}
                 </div>
               </div>
+              <Button disabled className="h-9 min-w-28 rounded-xl bg-brand px-4 text-xs font-bold text-brand-foreground shadow-none">
+                {t("Пополнить")}
+              </Button>
             </div>
           </div>
+
 
           {/* Tariff */}
           <div className="flex items-center gap-2 px-0.5 pt-1">

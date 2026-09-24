@@ -1366,10 +1366,70 @@ function TabSvyaz({
         </>
       ) : (
         <>
-          {/* Non-Beeline balance placeholder */}
-          <div className="rounded-2xl bg-card border border-border p-5">
-            <div className="text-sm font-semibold leading-snug text-foreground">
-              {t("Баланс абонента доступен для номеров Билайн. Закажите нашу сим-карту, чтобы получить полный доступ к сервису aloQa")}
+          {/* Balance card — same visual as Beeline, phrase differs */}
+          <div className="rounded-2xl bg-card border border-border px-4 py-3.5 shadow-sm shadow-foreground/5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="text-lg font-extrabold leading-none tracking-widest text-muted-foreground select-none">
+                  •••• ₽
+                </div>
+                <div className="text-[10px] text-muted-foreground mt-1 leading-snug max-w-[230px]">
+                  {t("Баланс абонента доступен для номеров Билайн. Закажите нашу сим-карту, чтобы получить полный доступ к сервису aloQa")}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tariff */}
+          <div className="flex items-center gap-2 px-0.5 pt-1">
+            <h2 className="text-xs font-bold">{t("Тариф")}</h2>
+            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-brand text-brand-foreground">{t("твой тариф")}</span>
+          </div>
+          <div className="relative -mt-1">
+            <div className="grid grid-cols-2 gap-2.5 blur-[3px] select-none pointer-events-none">
+              <div className="px-4 py-3.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
+                <div className="text-sm font-bold">25/35</div>
+                <div className="text-[9px] text-muted-foreground mt-3">{t("Гигабайты")}</div>
+              </div>
+              <div className="px-4 py-3.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
+                <div className="text-sm font-bold">200/250</div>
+                <div className="text-[9px] text-muted-foreground mt-3">{t("Минуты")}</div>
+              </div>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground/90 text-background text-[9px] font-bold shadow-lg">
+                <Wrench className="h-3 w-3" />{t("Раздел в разработке")}</div>
+            </div>
+          </div>
+
+          {/* Round actions */}
+          <div className="grid grid-cols-3 gap-2 pt-0.5">
+            {[
+              { icon: Settings, label: t("Настроить тариф") },
+              { icon: Layers, label: t("Услуги и сервисы") },
+              { icon: PieChart, label: t("Мои расходы") },
+            ].map(({ icon: Icon, label }) => (
+              <Button
+                variant="ghost"
+                key={label}
+                onClick={() => showDev(`${label.replace("\n", " ")} — в разработке`)}
+                className="h-auto flex-col gap-2 whitespace-normal p-0 hover:bg-transparent active:scale-[0.97]"
+              >
+                <div className="w-11 h-11 rounded-full bg-card border border-border grid place-items-center shadow-sm shadow-foreground/5">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <span className="max-w-20 text-[9px] font-normal text-center text-muted-foreground leading-tight whitespace-pre-line">
+                  {label}
+                </span>
+              </Button>
+            ))}
+          </div>
+
+          {/* Special offers */}
+          <div className="pt-1">
+            <h2 className="text-xs font-bold px-0.5 mb-2">{t("Специальные предложения")}</h2>
+            <div className="min-h-24 rounded-xl bg-surface p-4 text-primary-foreground">
+              <div className="text-[10px] font-medium leading-relaxed">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
             </div>
           </div>
 

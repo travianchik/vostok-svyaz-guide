@@ -1349,9 +1349,9 @@ function TabSvyaz({
 
           {/* Special offers */}
           <div className="pt-1">
-            <h2 className="text-xs font-bold px-0.5 mb-2">{t("Специальные предложения")}</h2>
-            <div className="min-h-24 rounded-xl bg-surface p-4 text-primary-foreground">
-              <div className="text-[10px] font-medium leading-relaxed">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
+            <h2 className="text-sm font-extrabold px-0.5 mb-2">{t("Специальные предложения")}</h2>
+            <div className="min-h-20 rounded-2xl bg-surface p-4 text-primary-foreground flex items-center">
+              <div className="text-sm font-bold leading-snug">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
             </div>
           </div>
         </>
@@ -1418,9 +1418,9 @@ function TabSvyaz({
 
           {/* Special offers */}
           <div className="pt-1">
-            <h2 className="text-xs font-bold px-0.5 mb-2">{t("Специальные предложения")}</h2>
-            <div className="min-h-24 rounded-xl bg-surface p-4 text-primary-foreground">
-              <div className="text-[10px] font-medium leading-relaxed">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
+            <h2 className="text-sm font-extrabold px-0.5 mb-2">{t("Специальные предложения")}</h2>
+            <div className="min-h-20 rounded-2xl bg-surface p-4 text-primary-foreground flex items-center">
+              <div className="text-sm font-bold leading-snug">{t("Следите за вашим балансом")}<br />{t("и управляйте связью")}</div>
             </div>
           </div>
 

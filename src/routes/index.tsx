@@ -1614,6 +1614,14 @@ function BankIntro({ onGo }: { onGo: () => void }) {
       </div>
 
       <p className="px-3 text-center text-[10px] leading-relaxed text-muted-foreground">{t("Банковские услуги предоставляет АО «Альфа-Банк». Продолжая, вы перейдёте\n        в защищённый раздел партнёра внутри приложения.")}</p>
+
+      <img
+        src={balanceCardOrnament.url}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-36 -left-36 -z-10 h-72 w-72 select-none opacity-[0.14]"
+        style={{ filter: "brightness(0) invert(1)" }}
+      />
     </div>
   );
 }

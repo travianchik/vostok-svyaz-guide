@@ -1543,7 +1543,13 @@ function BankIntro({ onGo }: { onGo: () => void }) {
           className="pointer-events-none absolute -bottom-16 -right-14 h-56 w-56 select-none opacity-[0.16]"
           style={{ filter: "brightness(0) invert(1)" }}
         />
-        <div className="absolute -left-10 -bottom-14 h-28 w-28 rounded-full bg-white/5" />
+        <img
+          src={balanceCardOrnament.url}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-28 -left-28 h-56 w-56 select-none opacity-[0.14]"
+          style={{ filter: "brightness(0) invert(1)" }}
+        />
         <div className="absolute right-5 top-5 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground/90">
           {t("Альфа-Банк")}
         </div>

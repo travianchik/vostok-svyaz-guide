@@ -1616,7 +1616,7 @@ function BankIntro({ onGo }: { onGo: () => void }) {
         src={balanceCardOrnament.url}
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-2 -left-2 -z-10 h-40 w-40 select-none opacity-[0.07]"
+        className="pointer-events-none absolute -bottom-[139px] -left-36 -z-10 h-72 w-72 select-none opacity-[0.07]"
       />
 
     </div>

@@ -1279,7 +1279,23 @@ function TabSvyaz({
   return (
     <div className="px-4 pt-1 space-y-3">
       {/* User header */}
-      <div className="flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5">
+      <div className="relative flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-card border border-border shadow-sm shadow-foreground/5 overflow-hidden">
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute -top-4 -right-4 h-24 w-24 text-foreground/[0.06]"
+          viewBox="0 0 100 100"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <path d="M100 0 C60 10 50 40 70 55 C85 66 100 60 100 45" />
+          <path d="M100 20 C75 26 68 45 80 56 C90 64 100 58 100 48" />
+          <circle cx="86" cy="38" r="10" />
+          <path d="M70 55 C55 70 55 88 70 100" />
+          <path d="M58 60 C48 74 48 88 58 100" />
+          <path d="M86 28 l4 4 M90 24 l4 4 M94 20 l4 4" />
+          <path d="M30 100 C40 82 55 75 70 78 C60 86 55 95 55 100 Z" />
+        </svg>
         <div className="w-10 h-10 rounded-full bg-muted grid place-items-center shrink-0">
           <User className="h-4 w-4 text-muted-foreground" />
         </div>

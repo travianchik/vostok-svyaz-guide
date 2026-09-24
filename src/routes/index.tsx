@@ -1282,12 +1282,14 @@ function TabSvyaz({
     <div className="space-y-5 px-5 pt-1">
       {/* User header */}
       <div className="relative flex min-h-[92px] items-center gap-4 overflow-hidden rounded-[28px] border border-border bg-card px-6 py-5 shadow-sm shadow-foreground/5">
-        <img
-          src={balanceCardOrnament.url}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-14 -top-12 h-44 w-44 select-none opacity-[0.055]"
-        />
+        {/* Ornament: only the top-left quarter of the medallion, fully inside the card */}
+        <div className="pointer-events-none absolute right-0 top-0 h-[88px] w-[88px] select-none overflow-hidden" aria-hidden="true">
+          <img
+            src={balanceCardOrnament.url}
+            alt=""
+            className="absolute left-0 top-0 h-[176px] w-[176px] opacity-[0.055]"
+          />
+        </div>
         <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-muted">
           <User className="h-6 w-6 text-muted-foreground" />
         </div>
